@@ -17,17 +17,17 @@ import uk.gov.service.notify.SendEmailResponse;
 public abstract class WebformServiceImplTestBase {
   static final String SEND_EMAIL_RESPONSE_JSON =
       "{\"content\" : {"
-          + "\"body\" : null,"
+          + "\"body\" : \"\","
           + "\"from_email\" : \"census.2021@test.gov.uk\","
           + "\"subject\" : \"COMPLAINT\"},"
           + "\"id\" : \"8db6313a-d4e3-47a1-8d0e-ddd30c86e878\","
           + "\"reference\" : \"88e4a66a-1a8d-4b8e-802d-b8a9dd10528d\","
-          + "\"scheduled_for\" :null,"
+          + "\"scheduled_for\" :\"\","
           + "\"template\" : {"
           + "\"id\" : \"457d8d8c-bdcb-4875-8f2f-88030643ad13\","
-          + "\"uri\" : null,"
+          + "\"uri\" : \"\","
           + "\"version\" : \"1\" },"
-          + "\"uri\" : null }";
+          + "\"uri\" : \"\" }";
 
   @Autowired WebformService webformService;
 

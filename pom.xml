@@ -27,9 +27,9 @@
   </parent>
 
   <scm>
-    <connection>scm:git:https://github.com/ONSdigital/census-rh-service</connection>
-    <developerConnection>scm:git:https://github.com/ONSdigital/census-rh-service</developerConnection>
-    <url>https://github.com/ONSdigital/census-rh-service</url>
+    <connection>scm:git:https://github.com/ONSdigital/sdc-int-rh-service</connection>
+    <developerConnection>scm:git:https://github.com/ONSdigital/sdc-int-rh-service</developerConnection>
+    <url>https://github.com/ONSdigital/sdc-int-rh-service</url>
     <tag>rhsvc-0.0.0</tag>
   </scm>
 
@@ -477,7 +477,7 @@
             </goals>
             <phase>package</phase>
             <configuration>
-              <repository>census-rh-service/${project.artifactId}</repository>
+              <repository>sdc-int-rh-service/${project.artifactId}</repository>
               <buildArgs>
                 <JAR_FILE>${project.build.finalName}.jar</JAR_FILE>
               </buildArgs>

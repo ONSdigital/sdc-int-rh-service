@@ -1,5 +1,3 @@
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/c11c38daa91f48818dca0a1e3a6837ea)](https://www.codacy.com/app/philwhiles/census-rh-service?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ONSdigital/census-rh-service&amp;utm_campaign=Badge_Grade)
-[![Build Status](https://concourse.census-gcp.onsdigital.uk/api/v1/teams/int/pipelines/respondent-home/jobs/rhsvc-build/badge)](https://concourse.census-gcp.onsdigital.uk/teams/int/pipelines/respondent-home/jobs/rhui-build)
 
 # Respondent Home Data Service
 This repository contains the Respondent Data service. This microservice is a RESTful web service implemented using [Spring Boot](http://projects.spring.io/spring-boot/). It manages respondent data, where a Respondent Data object represents an expected response from the Respondent Data service, which provides all the data that is required by Respondent Home in order for it to verify the respondent's UAC code and connect them to the relevant EQ questionnaire.
@@ -10,10 +8,8 @@ Do the following steps to set up the code to run locally:
 * Install Docker: Sign in to docker hub and then install docker by downloading it from https://hub.docker.com/editions/community/docker-ce-desktop-mac
 * Install maven
 * Clone the following git repositories:
-* https://github.com/ONSdigital/census-int-common-config
-* https://github.com/ONSdigital/census-int-common-service
-* https://github.com/ONSdigital/census-int-common-test-framework
-* https://github.com/ONSdigital/census-rh-service
+* https://github.com/ONSdigital/sdc-int-common
+* https://github.com/ONSdigital/sdc-int-rh-service
 * Make sure that you have a suitable settings.xml file in your local .m2 directory
 * Run a mvn clean install for each of the cloned repos in turn. This will install each of them into your local maven repository.
 
@@ -55,12 +51,12 @@ There are two ways of running this service
     ```
 This will create the JAR file in the Target directory. You can then right-click on the JAR file (in Intellij) and choose 'Run'.
 
-In order to run the Rabbitmq service, so that you can publish CaseCreated, CaseUpdated, and UACUpdated, messages for this census-rh-service to receive and store in Google CLoud Platform, enter the following command (from the same directory as the docker-compose.yml):
+In order to run the Rabbitmq service, so that you can publish CaseCreated, CaseUpdated, and UACUpdated, messages for this rh-service to receive and store in Google CLoud Platform, enter the following command (from the same directory as the docker-compose.yml):
     ```bash
     docker-compose up -d
     ```
 Messages that are published to the events exchange will be routed to either the Case.Gateway or UAC.Gateway queue (depending on their binding).
-They will then be received by census-rh-service and stored in either the case_schema or the uac_schema (as appropriate) of the relevant Google Firestore datastore.
+They will then be received by sdc-int-rh-service and stored in either the case_schema or the uac_schema (as appropriate) of the relevant Google Firestore datastore.
 The project to use is given by the Application Default Credentials (These are the credential associated with the service account that your app engine app runs as - to set these up please follow the steps given in the previous section).
 
 

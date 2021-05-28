@@ -8,6 +8,6 @@ export VERSIONTAG=$TRAVIS_BUILD_ID"-"$BRANCH
 
 echo "Building with tags [$VERSIONTAG]"
 
-docker build -t eu.gcr.io/census-int-ci/census-rh-service:$VERSIONTAG .
-docker push eu.gcr.io/census-int-ci/census-rh-service:$VERSIONTAG
+docker build -t eu.gcr.io/census-int-ci/sdc-int-rh-service:$VERSIONTAG .
+docker push eu.gcr.io/census-int-ci/sdc-int-rh-service:$VERSIONTAG
 
