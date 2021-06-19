@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
   <groupId>ons.sdc.int.app</groupId>
@@ -38,6 +40,9 @@
       </activation>
       <repositories>
         <repository>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
           <id>notify-repo</id>
           <url>https://dl.bintray.com/gov-uk-notify/maven</url>
         </repository>
@@ -69,18 +74,18 @@
     </dependency>
 
     <dependency>
-       <groupId>org.springframework.boot</groupId>
-       <artifactId>spring-boot-starter-integration</artifactId>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-integration</artifactId>
     </dependency>
 
     <dependency>
-        <groupId>org.springframework.integration</groupId>
-        <artifactId>spring-integration-core</artifactId>
+      <groupId>org.springframework.integration</groupId>
+      <artifactId>spring-integration-core</artifactId>
     </dependency>
 
     <dependency>
-        <groupId>org.springframework.integration</groupId>
-        <artifactId>spring-integration-amqp</artifactId>
+      <groupId>org.springframework.integration</groupId>
+      <artifactId>spring-integration-amqp</artifactId>
     </dependency>
 
     <dependency>
@@ -127,7 +132,7 @@
     <dependency>
       <groupId>com.godaddy</groupId>
       <artifactId>logging</artifactId>
-      </dependency>
+    </dependency>
 
     <dependency>
       <groupId>com.sun.xml.messaging.saaj</groupId>
@@ -315,8 +320,8 @@
       </plugin>
 
       <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>buildnumber-maven-plugin</artifactId>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>buildnumber-maven-plugin</artifactId>
       </plugin>
 
       <plugin>
@@ -341,7 +346,7 @@
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.8.2</version>
+        <version>${jacoco.version}</version>
         <configuration>
           <!-- exclude generated classes that cause javaco failures -->
           <excludes>
@@ -425,7 +430,7 @@
           <reuseForks>true</reuseForks>
           <argLine>${surefireArgLine}</argLine>
           <classpathDependencyExcludes>
-              <classpathDependencyExcludes>${project.groupId}:${project.artifactId}</classpathDependencyExcludes>
+            <classpathDependencyExcludes>${project.groupId}:${project.artifactId}</classpathDependencyExcludes>
           </classpathDependencyExcludes>
           <additionalClasspathElements>
             <additionalClasspathElement>${project.build.outputDirectory}</additionalClasspathElement>
