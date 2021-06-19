@@ -21,13 +21,12 @@
     <groupId>ons.sdc.int.common</groupId>
     <artifactId>common</artifactId>
     <!-- change this to the version of ALL common libs to be used by this build -->
-    <version>1.0.4</version>
+    <version>1.0.7</version>
   </parent>
 
   <scm>
-    <connection>scm:git:https://github.com/ONSdigital/sdc-int-rh-service</connection>
-    <developerConnection>scm:git:https://github.com/ONSdigital/sdc-int-rh-service</developerConnection>
-    <url>https://github.com/ONSdigital/sdc-int-rh-service</url>
+    <connection>scm:git:ssh://github.com/ONSdigital/sdc-int-rh-service</connection>
+    <developerConnection>scm:git:ssh://github.com/ONSdigital/sdc-int-rh-service</developerConnection>
     <tag>rhsvc-0.0.0</tag>
   </scm>
 
@@ -259,6 +258,14 @@
   <build>
     <defaultGoal>clean install</defaultGoal>
 
+    <extensions>
+      <extension>
+        <groupId>com.google.cloud.artifactregistry</groupId>
+        <artifactId>artifactregistry-maven-wagon</artifactId>
+        <version>2.1.1</version>
+      </extension>
+    </extensions>
+    
     <plugins>
       <plugin>
         <groupId>com.dkanejs.maven.plugins</groupId>
@@ -492,4 +499,5 @@
       </resource>
     </resources>
   </build>
+
 </project>
