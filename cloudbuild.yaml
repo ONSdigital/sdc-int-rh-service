@@ -16,11 +16,9 @@ steps:
     args: ['-Dmaven.repo.local=/workspace/.m2/repository', 'test']
     entrypoint: mvn
 
-  - name: 'maven:3-jdk-11'
-    id: Maven Deploy
-    args: ['-Dmaven.repo.local=/workspace/.m2/repository', 'deploy', '-Dmaven.test.skip=true']
-    entrypoint: mvn
-      #
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [ 'build', '-t', 'europe-west2-docker.pkg.dev/ons-ci-int/int-docker-snapshot/rh-service', '-f', 'Dockerfile', '.' ]
+
   # Update M2 repo cache
   - name: europe-west2-docker.pkg.dev/ons-ci-int/int-docker-ci/cloudbuild/tar
     id: Compress M2 Cache
