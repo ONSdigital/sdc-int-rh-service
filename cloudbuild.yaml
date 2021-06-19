@@ -1,0 +1,36 @@
+steps:
+  # Grab cached M2 repo
+  - name: gcr.io/cloud-builders/gsutil
+    id: Get M2 Cache
+    args: ['cp', 'gs://ons-ci-int-cloudbuild-maven-cache/m2.tar.gz', 'm2.tar.gz']
+      #
+  # See https://github.com/GoogleCloudPlatform/cloud-builders-community to get the tar command
+  - name: europe-west2-docker.pkg.dev/ons-ci-int/int-docker-ci/cloudbuild/tar
+    id: Expand M2 Cache
+    args: ['xpzf', 'm2.tar.gz']
+
+  - name: 'maven:3-jdk-11'
+    id: Maven Test
+    env:
+      - TZ=Europe/London
+    args: ['-Dmaven.repo.local=/workspace/.m2/repository', 'test']
+    entrypoint: mvn
+
+  - name: 'maven:3-jdk-11'
+    id: Maven Deploy
+    args: ['-Dmaven.repo.local=/workspace/.m2/repository', 'deploy', '-Dmaven.test.skip=true']
+    entrypoint: mvn
+      #
+  # Update M2 repo cache
+  - name: europe-west2-docker.pkg.dev/ons-ci-int/int-docker-ci/cloudbuild/tar
+    id: Compress M2 Cache
+    args: ['cpzf', 'm2.tar.gz', '.m2']
+
+  - name: gcr.io/cloud-builders/gsutil
+    id: Save M2 Cache
+    args: ['cp', 'm2.tar.gz', 'gs://ons-ci-int-cloudbuild-maven-cache/m2.tar.gz']
+
+
+
+
+
