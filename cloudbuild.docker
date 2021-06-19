@@ -5,6 +5,6 @@ RUN apt-get -yq clean
 RUN groupadd -g 985 rhsvc && \
     useradd -r -u 985 -g rhsvc rhsvc
 USER rhsvc
-COPY /workspace/target/rhsvc-0.0.0.jar /opt/rhsvc.jar
+COPY target/rhsvc-0.0.0.jar /opt/rhsvc.jar
 
 ENTRYPOINT [ "java", "-jar", "/opt/rhsvc.jar" ]

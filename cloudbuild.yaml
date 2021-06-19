@@ -16,7 +16,7 @@ steps:
     args: ['-Dmaven.repo.local=/workspace/.m2/repository', 'package']
     entrypoint: mvn
 
-  - name: 'docker'
+  - name: 'gcr.io/cloud-builders/docker'
     args: [ 'build', '-t', 'europe-west2-docker.pkg.dev/ons-ci-int/int-docker-snapshot/rh-service', '-f', 'cloudbuild.docker', '.' ]
 
   # Update M2 repo cache
@@ -28,6 +28,7 @@ steps:
     id: Save M2 Cache
     args: ['cp', 'm2.tar.gz', 'gs://ons-ci-int-cloudbuild-maven-cache/m2.tar.gz']
 
+images: [ 'europe-west2-docker.pkg.dev/ons-ci-int/int-docker-snapshot/rh-service' ]
 
 
 
