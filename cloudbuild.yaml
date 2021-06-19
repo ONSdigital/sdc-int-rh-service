@@ -10,10 +10,10 @@ steps:
     args: ['xpzf', 'm2.tar.gz']
 
   - name: 'maven:3-jdk-11'
-    id: Maven Test
+    id: Maven Package
     env:
       - TZ=Europe/London
-    args: ['-Dmaven.repo.local=/workspace/.m2/repository', 'test']
+    args: ['-Dmaven.repo.local=/workspace/.m2/repository', 'package']
     entrypoint: mvn
 
   - name: 'docker'
