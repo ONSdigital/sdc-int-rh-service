@@ -1,9 +1,8 @@
 package uk.gov.ons.ctp.integration.rhsvc.service.impl;
 
 import static java.util.stream.Collectors.toList;
+import static uk.gov.ons.ctp.common.log.ScopedStructuredArguments.kv;
 
-import com.godaddy.logging.Logger;
-import com.godaddy.logging.LoggerFactory;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 import ma.glasnost.orika.MapperFacade;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,11 +47,9 @@ import uk.gov.ons.ctp.integration.rhsvc.representation.SMSFulfilmentRequestDTO;
 import uk.gov.ons.ctp.integration.rhsvc.service.CaseService;
 
 /** Implementation to deal with Case data */
+@Slf4j
 @Service
 public class CaseServiceImpl implements CaseService {
-
-  private static final Logger log = LoggerFactory.getLogger(CaseServiceImpl.class);
-
   @Autowired private AppConfig appConfig;
   @Autowired private RespondentDataRepository dataRepo;
   @Autowired private MapperFacade mapperFacade;
@@ -66,12 +64,13 @@ public class CaseServiceImpl implements CaseService {
     Optional<CollectionCase> caseFound =
         dataRepo.readNonHILatestCollectionCaseByUprn(Long.toString(uprn.getValue()), true);
     if (caseFound.isPresent()) {
-      log.with("case", caseFound.get().getId())
-          .with("uprn", uprn)
-          .debug("non HI latest valid case retrieved for UPRN");
+      log.debug(
+          "non HI latest valid case retrieved for UPRN",
+          kv("case", caseFound.get().getId()),
+          kv("uprn", uprn));
       return mapperFacade.map(caseFound.get(), CaseDTO.class);
     } else {
-      log.with("uprn", uprn).warn("No cases returned for uprn");
+      log.warn("No cases returned for uprn", kv("uprn", uprn));
       throw new CTPException(Fault.RESOURCE_NOT_FOUND, "Failed to retrieve Case");
     }
   }
@@ -90,9 +89,7 @@ public class CaseServiceImpl implements CaseService {
       CaseType caseType = ServiceUtil.determineCaseType(request);
       CollectionCase newCase =
           ServiceUtil.createCase(request, caseType, appConfig.getCollectionExerciseId());
-      log.with("caseId", newCase.getId())
-          .with("primaryCaseType", caseType)
-          .debug("Created new case");
+      log.debug("Created new case", kv("caseId", newCase.getId()), kv("primaryCaseType", caseType));
 
       // Store new case in Firestore
       dataRepo.writeCollectionCase(newCase);
@@ -114,7 +111,7 @@ public class CaseServiceImpl implements CaseService {
     Optional<CollectionCase> caseMatch = dataRepo.readCollectionCase(caseId);
 
     if (caseMatch.isEmpty()) {
-      log.with("caseId", caseId).warn("Failed to retrieve Case from storage");
+      log.warn("Failed to retrieve Case from storage", kv("caseId", caseId));
       throw new CTPException(
           CTPException.Fault.RESOURCE_NOT_FOUND, "Failed to retrieve Case for caseId: {}", caseId);
     }
@@ -147,9 +144,10 @@ public class CaseServiceImpl implements CaseService {
 
     CaseDTO caseData = mapperFacade.map(rmCase, CaseDTO.class);
     if (!caseData.getAddress().getUprn().equals(addressChanges.getAddress().getUprn())) {
-      log.with("caseId", caseId)
-          .with("uprn", addressChanges.getAddress().getUprn().toString())
-          .warn("The UPRN of the referenced Case and the provided Address UPRN must be matching");
+      log.warn(
+          "The UPRN of the referenced Case and the provided Address UPRN must be matching",
+          kv("caseId", caseId),
+          kv("uprn", addressChanges.getAddress().getUprn().toString()));
       throw new CTPException(
           CTPException.Fault.BAD_REQUEST,
           "The UPRN of the referenced Case and the provided Address UPRN must be matching");
@@ -168,9 +166,10 @@ public class CaseServiceImpl implements CaseService {
   private void sendAddressModifiedEvent(
       String caseId, AddressCompact originalAddress, AddressCompact newAddress) {
 
-    log.with("caseId", caseId)
-        .with("uprn", originalAddress.getUprn())
-        .debug("Generating AddressModified event");
+    log.debug(
+        "Generating AddressModified event",
+        kv("caseId", caseId),
+        kv("uprn", originalAddress.getUprn()));
 
     AddressModification addressModification =
         AddressModification.builder()
@@ -183,9 +182,10 @@ public class CaseServiceImpl implements CaseService {
         eventPublisher.sendEvent(
             EventType.ADDRESS_MODIFIED, Source.RESPONDENT_HOME, Channel.RH, addressModification);
 
-    log.with("caseId", caseId)
-        .with("transactionId", transactionId)
-        .debug("AddressModified event published");
+    log.debug(
+        "AddressModified event published",
+        kv("caseId", caseId),
+        kv("transactionId", transactionId));
   }
 
   /**
@@ -249,7 +249,7 @@ public class CaseServiceImpl implements CaseService {
       throws CTPException {
     if (appConfig.getRateLimiter().isEnabled()) {
       for (Product product : products) {
-        log.with("fulfilmentCode", product.getFulfilmentCode()).debug("Recording rate-limiting");
+        log.debug("Recording rate-limiting", kv("fulfilmentCode", product.getFulfilmentCode()));
         CaseType caseType = CaseType.valueOf(caseDetails.getCaseType());
         UniquePropertyReferenceNumber uprn =
             UniquePropertyReferenceNumber.create(caseDetails.getAddress().getUprn());
@@ -286,9 +286,10 @@ public class CaseServiceImpl implements CaseService {
       List<Product> products,
       CollectionCase caseDetails)
       throws CTPException {
-    log.with("fulfilmentCodes", request.getFulfilmentCodes())
-        .with("deliveryChannel", deliveryChannel)
-        .debug("Entering createAndSendFulfilment");
+    log.debug(
+        "Entering createAndSendFulfilment",
+        kv("fulfilmentCodes", request.getFulfilmentCodes()),
+        kv("deliveryChannel", deliveryChannel));
 
     for (Product product : products) {
       FulfilmentRequest payload =
@@ -322,10 +323,11 @@ public class CaseServiceImpl implements CaseService {
 
   private Product findProduct(String fulfilmentCode, DeliveryChannel deliveryChannel, Region region)
       throws CTPException {
-    log.with("region", region)
-        .with("deliveryChannel", deliveryChannel)
-        .with("fulfilmentCode", fulfilmentCode)
-        .debug("Attempting to find product.");
+    log.debug(
+        "Attempting to find product.",
+        kv("region", region),
+        kv("deliveryChannel", deliveryChannel),
+        kv("fulfilmentCode", fulfilmentCode));
 
     // Build search criteria base on the cases details and the requested fulfilmentCode
     Product searchCriteria = new Product();
@@ -339,7 +341,7 @@ public class CaseServiceImpl implements CaseService {
         .findFirst()
         .orElseThrow(
             () -> {
-              log.with("searchCriteria", searchCriteria).warn("Compatible product cannot be found");
+              log.warn("Compatible product cannot be found", kv("searchCriteria", searchCriteria));
               return new CTPException(Fault.BAD_REQUEST, "Compatible product cannot be found");
             });
   }
@@ -350,7 +352,7 @@ public class CaseServiceImpl implements CaseService {
         .readCollectionCase(caseId.toString())
         .orElseThrow(
             () -> {
-              log.with("caseId", caseId).info("Case not found");
+              log.info("Case not found", kv("caseId", caseId));
               return new CTPException(Fault.RESOURCE_NOT_FOUND, "Case not found: " + caseId);
             });
   }
@@ -375,9 +377,8 @@ public class CaseServiceImpl implements CaseService {
     Optional<CollectionCase> caseFound =
         dataRepo.readNonHILatestCollectionCaseByUprn(Long.toString(uprn.getValue()), false);
     if (caseFound.isPresent()) {
-      log.with("case", caseFound.get().getId())
-          .with("uprn", uprn)
-          .debug("Existing case found by UPRN");
+      log.debug(
+          "Existing case found by UPRN", kv("case", caseFound.get().getId()), kv("uprn", uprn));
       result = Optional.of(mapperFacade.map(caseFound.get(), CaseDTO.class));
     }
 

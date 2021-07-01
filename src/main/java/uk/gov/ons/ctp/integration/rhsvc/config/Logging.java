@@ -6,7 +6,6 @@ import lombok.Data;
 
 @Data
 public class Logging {
-  private boolean useJson;
   @NotNull private Encryption encryption;
 
   @Data

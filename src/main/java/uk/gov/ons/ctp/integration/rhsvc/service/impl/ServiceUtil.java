@@ -1,10 +1,11 @@
 package uk.gov.ons.ctp.integration.rhsvc.service.impl;
 
-import com.godaddy.logging.Logger;
-import com.godaddy.logging.LoggerFactory;
+import static uk.gov.ons.ctp.common.log.ScopedStructuredArguments.kv;
+
 import java.util.Optional;
 import java.util.UUID;
 import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.ons.ctp.common.domain.AddressLevel;
 import uk.gov.ons.ctp.common.domain.AddressType;
 import uk.gov.ons.ctp.common.domain.CaseType;
@@ -24,9 +25,9 @@ import uk.gov.ons.ctp.integration.rhsvc.representation.CaseRequestDTO;
  * This class aims to prevent code duplication by holding code which is common to more than one
  * service.
  */
+@Slf4j
 @UtilityClass
 public class ServiceUtil {
-  private static final Logger log = LoggerFactory.getLogger(ServiceUtil.class);
 
   static CaseType determineCaseType(CaseRequestDTO request) {
     String caseTypeStr = null;
@@ -78,7 +79,7 @@ public class ServiceUtil {
 
   static void sendNewAddressEvent(EventPublisher eventPublisher, CollectionCase collectionCase) {
     String caseId = collectionCase.getId();
-    log.with("caseId", caseId).info("Generating NewAddressReported event");
+    log.info("Generating NewAddressReported event", kv("caseId", caseId));
 
     CollectionCaseNewAddress caseNewAddress = new CollectionCaseNewAddress();
     caseNewAddress.setId(caseId);
@@ -95,8 +96,9 @@ public class ServiceUtil {
         eventPublisher.sendEvent(
             EventType.NEW_ADDRESS_REPORTED, Source.RESPONDENT_HOME, Channel.RH, newAddress);
 
-    log.with("caseId", caseId)
-        .with("transactionId", transactionId)
-        .debug("NewAddressReported event published");
+    log.debug(
+        "NewAddressReported event published",
+        kv("caseId", caseId),
+        kv("transactionId", transactionId));
   }
 }

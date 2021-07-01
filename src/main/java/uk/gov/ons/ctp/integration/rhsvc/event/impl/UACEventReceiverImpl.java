@@ -1,10 +1,11 @@
 package uk.gov.ons.ctp.integration.rhsvc.event.impl;
 
-import com.godaddy.logging.Logger;
-import com.godaddy.logging.LoggerFactory;
+import static uk.gov.ons.ctp.common.log.ScopedStructuredArguments.kv;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.annotation.ServiceActivator;
@@ -18,16 +19,13 @@ import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
  * Service implementation responsible for receipt of UAC Events. See Spring Integration flow for
  * details of in bound queue.
  */
+@Slf4j
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @MessageEndpoint
 public class UACEventReceiverImpl {
-
-  private static final Logger log = LoggerFactory.getLogger(UACEventReceiverImpl.class);
-
   @Autowired private RespondentDataRepository respondentDataRepo;
-
   @Autowired private AppConfig appConfig;
 
   /**
@@ -43,23 +41,25 @@ public class UACEventReceiverImpl {
     UAC uac = uacEvent.getPayload().getUac();
     String uacTransactionId = uacEvent.getEvent().getTransactionId();
 
-    log.with("transactionId", uacTransactionId)
-        .with("caseId", uac.getCaseId())
-        .info("Entering acceptUACEvent");
+    log.info(
+        "Entering acceptUACEvent",
+        kv("transactionId", uacTransactionId),
+        kv("caseId", uac.getCaseId()));
 
     String qid = uac.getQuestionnaireId();
     if (isFilteredByQid(qid)) {
-      log.with("transactionId", uacTransactionId)
-          .with("caseId", uac.getCaseId())
-          .with("questionnaireId", qid)
-          .info("Filtering UAC Event because of questionnaire ID prefix");
+      log.info(
+          "Filtering UAC Event because of questionnaire ID prefix",
+          kv("transactionId", uacTransactionId),
+          kv("caseId", uac.getCaseId()),
+          kv("questionnaireId", qid));
       return;
     }
 
     try {
       respondentDataRepo.writeUAC(uac);
     } catch (CTPException ctpEx) {
-      log.with("uacTransactionId", uacTransactionId).error(ctpEx, "UAC Event processing failed");
+      log.error("UAC Event processing failed", kv("uacTransactionId", uacTransactionId), ctpEx);
       throw new CTPException(ctpEx.getFault());
     }
   }

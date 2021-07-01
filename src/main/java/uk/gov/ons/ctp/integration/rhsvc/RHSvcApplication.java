@@ -1,8 +1,5 @@
 package uk.gov.ons.ctp.integration.rhsvc;
 
-import com.godaddy.logging.Logger;
-import com.godaddy.logging.LoggerFactory;
-import com.godaddy.logging.LoggingConfigs;
 import io.micrometer.core.instrument.Meter;
 import io.micrometer.core.instrument.config.MeterFilter;
 import io.micrometer.core.instrument.config.MeterFilterReply;
@@ -12,7 +9,7 @@ import java.time.Duration;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
@@ -52,11 +49,11 @@ import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientApi;
 
 /** The 'main' entry point for the RHSvc SpringBoot Application. */
+@Slf4j
 @SpringBootApplication
 @IntegrationComponentScan("uk.gov.ons.ctp.integration")
 @ComponentScan(basePackages = {"uk.gov.ons.ctp.integration", "uk.gov.ons.ctp.common"})
 public class RHSvcApplication {
-  private static final Logger log = LoggerFactory.getLogger(RHSvcApplication.class);
 
   @Value("${management.metrics.export.stackdriver.project-id}")
   private String stackdriverProjectId;
@@ -163,16 +160,6 @@ public class RHSvcApplication {
   @Primary
   public CustomObjectMapper customObjectMapper() {
     return new CustomObjectMapper();
-  }
-
-  @Value("#{new Boolean('${logging.useJson}')}")
-  private boolean useJsonLogging;
-
-  @PostConstruct
-  public void initJsonLogging() {
-    if (useJsonLogging) {
-      LoggingConfigs.setCurrent(LoggingConfigs.getCurrent().useJson());
-    }
   }
 
   @Bean

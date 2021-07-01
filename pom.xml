@@ -23,7 +23,7 @@
     <groupId>ons.sdc.int.common</groupId>
     <artifactId>common</artifactId>
     <!-- change this to the version of ALL common libs to be used by this build -->
-    <version>1.0.14</version>
+    <version>1.0.17-SNAPSHOT</version>
   </parent>
 
   <scm>
@@ -127,11 +127,6 @@
     <dependency>
       <groupId>net.logstash.logback</groupId>
       <artifactId>logstash-logback-encoder</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>com.godaddy</groupId>
-      <artifactId>logging</artifactId>
     </dependency>
 
     <dependency>

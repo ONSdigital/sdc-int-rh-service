@@ -1,12 +1,13 @@
 package uk.gov.ons.ctp.integration.rhsvc.endpoint;
 
-import com.godaddy.logging.Logger;
-import com.godaddy.logging.LoggerFactory;
+import static uk.gov.ons.ctp.common.log.ScopedStructuredArguments.kv;
+
 import io.micrometer.core.annotation.Timed;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,12 +24,11 @@ import uk.gov.ons.ctp.integration.rhsvc.representation.ProductDTO;
 import uk.gov.ons.ctp.integration.rhsvc.service.FulfilmentsService;
 
 /** The REST controller for the RH Fulfilment end points */
+@Slf4j
 @Timed
 @RestController
 @RequestMapping(value = "/", produces = "application/json")
 public final class FulfilmentsEndpoint implements CTPEndpoint {
-  private static final Logger log = LoggerFactory.getLogger(FulfilmentsEndpoint.class);
-
   private FulfilmentsService fulfilmentsService;
 
   @Autowired
@@ -61,12 +61,13 @@ public final class FulfilmentsEndpoint implements CTPEndpoint {
       @RequestParam(required = false) Product.ProductGroup productGroup)
       throws CTPException {
 
-    log.with("requestParam.caseType", caseType)
-        .with("requestParam.region", region)
-        .with("requestParam.deliveryChannel", deliveryChannel)
-        .with("requestParam.individual", individual)
-        .with("requestParam.productGroup", productGroup)
-        .info("Entering GET getFulfilments");
+    log.info(
+        "Entering GET getFulfilments",
+        kv("requestParam.caseType", caseType),
+        kv("requestParam.region", region),
+        kv("requestParam.deliveryChannel", deliveryChannel),
+        kv("requestParam.individual", individual),
+        kv("requestParam.productGroup", productGroup));
     List<CaseType> caseTypes = caseType == null ? Collections.emptyList() : Arrays.asList(caseType);
     List<ProductDTO> fulfilments =
         fulfilmentsService.getFulfilments(
@@ -74,13 +75,13 @@ public final class FulfilmentsEndpoint implements CTPEndpoint {
 
     List<String> fulfilmentCodes =
         fulfilments.stream().map(ProductDTO::getFulfilmentCode).collect(Collectors.toList());
-    log.with("size", fulfilments.size())
-        .with("fulfilments", fulfilmentCodes)
-        .info("Found fulfilment(s)");
+    log.info(
+        "Found fulfilment(s)", kv("size", fulfilments.size()), kv("fulfilments", fulfilmentCodes));
 
-    log.with("requestParam.caseType", caseType)
-        .with("requestParam.productGroup", productGroup)
-        .debug("Exit GET getFulfilments");
+    log.debug(
+        "Exit GET getFulfilments",
+        kv("requestParam.caseType", caseType),
+        kv("requestParam.productGroup", productGroup));
 
     return ResponseEntity.ok(fulfilments);
   }

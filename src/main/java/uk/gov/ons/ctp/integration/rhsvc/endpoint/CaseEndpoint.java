@@ -1,10 +1,11 @@
 package uk.gov.ons.ctp.integration.rhsvc.endpoint;
 
-import com.godaddy.logging.Logger;
-import com.godaddy.logging.LoggerFactory;
+import static uk.gov.ons.ctp.common.log.ScopedStructuredArguments.kv;
+
 import io.micrometer.core.annotation.Timed;
 import java.util.UUID;
 import javax.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,12 +26,11 @@ import uk.gov.ons.ctp.integration.rhsvc.representation.SMSFulfilmentRequestDTO;
 import uk.gov.ons.ctp.integration.rhsvc.service.CaseService;
 
 /** The REST controller to deal with Cases */
+@Slf4j
 @Timed
 @RestController
 @RequestMapping(value = "/cases", produces = "application/json")
 public class CaseEndpoint {
-  private static final Logger log = LoggerFactory.getLogger(CaseEndpoint.class);
-
   @Autowired private CaseService caseService;
 
   /**
@@ -46,13 +46,15 @@ public class CaseEndpoint {
   public ResponseEntity<CaseDTO> createNewCase(@Valid @RequestBody CaseRequestDTO requestBodyDTO)
       throws CTPException {
     String methodName = "createNewCase";
-    log.with("UPRN", requestBodyDTO.getUprn())
-        .with("requestBody", requestBodyDTO)
-        .info("Entering POST {}", methodName);
+    log.info(
+        "Entering POST {}",
+        methodName,
+        kv("UPRN", requestBodyDTO.getUprn()),
+        kv("requestBody", requestBodyDTO));
 
     CaseDTO caseToReturn = caseService.createNewCase(requestBodyDTO);
 
-    log.with("UPRN", requestBodyDTO.getUprn()).debug("Exit POST {}", methodName);
+    log.debug("Exit POST {}", methodName, kv("UPRN", requestBodyDTO.getUprn()));
     return ResponseEntity.ok(caseToReturn);
   }
 
@@ -66,10 +68,10 @@ public class CaseEndpoint {
   @RequestMapping(value = "/uprn/{uprn}", method = RequestMethod.GET)
   public ResponseEntity<CaseDTO> getCaseByUPRN(
       @PathVariable(value = "uprn") final UniquePropertyReferenceNumber uprn) throws CTPException {
-    log.with("pathParam.uprn", uprn).info("Entering GET getLatestValidNonHICaseByUPRN");
+    log.info("Entering GET getLatestValidNonHICaseByUPRN", kv("pathParam.uprn", uprn));
 
     CaseDTO result = caseService.getLatestValidNonHICaseByUPRN(uprn);
-    log.with("pathParam.uprn", uprn).debug("Exit GET getLatestValidNonHICaseByUPRN");
+    log.debug("Exit GET getLatestValidNonHICaseByUPRN", kv("pathParam.uprn", uprn));
     return ResponseEntity.ok(result);
   }
 
@@ -77,7 +79,7 @@ public class CaseEndpoint {
       throws CTPException {
     if (!caseId.equals(dtoCaseId)) {
       String message = "The path parameter caseId does not match the caseId in the request body";
-      log.with("caseId", caseId).with("dtoName", dtoName).warn(message);
+      log.warn(message, kv("caseId", caseId), kv("dtoName", dtoName));
       throw new CTPException(Fault.BAD_REQUEST, message);
     }
   }
@@ -96,13 +98,15 @@ public class CaseEndpoint {
       @PathVariable("caseId") final UUID caseId, @Valid @RequestBody AddressChangeDTO addressChange)
       throws CTPException {
     String methodName = "modifyAddress";
-    log.with("pathParam.caseId", caseId)
-        .with("requestBody", addressChange)
-        .info("Entering PUT {}", methodName);
+    log.info(
+        "Entering PUT {}",
+        methodName,
+        kv("pathParam.caseId", caseId),
+        kv("requestBody", addressChange));
 
     validateMatchingCaseId(caseId, addressChange.getCaseId(), methodName);
     CaseDTO result = caseService.modifyAddress(addressChange);
-    log.with("pathParam.caseId", caseId).debug("Exit {}", methodName);
+    log.debug("Exit {}", methodName, kv("pathParam.caseId", caseId));
     return ResponseEntity.ok(result);
   }
 
@@ -122,9 +126,11 @@ public class CaseEndpoint {
       @Valid @RequestBody SMSFulfilmentRequestDTO requestBodyDTO)
       throws CTPException {
     String methodName = "fulfilmentRequestBySMS";
-    log.with("pathParam.caseId", caseId)
-        .with("requestBody", requestBodyDTO)
-        .info("Entering POST {}", methodName);
+    log.info(
+        "Entering POST {}",
+        methodName,
+        kv("pathParam.caseId", caseId),
+        kv("requestBody", requestBodyDTO));
 
     // Treat an empty clientIP as if it's a null value
     String clientIP = requestBodyDTO.getClientIP();
@@ -134,7 +140,7 @@ public class CaseEndpoint {
 
     validateMatchingCaseId(caseId, requestBodyDTO.getCaseId(), methodName);
     caseService.fulfilmentRequestBySMS(requestBodyDTO);
-    log.with("pathParam.caseId", caseId).debug("Exit POST {}", methodName);
+    log.debug("Exit POST {}", methodName, kv("pathParam.caseId", caseId));
   }
 
   @RequestMapping(value = "/{caseId}/fulfilments/post", method = RequestMethod.POST)
@@ -144,9 +150,11 @@ public class CaseEndpoint {
       @Valid @RequestBody PostalFulfilmentRequestDTO requestBodyDTO)
       throws CTPException {
     String methodName = "fulfilmentRequestByPost";
-    log.with("pathParam.caseId", caseId)
-        .with("requestBody", requestBodyDTO)
-        .info("Entering POST {}", methodName);
+    log.info(
+        "Entering POST {}",
+        methodName,
+        kv("pathParam.caseId", caseId),
+        kv("requestBody", requestBodyDTO));
 
     // Treat an empty clientIP as if it's a null value
     String clientIP = requestBodyDTO.getClientIP();
@@ -156,6 +164,6 @@ public class CaseEndpoint {
 
     validateMatchingCaseId(caseId, requestBodyDTO.getCaseId(), methodName);
     caseService.fulfilmentRequestByPost(requestBodyDTO);
-    log.with("pathParam.caseId", caseId).debug("Exit POST {}", methodName);
+    log.debug("Exit POST {}", methodName, kv("pathParam.caseId", caseId));
   }
 }

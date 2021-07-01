@@ -1,10 +1,11 @@
 package uk.gov.ons.ctp.integration.rhsvc.event.impl;
 
-import com.godaddy.logging.Logger;
-import com.godaddy.logging.LoggerFactory;
+import static uk.gov.ons.ctp.common.log.ScopedStructuredArguments.kv;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.annotation.ServiceActivator;
@@ -18,14 +19,12 @@ import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
  * Service implementation responsible for receipt of Case Events. See Spring Integration flow for
  * details of in bound queue.
  */
+@Slf4j
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @MessageEndpoint
 public class CaseEventReceiverImpl implements CaseEventReceiver {
-
-  private static final Logger log = LoggerFactory.getLogger(CaseEventReceiverImpl.class);
-
   @Autowired private RespondentDataRepository respondentDataRepo;
 
   /**
@@ -40,14 +39,15 @@ public class CaseEventReceiverImpl implements CaseEventReceiver {
     CollectionCase collectionCase = caseEvent.getPayload().getCollectionCase();
     String caseTransactionId = caseEvent.getEvent().getTransactionId();
 
-    log.with("transactionId", caseTransactionId)
-        .with("caseId", collectionCase.getId())
-        .info("Entering acceptCaseEvent");
+    log.info(
+        "Entering acceptCaseEvent",
+        kv("transactionId", caseTransactionId),
+        kv("caseId", collectionCase.getId()));
 
     try {
       respondentDataRepo.writeCollectionCase(collectionCase);
     } catch (CTPException ctpEx) {
-      log.with("caseTransactionId", caseTransactionId).error(ctpEx, "Case Event processing failed");
+      log.error("Case Event processing failed", kv("caseTransactionId", caseTransactionId), ctpEx);
       throw new CTPException(ctpEx.getFault());
     }
   }

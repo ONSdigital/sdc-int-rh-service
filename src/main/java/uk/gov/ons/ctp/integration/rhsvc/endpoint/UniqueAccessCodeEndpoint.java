@@ -1,9 +1,10 @@
 package uk.gov.ons.ctp.integration.rhsvc.endpoint;
 
-import com.godaddy.logging.Logger;
-import com.godaddy.logging.LoggerFactory;
+import static uk.gov.ons.ctp.common.log.ScopedStructuredArguments.kv;
+
 import io.micrometer.core.annotation.Timed;
 import javax.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,13 +18,11 @@ import uk.gov.ons.ctp.integration.rhsvc.representation.UniqueAccessCodeDTO;
 import uk.gov.ons.ctp.integration.rhsvc.service.UniqueAccessCodeService;
 
 /** The REST endpoint controller for UAC requests. */
+@Slf4j
 @Timed
 @RestController
 @RequestMapping(value = "/uacs", produces = "application/json")
 public class UniqueAccessCodeEndpoint {
-
-  private static final Logger log = LoggerFactory.getLogger(UniqueAccessCodeEndpoint.class);
-
   @Autowired private UniqueAccessCodeService uacService;
 
   /**
@@ -37,7 +36,7 @@ public class UniqueAccessCodeEndpoint {
   public ResponseEntity<UniqueAccessCodeDTO> getUACClaimContext(
       @PathVariable("uacHash") final String uacHash) throws CTPException {
 
-    log.with("uacHash", uacHash).info("Entering GET getUACClaimContext");
+    log.info("Entering GET getUACClaimContext", kv("uacHash", uacHash));
     UniqueAccessCodeDTO uacDTO = uacService.getAndAuthenticateUAC(uacHash);
 
     log.debug("Exit GET getUACClaimContext");
@@ -58,7 +57,7 @@ public class UniqueAccessCodeEndpoint {
       @PathVariable("uacHash") final String uacHash, @Valid @RequestBody CaseRequestDTO request)
       throws CTPException {
 
-    log.with("uacHash", uacHash).info("Entering POST linkUACtoCase");
+    log.info("Entering POST linkUACtoCase", kv("uacHash", uacHash));
     UniqueAccessCodeDTO uacDTO = uacService.linkUACCase(uacHash, request);
 
     return ResponseEntity.ok(uacDTO);

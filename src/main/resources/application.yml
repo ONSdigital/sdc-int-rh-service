@@ -12,8 +12,7 @@ logging:
   level:
     uk.gov.ons.ctp: INFO
     org.springframework: INFO
-  profile: DEV
-  useJson: true
+  profile: NON_JSON
   encryption:
     password: CENSUS
 
