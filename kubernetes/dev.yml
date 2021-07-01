@@ -1,0 +1,131 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: respondenthomesvc
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: respondenthomesvc
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      name: respondenthomesvc
+      labels:
+        app: respondenthomesvc
+    spec:
+      serviceAccountName: respondenthome-service
+      terminationGracePeriodSeconds: 40
+      containers:
+      - name: respondenthomesvc
+        image: europe-west2-docker.pkg.dev/ons-ci-int/int-docker-snapshot/rh-service:cloudbuild
+        imagePullPolicy: Always
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - /bin/sleep
+              - "5"
+        resources:
+          requests:
+            cpu: "1000m"
+            memory: "1000Mi"
+          limits:
+            cpu: "1000m"
+            memory: "1000Mi"
+        readinessProbe:
+          httpGet:
+            path: /info
+            port: 8071
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          failureThreshold: 3
+          successThreshold: 1
+        ports:
+        - name: http-server
+          containerPort: 8071
+        env:
+        - name: MANAGEMENT_METRICS_EXPORT_STACKDRIVER_ENABLED
+          value: "true"
+        - name: GOOGLE_CLOUD_PROJECT
+          value: "sdc-rh-dev"
+        - name: JAVA_TOOL_OPTIONS
+          value: "-XX:+UseContainerSupport
+            -Xms1500m
+            -Xmx1500m
+            -Dmessaging.uac-case-listener.consuming-threads=50
+            -Dmessaging.uac-case-listener.prefetch-count=250
+            -Dspring.profiles.active=dev"
+        - name: CLOUD_STORAGE_CASE_SCHEMA_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: rh-config
+              key: cloud-storage-case-schema-name
+        - name: CLOUD_STORAGE_UAC_SCHEMA_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: rh-config
+              key: cloud-storage-uac-schema-name
+        - name: RATE_LIMITER_REST_CLIENT_CONFIG_SCHEME
+          value: "http"
+        - name: RATE_LIMITER_REST_CLIENT_CONFIG_PORT
+          value: "80"
+        - name: RATE_LIMITER_REST_CLIENT_CONFIG_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: rh-config
+              key: envoy-host
+        - name: MESSAGING_PUBLISH_MAX_ATTEMPTS
+          valueFrom:
+            configMapKeyRef:
+              name: rh-config
+              key: messaging-publish-max-attempts
+        - name: SPRING_RABBITMQ_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: rh-config
+              key: rabbitmq-host
+        - name: SPRING_RABBITMQ_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: rh-config
+              key: rabbitmq-port
+        - name: SPRING_RABBITMQ_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: rabbit-identity
+              key: username
+        - name: SPRING_RABBITMQ_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: rabbit-identity
+              key: password
+        - name: NOTIFY_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: rh-notify
+              key: apikey
+        - name: LOGGING_ENCRYPTION_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: env-secrets
+              key: response-id-salt
+        - name: WEBFORM_TEMPLATE_ID
+          valueFrom:
+            configMapKeyRef:
+              name: rh-config
+              key: webform-template-id
+        - name: WEBFORM_EMAIL_EN
+          valueFrom:
+            configMapKeyRef:
+              name: rh-config
+              key: webform-email-en
+        - name: WEBFORM_EMAIL_CY
+          valueFrom:
+            configMapKeyRef:
+              name: rh-config
+              key: webform-email-cy
