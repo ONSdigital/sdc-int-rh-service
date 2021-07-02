@@ -23,7 +23,7 @@
     <groupId>ons.sdc.int.common</groupId>
     <artifactId>common</artifactId>
     <!-- change this to the version of ALL common libs to be used by this build -->
-    <version>1.0.17-SNAPSHOT</version>
+    <version>1.0.17</version>
   </parent>
 
   <scm>
@@ -345,7 +345,6 @@
         <configuration>
           <!-- exclude generated classes that cause javaco failures -->
           <excludes>
-            <exclude>reflectasm.*</exclude>
             <exclude>**/*MethodAccess</exclude>
           </excludes>
         </configuration>
