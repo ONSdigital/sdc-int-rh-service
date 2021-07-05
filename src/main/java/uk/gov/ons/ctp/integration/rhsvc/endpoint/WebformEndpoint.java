@@ -1,10 +1,11 @@
 package uk.gov.ons.ctp.integration.rhsvc.endpoint;
 
-import com.godaddy.logging.Logger;
-import com.godaddy.logging.LoggerFactory;
+import static uk.gov.ons.ctp.common.log.ScopedStructuredArguments.kv;
+
 import io.micrometer.core.annotation.Timed;
 import java.util.UUID;
 import javax.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,19 +16,17 @@ import uk.gov.ons.ctp.integration.rhsvc.representation.WebformDTO;
 import uk.gov.ons.ctp.integration.rhsvc.service.WebformService;
 
 /** The REST endpoint controller for the webform endpoint. */
+@Slf4j
 @Timed
 @RestController
 @RequestMapping(value = "/", produces = "application/json")
 public final class WebformEndpoint {
-
-  private static final Logger log = LoggerFactory.getLogger(WebformEndpoint.class);
-
   @Autowired private WebformService webformService;
 
   @RequestMapping(value = "/webform", method = RequestMethod.POST)
   public void webformCapture(@Valid @RequestBody WebformDTO webform) throws CTPException {
-    log.with("requestBody", webform).info("Entering POST webformCapture");
+    log.info("Entering POST webformCapture", kv("requestBody", webform));
     UUID notificationId = webformService.sendWebformEmail(webform);
-    log.with("notificationId", notificationId).info("Exit POST webformCapture");
+    log.info("Exit POST webformCapture", kv("notificationId", notificationId));
   }
 }

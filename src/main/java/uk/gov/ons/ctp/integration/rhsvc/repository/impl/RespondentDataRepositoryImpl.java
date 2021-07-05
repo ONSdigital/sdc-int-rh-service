@@ -1,13 +1,14 @@
 package uk.gov.ons.ctp.integration.rhsvc.repository.impl;
 
-import com.godaddy.logging.Logger;
-import com.godaddy.logging.LoggerFactory;
+import static uk.gov.ons.ctp.common.log.ScopedStructuredArguments.kv;
+
 import java.text.SimpleDateFormat;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import javax.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -17,14 +18,12 @@ import uk.gov.ons.ctp.common.domain.CaseType;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.model.CollectionCase;
 import uk.gov.ons.ctp.common.event.model.UAC;
-import uk.gov.ons.ctp.integration.rhsvc.RHSvcApplication;
 import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
 
 /** A RespondentDataRepository implementation for CRUD operations on Respondent data entities */
+@Slf4j
 @Service
 public class RespondentDataRepositoryImpl implements RespondentDataRepository {
-  private static final Logger log = LoggerFactory.getLogger(RHSvcApplication.class);
-
   private RetryableCloudDataStore retryableCloudDataStore;
 
   // Cloud data store access for startup checks only
@@ -161,7 +160,7 @@ public class RespondentDataRepositoryImpl implements RespondentDataRepository {
       // Test connectivity with cloud storage by writing a test object
       log.info("About to run cloud storage startup check");
       String startupCheckKey = writeCloudStartupCheckObject();
-      log.with("startupAuditId", startupCheckKey).info("Passed cloud storage startup check");
+      log.info("Passed cloud storage startup check", kv("startupAuditId", startupCheckKey));
     } else {
       log.info("Skipping cloud storage startup check");
     }

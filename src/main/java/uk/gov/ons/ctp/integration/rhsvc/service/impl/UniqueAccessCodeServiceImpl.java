@@ -1,10 +1,11 @@
 package uk.gov.ons.ctp.integration.rhsvc.service.impl;
 
-import com.godaddy.logging.Logger;
-import com.godaddy.logging.LoggerFactory;
+import static uk.gov.ons.ctp.common.log.ScopedStructuredArguments.kv;
+
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
+import lombok.extern.slf4j.Slf4j;
 import ma.glasnost.orika.MapperFacade;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,11 +32,9 @@ import uk.gov.ons.ctp.integration.rhsvc.representation.UniqueAccessCodeDTO.CaseS
 import uk.gov.ons.ctp.integration.rhsvc.service.UniqueAccessCodeService;
 
 /** Implementation to deal with UAC data */
+@Slf4j
 @Service
 public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
-
-  private static final Logger log = LoggerFactory.getLogger(UniqueAccessCodeService.class);
-
   @Autowired private AppConfig appConfig;
   @Autowired private RespondentDataRepository dataRepo;
   @Autowired private EventPublisher eventPublisher;
@@ -84,24 +83,25 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
         Optional<CollectionCase> caseMatch = dataRepo.readCollectionCase(caseId);
         if (caseMatch.isPresent()) {
           // Case found
-          log.with(uacHash).with(caseId).debug("UAC is linked");
+          log.debug("UAC is linked", kv("uacHash", uacHash), kv("caseId", caseId));
           data = createUniqueAccessCodeDTO(uacMatch.get(), caseMatch, CaseStatus.OK);
         } else {
           // Case NOT found
-          log.with(uacHash)
-              .with(caseId)
-              .info("Cannot find Case for UAC - telling UI unlinked - RM remediation required");
+          log.info(
+              "Cannot find Case for UAC - telling UI unlinked - RM remediation required",
+              kv("uacHash", uacHash),
+              kv("caseId", caseId));
           data = createUniqueAccessCodeDTO(uacMatch.get(), Optional.empty(), CaseStatus.UNLINKED);
           data.setCaseId(null);
         }
       } else {
-        // unlinked log.with(uacHash)
-        log.with(uacHash).debug("UAC is unlinked");
+        // unlinked logkv(uacHash)
+        log.debug("UAC is unlinked", kv("uacHash", uacHash));
         data = createUniqueAccessCodeDTO(uacMatch.get(), Optional.empty(), CaseStatus.UNLINKED);
       }
       sendRespondentAuthenticatedEvent(data);
     } else {
-      log.with("uacHash", uacHash).warn("Unknown UAC");
+      log.warn("Unknown UAC", kv("uacHash", uacHash));
       throw new CTPException(CTPException.Fault.RESOURCE_NOT_FOUND, "Failed to retrieve UAC");
     }
 
@@ -111,12 +111,12 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
   @Override
   public UniqueAccessCodeDTO linkUACCase(String uacHash, CaseRequestDTO request)
       throws CTPException {
-    log.with(uacHash).with(request).debug("Enter linkUACCase()");
+    log.debug("Enter linkUACCase()", kv("uacHash", uacHash), kv("request", request));
 
     // First get UAC from firestore
     Optional<UAC> uacOptional = dataRepo.readUAC(uacHash);
     if (uacOptional.isEmpty()) {
-      log.with("UACHash", uacHash).warn("Failed to retrieve UAC");
+      log.warn("Failed to retrieve UAC", kv("UACHash", uacHash));
       throw new CTPException(CTPException.Fault.RESOURCE_NOT_FOUND, "Failed to retrieve UAC");
     }
     UAC uac = uacOptional.get();
@@ -130,11 +130,14 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
             Long.toString(request.getUprn().getValue()), true);
     if (primaryCaseOptional.isPresent()) {
       primaryCase = primaryCaseOptional.get();
-      log.with(primaryCase.getId()).debug("Found existing case");
+      log.debug("Found existing case", kv("primaryCaseId", primaryCase.getId()));
 
       if (primaryCase.getId().equals(uac.getCaseId())) {
         // The UAC is already linked to the target case. Don't send duplicate events
-        log.with(uacHash).with(primaryCase.getId()).debug("Already linked to case");
+        log.debug(
+            "Already linked to case",
+            kv("uacHash", uacHash),
+            kv("primaryCaseId", primaryCase.getId()));
         alreadyLinked = true;
       }
 
@@ -145,9 +148,10 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
       primaryCase =
           ServiceUtil.createCase(request, primaryCaseType, appConfig.getCollectionExerciseId());
       primaryCase.getAddress().setAddressLevel(determineAddressLevel(primaryCaseType, uac).name());
-      log.with("caseId", primaryCase.getId())
-          .with("primaryCaseType", primaryCaseType)
-          .debug("Created new case");
+      log.debug(
+          "Created new case",
+          kv("caseId", primaryCase.getId()),
+          kv("primaryCaseType", primaryCaseType));
       validateUACCase(uac, primaryCase); // will abort here if invalid combo
 
       // Store new case in Firestore
@@ -178,7 +182,7 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
             ServiceUtil.createCase(request, CaseType.HI, appConfig.getCollectionExerciseId());
         individualCase.getAddress().setAddressLevel(determineAddressLevel(CaseType.HI, uac).name());
         individualCaseId = individualCase.getId();
-        log.with(individualCaseId).debug("Created individual case");
+        log.debug("Created individual case", kv("individualCaseId", individualCaseId));
 
         dataRepo.writeCollectionCase(individualCase);
 
@@ -204,16 +208,20 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
       sendRespondentAuthenticatedEvent(uniqueAccessCodeDTO);
     }
 
-    log.with(uacHash).with(uniqueAccessCodeDTO).debug("Exit linkUACCase()");
+    log.debug(
+        "Exit linkUACCase()",
+        kv("uacHash", uacHash),
+        kv("uniqueAccessCodeDTO", uniqueAccessCodeDTO));
     return uniqueAccessCodeDTO;
   }
 
   /** Send RespondentAuthenticated event */
   private void sendRespondentAuthenticatedEvent(UniqueAccessCodeDTO data) throws CTPException {
 
-    log.with("caseId", data.getCaseId())
-        .with("questionnaireId", data.getQuestionnaireId())
-        .info("Generating RespondentAuthenticated event for caseId");
+    log.info(
+        "Generating RespondentAuthenticated event for caseId",
+        kv("caseId", data.getCaseId()),
+        kv("questionnaireId", data.getQuestionnaireId()));
 
     RespondentAuthenticatedResponse response =
         RespondentAuthenticatedResponse.builder()
@@ -234,7 +242,7 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
 
   private void sendNewAddressEvent(CollectionCase collectionCase) {
     String caseId = collectionCase.getId();
-    log.with("caseId", caseId).info("Generating NewAddressReported event");
+    log.info("Generating NewAddressReported event", kv("caseId", caseId));
 
     CollectionCaseNewAddress caseNewAddress = new CollectionCaseNewAddress();
     caseNewAddress.setId(caseId);
@@ -250,18 +258,20 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
         eventPublisher.sendEvent(
             EventType.NEW_ADDRESS_REPORTED, Source.RESPONDENT_HOME, Channel.RH, newAddress);
 
-    log.with("caseId", caseId)
-        .with("transactionId", transactionId)
-        .debug("NewAddressReported event published");
+    log.debug(
+        "NewAddressReported event published",
+        kv("caseId", caseId),
+        kv("transactionId", transactionId));
   }
 
   private void sendQuestionnaireLinkedEvent(
       String questionnaireId, String caseId, String individualCaseId) {
 
-    log.with("caseId", caseId)
-        .with("questionnaireId", questionnaireId)
-        .with("individualCaseId", individualCaseId)
-        .info("Generating QuestionnaireLinked event");
+    log.info(
+        "Generating QuestionnaireLinked event",
+        kv("caseId", caseId),
+        kv("questionnaireId", questionnaireId),
+        kv("individualCaseId", individualCaseId));
 
     QuestionnaireLinkedDetails response =
         QuestionnaireLinkedDetails.builder()
@@ -274,9 +284,10 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
         eventPublisher.sendEvent(
             EventType.QUESTIONNAIRE_LINKED, Source.RESPONDENT_HOME, Channel.RH, response);
 
-    log.with("CaseId", caseId)
-        .with("transactionId", transactionId)
-        .debug("QuestionnaireLinked event published");
+    log.debug(
+        "QuestionnaireLinked event published",
+        kv("CaseId", caseId),
+        kv("transactionId", transactionId));
   }
 
   private AddressLevel determineAddressLevel(CaseType caseType, UAC uac) {
@@ -306,10 +317,11 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
 
     if (linkCombo.isEmpty()) {
       String failureDetails = uacFormType + ", " + caseCaseType;
-      log.with("uacFormType", uacFormType)
-          .with("caseCaseType", caseCaseType)
-          .with("failureDetails", failureDetails)
-          .warn("Failed to link UAC to case. Incompatible combination");
+      log.warn(
+          "Failed to link UAC to case. Incompatible combination",
+          kv("uacFormType", uacFormType),
+          kv("caseCaseType", caseCaseType),
+          kv("failureDetails", failureDetails));
       throw new CTPException(
           CTPException.Fault.BAD_REQUEST, "Case and UAC incompatible: " + failureDetails);
     }

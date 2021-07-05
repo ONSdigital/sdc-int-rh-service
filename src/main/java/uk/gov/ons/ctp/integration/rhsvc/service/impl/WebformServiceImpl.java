@@ -1,11 +1,12 @@
 package uk.gov.ons.ctp.integration.rhsvc.service.impl;
 
-import com.godaddy.logging.Logger;
-import com.godaddy.logging.LoggerFactory;
+import static uk.gov.ons.ctp.common.log.ScopedStructuredArguments.kv;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreaker;
@@ -21,11 +22,9 @@ import uk.gov.service.notify.NotificationClientException;
 import uk.gov.service.notify.SendEmailResponse;
 
 /** This is a service layer class, which performs RH business level logic for webform requests. */
+@Slf4j
 @Service
 public class WebformServiceImpl implements WebformService {
-
-  private static final Logger log = LoggerFactory.getLogger(WebformServiceImpl.class);
-
   private static final String TEMPLATE_FULL_NAME = "respondent_full_name";
   private static final String TEMPLATE_EMAIL = "respondent_email";
   private static final String TEMPLATE_REGION = "respondent_region";
@@ -107,19 +106,22 @@ public class WebformServiceImpl implements WebformService {
               emailToAddress,
               templateValues(webform),
               reference);
-      log.with("reference", reference)
-          .with("notificationId", response.getNotificationId())
-          .with("templateId", response.getTemplateId())
-          .with("templateVersion", response.getTemplateVersion())
-          .debug("Gov Notify sendEmail response received");
+      log.debug(
+          "Gov Notify sendEmail response received",
+          kv("reference", reference),
+          kv("notificationId", response.getNotificationId()),
+          kv("templateId", response.getTemplateId()),
+          kv("templateVersion", response.getTemplateVersion()));
       return response;
     } catch (NotificationClientException ex) {
-      log.with("reference", reference)
-          .with("webform", webform)
-          .with("emailToAddress", emailToAddress)
-          .with("status", ex.getHttpResult())
-          .with("message", ex.getMessage())
-          .error(ex, "Gov Notify sendEmail error");
+      log.error(
+          "Gov Notify sendEmail error",
+          kv("reference", reference),
+          kv("webform", webform),
+          kv("emailToAddress", emailToAddress),
+          kv("status", ex.getHttpResult()),
+          kv("message", ex.getMessage()),
+          ex);
       throw new RuntimeException("Gov Notify sendEmail error", ex);
     }
   }
@@ -136,7 +138,7 @@ public class WebformServiceImpl implements WebformService {
 
   private void checkWebformRateLimit(String ipAddress) throws CTPException {
     if (appConfig.getRateLimiter().isEnabled()) {
-      log.with("ipAddress", ipAddress).debug("Invoking rate limiter for webform");
+      log.debug("Invoking rate limiter for webform", kv("ipAddress", ipAddress));
       // Do rest call to rate limiter
       rateLimiterClient.checkWebformRateLimit(Domain.RH, ipAddress);
     } else {

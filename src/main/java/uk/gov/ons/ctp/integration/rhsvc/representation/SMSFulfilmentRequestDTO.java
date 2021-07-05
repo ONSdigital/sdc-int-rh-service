@@ -1,7 +1,5 @@
 package uk.gov.ons.ctp.integration.rhsvc.representation;
 
-import com.godaddy.logging.LoggingScope;
-import com.godaddy.logging.Scope;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -10,6 +8,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import uk.gov.ons.ctp.common.log.LoggingScope;
+import uk.gov.ons.ctp.common.log.Scope;
 
 /** The request object when a SMS fulfilment is requested for a given case */
 @Data
@@ -22,6 +22,6 @@ public class SMSFulfilmentRequestDTO extends FulfilmentRequestDTO {
   @NotNull
   @Size(max = 20)
   @Pattern(regexp = Constants.PHONENUMBER_RE)
-  @LoggingScope(scope = Scope.SKIP)
+  @LoggingScope(scope = Scope.MASK)
   private String telNo;
 }

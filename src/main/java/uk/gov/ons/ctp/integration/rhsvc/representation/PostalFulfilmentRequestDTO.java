@@ -1,13 +1,13 @@
 package uk.gov.ons.ctp.integration.rhsvc.representation;
 
-import com.godaddy.logging.LoggingScope;
-import com.godaddy.logging.Scope;
 import javax.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import uk.gov.ons.ctp.common.log.LoggingScope;
+import uk.gov.ons.ctp.common.log.Scope;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -17,14 +17,14 @@ import lombok.experimental.SuperBuilder;
 public class PostalFulfilmentRequestDTO extends FulfilmentRequestDTO {
 
   @Size(max = 12)
-  @LoggingScope(scope = Scope.SKIP)
+  @LoggingScope(scope = Scope.MASK)
   private String title;
 
   @Size(max = 60)
-  @LoggingScope(scope = Scope.SKIP)
+  @LoggingScope(scope = Scope.MASK)
   private String forename;
 
   @Size(max = 60)
-  @LoggingScope(scope = Scope.SKIP)
+  @LoggingScope(scope = Scope.MASK)
   private String surname;
 }

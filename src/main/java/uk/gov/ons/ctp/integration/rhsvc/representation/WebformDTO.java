@@ -1,12 +1,12 @@
 package uk.gov.ons.ctp.integration.rhsvc.representation;
 
-import com.godaddy.logging.LoggingScope;
-import com.godaddy.logging.Scope;
 import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.ons.ctp.common.domain.Region;
+import uk.gov.ons.ctp.common.log.LoggingScope;
+import uk.gov.ons.ctp.common.log.Scope;
 
 @Data
 @NoArgsConstructor
@@ -36,15 +36,15 @@ public class WebformDTO {
   @NotNull private WebformLanguage language;
 
   @NotNull
-  @LoggingScope(scope = Scope.SKIP)
+  @LoggingScope(scope = Scope.MASK)
   private String name;
 
   @NotNull
-  @LoggingScope(scope = Scope.SKIP)
+  @LoggingScope(scope = Scope.MASK)
   private String description;
 
   @NotNull
-  @LoggingScope(scope = Scope.SKIP)
+  @LoggingScope(scope = Scope.MASK)
   private String email;
 
   private String clientIP;
