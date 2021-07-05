@@ -1,8 +1,8 @@
 package uk.gov.ons.ctp.integration.rhsvc.service.impl;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
@@ -17,9 +17,9 @@ import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import javax.validation.ConstraintViolationException;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
@@ -31,7 +31,7 @@ import org.springframework.boot.autoconfigure.validation.ValidationAutoConfigura
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreaker;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.ons.ctp.common.config.CustomCircuitBreakerConfig;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.EventPublisher;
@@ -45,7 +45,7 @@ import uk.gov.ons.ctp.integration.rhsvc.representation.WebformDTO;
 import uk.gov.ons.ctp.integration.rhsvc.service.WebformService;
 import uk.gov.service.notify.NotificationClientException;
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(
     classes = {WebformServiceImpl.class, AppConfig.class, ValidationAutoConfiguration.class})
 public class WebformServiceImplTest extends WebformServiceImplTestBase {
@@ -75,7 +75,7 @@ public class WebformServiceImplTest extends WebformServiceImplTestBase {
   @Captor ArgumentCaptor<WebformDTO> webformEventCaptor;
   @Captor ArgumentCaptor<Map<String, String>> templateValueCaptor;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     NotifyConfig notifyConfig = new NotifyConfig();
     notifyConfig.setApiKey(UUID.randomUUID().toString());
@@ -176,46 +176,46 @@ public class WebformServiceImplTest extends WebformServiceImplTestBase {
     assertTrue(e.getCause() instanceof TimeoutException);
   }
 
-  @Test(expected = ConstraintViolationException.class)
+  @Test
   public void webformCategoryNull() throws CTPException {
-
     webform.setCategory(null);
-    webformService.sendWebformEmail(webform);
+    assertThrows(
+        ConstraintViolationException.class, () -> webformService.sendWebformEmail(webform));
   }
 
-  @Test(expected = ConstraintViolationException.class)
+  @Test
   public void webformRegionNull() throws CTPException {
-
     webform.setRegion(null);
-    webformService.sendWebformEmail(webform);
+    assertThrows(
+        ConstraintViolationException.class, () -> webformService.sendWebformEmail(webform));
   }
 
-  @Test(expected = ConstraintViolationException.class)
+  @Test
   public void webformLanguageNull() throws CTPException {
-
     webform.setLanguage(null);
-    webformService.sendWebformEmail(webform);
+    assertThrows(
+        ConstraintViolationException.class, () -> webformService.sendWebformEmail(webform));
   }
 
-  @Test(expected = ConstraintViolationException.class)
+  @Test
   public void webformNameNull() throws CTPException {
-
     webform.setName(null);
-    webformService.sendWebformEmail(webform);
+    assertThrows(
+        ConstraintViolationException.class, () -> webformService.sendWebformEmail(webform));
   }
 
-  @Test(expected = ConstraintViolationException.class)
+  @Test
   public void webformDescriptionNull() throws CTPException {
-
     webform.setDescription(null);
-    webformService.sendWebformEmail(webform);
+    assertThrows(
+        ConstraintViolationException.class, () -> webformService.sendWebformEmail(webform));
   }
 
-  @Test(expected = ConstraintViolationException.class)
+  @Test
   public void webformEmailNull() throws CTPException {
-
     webform.setEmail(null);
-    webformService.sendWebformEmail(webform);
+    assertThrows(
+        ConstraintViolationException.class, () -> webformService.sendWebformEmail(webform));
   }
 
   private boolean validateTemplateValues(WebformDTO webform, Map<String, String> personalisation) {

@@ -4,8 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.UUID;
 import ma.glasnost.orika.MapperFacade;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.domain.AddressType;
 import uk.gov.ons.ctp.common.domain.CaseType;
@@ -21,7 +21,7 @@ public class RHSvcBeanMapperTest {
 
   private CollectionCase collectionCase;
 
-  @Before
+  @BeforeEach
   public void setup() {
     collectionCase = FixtureHelper.loadClassFixtures(CollectionCase[].class).get(0);
   }

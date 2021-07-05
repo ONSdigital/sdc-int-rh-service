@@ -7,10 +7,10 @@ import static org.mockito.Mockito.verify;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.SneakyThrows;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.ons.ctp.common.event.EventPublisher.EventType;
 import uk.gov.ons.ctp.common.event.model.Header;
@@ -24,7 +24,7 @@ import uk.gov.ons.ctp.integration.rhsvc.event.impl.UACEventReceiverImpl;
 import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
 import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentDataRepositoryImpl;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class UacEventReceiverImplUnit_Test {
 
   private RespondentDataRepository mockRespondentDataRepo;
@@ -33,7 +33,7 @@ public class UacEventReceiverImplUnit_Test {
   private UAC uacFixture;
   private AppConfig appConfig = new AppConfig();
 
-  @Before
+  @BeforeEach
   public void setUp() {
     target = new UACEventReceiverImpl();
     QueueConfig queueConfig = new QueueConfig();

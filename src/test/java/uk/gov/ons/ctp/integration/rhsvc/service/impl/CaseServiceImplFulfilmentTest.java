@@ -1,13 +1,14 @@
 package uk.gov.ons.ctp.integration.rhsvc.service.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -19,16 +20,16 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import ma.glasnost.orika.MapperFacade;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
@@ -56,7 +57,7 @@ import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
 import uk.gov.ons.ctp.integration.rhsvc.representation.PostalFulfilmentRequestDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.SMSFulfilmentRequestDTO;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 @ContextConfiguration(
     classes = {WebformServiceImpl.class, AppConfig.class, ValidationAutoConfiguration.class})
 public class CaseServiceImplFulfilmentTest {
@@ -81,12 +82,12 @@ public class CaseServiceImplFulfilmentTest {
   private SMSFulfilmentRequestDTO smsRequest;
   private PostalFulfilmentRequestDTO postalRequest;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     this.collectionCase = FixtureHelper.loadClassFixtures(CollectionCase[].class);
     this.smsRequest = FixtureHelper.loadClassFixtures(SMSFulfilmentRequestDTO[].class).get(0);
     this.postalRequest = FixtureHelper.loadClassFixtures(PostalFulfilmentRequestDTO[].class).get(0);
-    when(appConfig.getRateLimiter()).thenReturn(rateLimiterConfig(true));
+    lenient().when(appConfig.getRateLimiter()).thenReturn(rateLimiterConfig(true));
   }
 
   private RateLimiterConfig rateLimiterConfig(boolean enabled) {
@@ -186,7 +187,7 @@ public class CaseServiceImplFulfilmentTest {
     when(dataRepo.readCollectionCase(any())).thenReturn(Optional.empty());
     CTPException e =
         assertThrows(CTPException.class, () -> caseSvc.fulfilmentRequestBySMS(smsRequest));
-    assertTrue(e.toString(), e.getMessage().contains("Case not found"));
+    assertTrue(e.getMessage().contains("Case not found"));
     verifyRateLimiterNotCalled();
   }
 
@@ -196,7 +197,7 @@ public class CaseServiceImplFulfilmentTest {
     when(productReference.searchProducts(any())).thenReturn(new ArrayList<>());
     CTPException e =
         assertThrows(CTPException.class, () -> caseSvc.fulfilmentRequestBySMS(smsRequest));
-    assertTrue(e.toString(), e.getMessage().contains("Compatible product cannot be found"));
+    assertTrue(e.getMessage().contains("Compatible product cannot be found"));
     verifyRateLimiterNotCalled();
   }
 
@@ -309,7 +310,6 @@ public class CaseServiceImplFulfilmentTest {
     CTPException e =
         assertThrows(CTPException.class, () -> caseSvc.fulfilmentRequestByPost(postalRequest));
     assertTrue(
-        e.toString(),
         e.getMessage()
             .contains(
                 "The fulfilment is for an individual so none of the following fields can be empty"));
@@ -345,7 +345,7 @@ public class CaseServiceImplFulfilmentTest {
     when(dataRepo.readCollectionCase(any())).thenReturn(Optional.empty());
     CTPException e =
         assertThrows(CTPException.class, () -> caseSvc.fulfilmentRequestByPost(postalRequest));
-    assertTrue(e.toString(), e.getMessage().contains("Case not found"));
+    assertTrue(e.getMessage().contains("Case not found"));
     verifyRateLimiterNotCalled();
   }
 
@@ -355,7 +355,7 @@ public class CaseServiceImplFulfilmentTest {
     when(productReference.searchProducts(any())).thenReturn(new ArrayList<>());
     CTPException e =
         assertThrows(CTPException.class, () -> caseSvc.fulfilmentRequestByPost(postalRequest));
-    assertTrue(e.toString(), e.getMessage().contains("Compatible product cannot be found"));
+    assertTrue(e.getMessage().contains("Compatible product cannot be found"));
     verifyRateLimiterNotCalled();
   }
 

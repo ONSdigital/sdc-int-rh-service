@@ -6,12 +6,12 @@ import static uk.gov.ons.ctp.common.utility.MockMvcControllerAdviceHelper.mockAd
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.web.servlet.MockMvc;
@@ -24,7 +24,7 @@ import uk.gov.ons.ctp.integration.rhsvc.representation.WebformDTO;
 import uk.gov.ons.ctp.integration.rhsvc.service.WebformService;
 
 /** Respondent Home Endpoint Unit tests */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public final class WebformEndpointTest {
   @InjectMocks private WebformEndpoint webformEndpoint;
 
@@ -41,7 +41,7 @@ public final class WebformEndpointTest {
    *
    * @throws Exception exception thrown
    */
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     this.mockMvc =
         MockMvcBuilders.standaloneSetup(webformEndpoint)

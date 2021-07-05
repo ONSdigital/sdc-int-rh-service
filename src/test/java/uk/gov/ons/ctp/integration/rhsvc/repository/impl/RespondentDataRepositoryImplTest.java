@@ -1,6 +1,6 @@
 package uk.gov.ons.ctp.integration.rhsvc.repository.impl;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -8,20 +8,19 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import org.apache.commons.lang3.time.DateUtils;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Spy;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.cloud.RetryableCloudDataStore;
 import uk.gov.ons.ctp.common.domain.UniquePropertyReferenceNumber;
 import uk.gov.ons.ctp.common.event.model.CollectionCase;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class RespondentDataRepositoryImplTest {
 
   private static final UniquePropertyReferenceNumber UPRN =
@@ -36,7 +35,7 @@ public class RespondentDataRepositoryImplTest {
   private final String[] searchByUprnPath = new String[] {"address", "uprn"};
 
   /** Setup tests */
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     this.collectionCase = FixtureHelper.loadClassFixtures(CollectionCase[].class);
     ReflectionTestUtils.setField(target, "caseSchema", "SCHEMA");
@@ -51,10 +50,10 @@ public class RespondentDataRepositoryImplTest {
             CollectionCase.class, target.caseSchema, searchByUprnPath, UPRN_STRING))
         .thenReturn(emptyList);
 
-    Assert.assertEquals(
-        "Expects Empty Optional",
+    assertEquals(
         Optional.empty(),
-        target.readNonHILatestCollectionCaseByUprn(UPRN_STRING, true));
+        target.readNonHILatestCollectionCaseByUprn(UPRN_STRING, true),
+        "Expects Empty Optional");
   }
 
   /** Returns Empty Optional where no valid caseType cases are returned from repository */
@@ -66,10 +65,10 @@ public class RespondentDataRepositoryImplTest {
             CollectionCase.class, target.caseSchema, searchByUprnPath, UPRN_STRING))
         .thenReturn(collectionCase);
 
-    Assert.assertEquals(
-        "Expects Empty Optional",
+    assertEquals(
         Optional.empty(),
-        target.readNonHILatestCollectionCaseByUprn(UPRN_STRING, true));
+        target.readNonHILatestCollectionCaseByUprn(UPRN_STRING, true),
+        "Expects Empty Optional");
   }
 
   /** Returns Empty Optional where no valid Address cases are returned from repository */
@@ -81,10 +80,10 @@ public class RespondentDataRepositoryImplTest {
             CollectionCase.class, target.caseSchema, searchByUprnPath, UPRN_STRING))
         .thenReturn(collectionCase);
 
-    Assert.assertEquals(
-        "Expects Empty Optional",
+    assertEquals(
         Optional.empty(),
-        target.readNonHILatestCollectionCaseByUprn(UPRN_STRING, true));
+        target.readNonHILatestCollectionCaseByUprn(UPRN_STRING, true),
+        "Expects Empty Optional");
   }
 
   /** Test retrieves latest case when all valid HH */
@@ -104,9 +103,9 @@ public class RespondentDataRepositoryImplTest {
         .thenReturn(collectionCase);
 
     assertEquals(
-        "Expects Item with Latest Date",
         Optional.of(collectionCase.get(1)),
-        target.readNonHILatestCollectionCaseByUprn(UPRN_STRING, true));
+        target.readNonHILatestCollectionCaseByUprn(UPRN_STRING, true),
+        "Expects Item with Latest Date");
   }
 
   /** Test retrieves latest valid case when actual latest date is an HI case */
@@ -127,9 +126,9 @@ public class RespondentDataRepositoryImplTest {
         .thenReturn(collectionCase);
 
     assertEquals(
-        "Expects HH Item With Latest Date",
         Optional.of(collectionCase.get(0)),
-        target.readNonHILatestCollectionCaseByUprn(UPRN_STRING, true));
+        target.readNonHILatestCollectionCaseByUprn(UPRN_STRING, true),
+        "Expects HH Item With Latest Date");
   }
 
   /** Test retrieves latest Address valid case when actual latest date is an HI case */
@@ -151,9 +150,9 @@ public class RespondentDataRepositoryImplTest {
         .thenReturn(collectionCase);
 
     assertEquals(
-        "Expects Latest Item With Valid Address",
         Optional.of(collectionCase.get(2)),
-        target.readNonHILatestCollectionCaseByUprn(UPRN_STRING, true));
+        target.readNonHILatestCollectionCaseByUprn(UPRN_STRING, true),
+        "Expects Latest Item With Valid Address");
   }
 
   /** Test retrieves latest invalid Address case when actual latest date is an HI case */
@@ -175,8 +174,8 @@ public class RespondentDataRepositoryImplTest {
         .thenReturn(collectionCase);
 
     assertEquals(
-        "Expects Latest Item With non HI Address",
         Optional.of(collectionCase.get(0)),
-        target.readNonHILatestCollectionCaseByUprn(UPRN_STRING, false));
+        target.readNonHILatestCollectionCaseByUprn(UPRN_STRING, false),
+        "Expects Latest Item With non HI Address");
   }
 }

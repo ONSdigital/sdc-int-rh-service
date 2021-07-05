@@ -15,7 +15,6 @@ import uk.gov.ons.ctp.common.config.CustomCircuitBreakerConfig;
 @Data
 public class AppConfig {
   private String collectionExerciseId;
-  private SwaggerSettings swaggerSettings;
   private Logging logging;
   private QueueConfig queueConfig;
   private MessagingConfig messaging;

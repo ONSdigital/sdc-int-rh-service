@@ -12,13 +12,13 @@ import static uk.gov.ons.ctp.integration.common.product.model.Product.Region.E;
 
 import java.util.Arrays;
 import java.util.List;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -33,7 +33,7 @@ import uk.gov.ons.ctp.integration.rhsvc.service.FulfilmentsService;
  * This class holds unit tests for the Fulfilments Endpoint to validate its handling of requests and
  * their parameters.
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public final class FulfilmentsEndpointUnitTest {
   @InjectMocks private FulfilmentsEndpoint fulfilmentsEndpoint;
 
@@ -49,7 +49,7 @@ public final class FulfilmentsEndpointUnitTest {
    *
    * @throws Exception exception thrown
    */
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     this.mockMvc =
         MockMvcBuilders.standaloneSetup(fulfilmentsEndpoint)

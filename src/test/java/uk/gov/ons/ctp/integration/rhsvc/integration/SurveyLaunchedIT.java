@@ -1,8 +1,8 @@
 package uk.gov.ons.ctp.integration.rhsvc.integration;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -11,10 +11,10 @@ import static uk.gov.ons.ctp.common.utility.MockMvcControllerAdviceHelper.mockAd
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.UUID;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mockito;
@@ -24,7 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -41,8 +41,8 @@ import uk.gov.ons.ctp.integration.rhsvc.endpoint.SurveyLaunchedEndpoint;
  * This is a component test which submits a Post saying that a survey has been launched and uses a
  * mock of RabbitMQ to confirm that RH publishes a survey launched event.
  */
-@Ignore
-@RunWith(SpringRunner.class)
+@Disabled
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class SurveyLaunchedIT {
   @Autowired private SurveyLaunchedEndpoint surveyLaunchedEndpoint;
@@ -55,7 +55,7 @@ public class SurveyLaunchedIT {
 
   @Captor private ArgumentCaptor<SurveyLaunchedEvent> publishCaptor;
 
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     ReflectionTestUtils.setField(eventPublisher, "template", rabbitTemplate);
 
