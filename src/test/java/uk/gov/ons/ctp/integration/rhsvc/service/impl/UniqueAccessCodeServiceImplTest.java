@@ -1,10 +1,11 @@
 package uk.gov.ons.ctp.integration.rhsvc.service.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
@@ -17,15 +18,15 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import ma.glasnost.orika.MapperFacade;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.domain.AddressLevel;
@@ -53,7 +54,7 @@ import uk.gov.ons.ctp.integration.rhsvc.representation.UniqueAccessCodeDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.UniqueAccessCodeDTO.CaseStatus;
 
 /** Unit tests of the Unique Access Code Service */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class UniqueAccessCodeServiceImplTest {
 
   private static final String UAC_HASH =
@@ -76,7 +77,7 @@ public class UniqueAccessCodeServiceImplTest {
   private TestUtil testUtil;
 
   /** Setup tests */
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     appConfig.setCollectionExerciseId(COLLECTION_EXERCISE_ID);
     ReflectionTestUtils.setField(uacSvc, "appConfig", appConfig);
@@ -517,13 +518,9 @@ public class UniqueAccessCodeServiceImplTest {
   public void attemptToLinkUACtoUnknownCase() throws Exception {
     CaseRequestDTO request = getRequest("householdAddress");
 
-    try {
-      uacSvc.linkUACCase(UAC_HASH, request);
-      fail("Should have failed to find UAC");
-    } catch (CTPException e) {
-      assertEquals(Fault.RESOURCE_NOT_FOUND, e.getFault());
-      assertTrue(e.getMessage(), e.getMessage().contains("UAC"));
-    }
+    CTPException e = assertThrows(CTPException.class, () -> uacSvc.linkUACCase(UAC_HASH, request));
+    assertEquals(Fault.RESOURCE_NOT_FOUND, e.getFault());
+    assertTrue(e.getMessage().contains("UAC"));
   }
 
   private void assertAddressesEqual(Address expected, AddressDTO actual) {

@@ -1,14 +1,14 @@
 package uk.gov.ons.ctp.integration.rhsvc.message.impl;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Channel;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.amqp.core.Message;
@@ -22,7 +22,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.event.model.CaseEvent;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
@@ -33,7 +33,7 @@ import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentDataRepository
 @SpringBootTest
 @EnableConfigurationProperties
 @ContextConfiguration(classes = {AppConfig.class, CaseEventReceiverImplIT_Config.class})
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @ActiveProfiles("mocked-connection-factory")
 public class CaseEventReceiverImplIT_Test {
 
@@ -41,7 +41,7 @@ public class CaseEventReceiverImplIT_Test {
   @Autowired private SimpleMessageListenerContainer caseEventListenerContainer;
   @MockBean private RespondentDataRepositoryImpl respondentDataRepo;
 
-  @Before
+  @BeforeEach
   public void initMocks() {
     Mockito.reset(receiver);
   }

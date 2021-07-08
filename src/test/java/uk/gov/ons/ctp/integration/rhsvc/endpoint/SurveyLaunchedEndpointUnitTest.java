@@ -6,13 +6,13 @@ import static uk.gov.ons.ctp.common.MvcHelper.postJson;
 import static uk.gov.ons.ctp.common.utility.MockMvcControllerAdviceHelper.mockAdviceFor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -23,7 +23,7 @@ import uk.gov.ons.ctp.integration.rhsvc.representation.SurveyLaunchedDTO;
 import uk.gov.ons.ctp.integration.rhsvc.service.SurveyLaunchedService;
 
 /** Respondent Home Endpoint Unit tests */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public final class SurveyLaunchedEndpointUnitTest {
   @InjectMocks private SurveyLaunchedEndpoint surveyLaunchedEndpoint;
 
@@ -39,7 +39,7 @@ public final class SurveyLaunchedEndpointUnitTest {
    *
    * @throws Exception exception thrown
    */
-  @Before
+  @BeforeEach
   public void setUp() throws Exception {
     this.mockMvc =
         MockMvcBuilders.standaloneSetup(surveyLaunchedEndpoint)

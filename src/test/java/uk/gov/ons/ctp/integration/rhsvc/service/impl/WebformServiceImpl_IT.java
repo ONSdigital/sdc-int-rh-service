@@ -1,14 +1,14 @@
 package uk.gov.ons.ctp.integration.rhsvc.service.impl;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import java.util.concurrent.TimeoutException;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
@@ -18,7 +18,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient;
 import uk.gov.ons.ctp.integration.rhsvc.RHSvcCircuitBreakerConfig;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
@@ -30,7 +30,7 @@ import uk.gov.service.notify.SendEmailResponse;
  * many seconds to run.
  */
 @EnableConfigurationProperties
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest
 @ContextConfiguration(
     classes = {
@@ -98,8 +98,8 @@ public class WebformServiceImpl_IT extends WebformServiceImplTestBase {
       RuntimeException e =
           assertThrows(RuntimeException.class, () -> webformService.sendWebformEmail(webform));
       assertTrue(
-          "wrong type of exception: " + e.getCause().getClass() + " on iteration: " + i,
-          e.getCause().getCause() instanceof NotificationClientException);
+          e.getCause().getCause() instanceof NotificationClientException,
+          "wrong type of exception: " + e.getCause().getClass() + " on iteration: " + i);
     }
     RuntimeException e =
         assertThrows(RuntimeException.class, () -> webformService.sendWebformEmail(webform));

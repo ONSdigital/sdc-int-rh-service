@@ -1,9 +1,10 @@
 package uk.gov.ons.ctp.integration.rhsvc.service.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
@@ -16,14 +17,14 @@ import java.util.Optional;
 import java.util.UUID;
 import ma.glasnost.orika.MapperFacade;
 import org.apache.commons.lang3.time.DateUtils;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.domain.AddressLevel;
@@ -49,7 +50,7 @@ import uk.gov.ons.ctp.integration.rhsvc.representation.AddressDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseRequestDTO;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class CaseServiceImplTest {
 
   private static final UniquePropertyReferenceNumber UPRN =
@@ -76,7 +77,7 @@ public class CaseServiceImplTest {
   private List<AddressChangeDTO> addressChangeDTO;
 
   /** Setup tests */
-  @Before
+  @BeforeEach
   public void setUp() {
     this.collectionCase = FixtureHelper.loadClassFixtures(CollectionCase[].class);
     this.addressChangeDTO = FixtureHelper.loadClassFixtures(AddressChangeDTO[].class);
@@ -114,11 +115,11 @@ public class CaseServiceImplTest {
   }
 
   /** Test throws a CTPException where no valid Address cases are returned from repository */
-  @Test(expected = CTPException.class)
+  @Test
   public void getInvalidAddressCaseByUPRNOnly() throws Exception {
     when(dataRepo.readNonHILatestCollectionCaseByUprn(Long.toString(UPRN.getValue()), true))
         .thenThrow(new CTPException(null));
-    caseSvc.getLatestValidNonHICaseByUPRN(UPRN);
+    assertThrows(CTPException.class, () -> caseSvc.getLatestValidNonHICaseByUPRN(UPRN));
   }
 
   /** Test retrieves latest case when all valid HH */
@@ -139,9 +140,9 @@ public class CaseServiceImplTest {
     CaseDTO result = caseSvc.getLatestValidNonHICaseByUPRN(UPRN);
 
     assertEquals(
-        "Resultant Case created date should match expected case with latest date",
         UUID.fromString(collectionCase.get(1).getId()),
-        result.getCaseId());
+        result.getCaseId(),
+        "Resultant Case created date should match expected case with latest date");
   }
 
   /** Test retrieves latest valid case when actual latest date is an HI case */
@@ -162,9 +163,9 @@ public class CaseServiceImplTest {
     CaseDTO result = caseSvc.getLatestValidNonHICaseByUPRN(UPRN);
 
     assertEquals(
-        "Resultant Case created date should match expected case with latest date",
         UUID.fromString(collectionCase.get(0).getId()),
-        result.getCaseId());
+        result.getCaseId(),
+        "Resultant Case created date should match expected case with latest date");
   }
 
   /** Test retrieves latest Address valid case when actual latest date is an HI case */
@@ -186,19 +187,19 @@ public class CaseServiceImplTest {
     CaseDTO result = caseSvc.getLatestValidNonHICaseByUPRN(UPRN);
 
     assertEquals(
-        "Resultant Case created date should match expected case with latest date and Valid Address",
         UUID.fromString(collectionCase.get(2).getId()),
-        result.getCaseId());
+        result.getCaseId(),
+        "Resultant Case created date should match expected case with latest date and Valid Address");
   }
 
   /** Test Test throws a CTPException where no cases returned from repository */
-  @Test(expected = CTPException.class)
+  @Test
   public void getCaseByUPRNNotFound() throws Exception {
 
     when(dataRepo.readNonHILatestCollectionCaseByUprn(Long.toString(UPRN.getValue()), true))
         .thenReturn(Optional.empty());
 
-    caseSvc.getLatestValidNonHICaseByUPRN(UPRN);
+    assertThrows(CTPException.class, () -> caseSvc.getLatestValidNonHICaseByUPRN(UPRN));
   }
 
   /** Test returns valid CaseDTO and sends address modified event message for valid CaseID */

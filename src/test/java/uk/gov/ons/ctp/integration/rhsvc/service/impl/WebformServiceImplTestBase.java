@@ -3,7 +3,7 @@ package uk.gov.ons.ctp.integration.rhsvc.service.impl;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import uk.gov.ons.ctp.common.FixtureHelper;
@@ -35,7 +35,7 @@ public abstract class WebformServiceImplTestBase {
 
   WebformDTO webform;
 
-  @Before
+  @BeforeEach
   public void init() throws Exception {
     webform = FixtureHelper.loadPackageFixtures(WebformDTO[].class).get(0);
   }
