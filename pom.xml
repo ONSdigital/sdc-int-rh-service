@@ -392,7 +392,7 @@
           </additionalClasspathElements>
           <systemPropertyVariables>
             <java.util.logging.config.file>src/test/resources/junit-logging.properties</java.util.logging.config.file>
-        </systemPropertyVariables>
+          </systemPropertyVariables>
         </configuration>
         <executions>
           <execution>
