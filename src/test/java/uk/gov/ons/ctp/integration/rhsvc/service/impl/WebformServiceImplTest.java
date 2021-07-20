@@ -3,6 +3,7 @@ package uk.gov.ons.ctp.integration.rhsvc.service.impl;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
@@ -20,6 +21,7 @@ import javax.validation.ConstraintViolationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.parallel.ResourceLock;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
@@ -48,6 +50,7 @@ import uk.gov.service.notify.NotificationClientException;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(
     classes = {WebformServiceImpl.class, AppConfig.class, ValidationAutoConfiguration.class})
+@ResourceLock(value = "WebformServiceImplTest", mode = READ_WRITE)
 public class WebformServiceImplTest extends WebformServiceImplTestBase {
   private static final String TEMPLATE_FULL_NAME = "respondent_full_name";
   private static final String TEMPLATE_EMAIL = "respondent_email";

@@ -2,6 +2,7 @@ package uk.gov.ons.ctp.integration.rhsvc.service.impl;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 
@@ -9,6 +10,7 @@ import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import java.util.concurrent.TimeoutException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.parallel.ResourceLock;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
@@ -47,6 +49,7 @@ import uk.gov.service.notify.SendEmailResponse;
       "webform-circuit-breaker.wait-duration-seconds-in-open-state=2",
       "webform-circuit-breaker.permitted-number-of-calls-in-half-open-state=1"
     })
+@ResourceLock(value = "WebformServiceImpl_IT", mode = READ_WRITE)
 public class WebformServiceImpl_IT extends WebformServiceImplTestBase {
   private static final int WINDOW_SIZE = 4;
   private static final int TIMEOUT = 1;

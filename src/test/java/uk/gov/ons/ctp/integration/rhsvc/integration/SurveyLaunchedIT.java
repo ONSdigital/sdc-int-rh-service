@@ -3,6 +3,7 @@ package uk.gov.ons.ctp.integration.rhsvc.integration;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.parallel.ResourceLock;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mockito;
@@ -44,6 +46,7 @@ import uk.gov.ons.ctp.integration.rhsvc.endpoint.SurveyLaunchedEndpoint;
 @Disabled
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@ResourceLock(value = "SurveyLaunchedIT", mode = READ_WRITE)
 public class SurveyLaunchedIT {
   @Autowired private SurveyLaunchedEndpoint surveyLaunchedEndpoint;
 
