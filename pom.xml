@@ -390,6 +390,9 @@
           <additionalClasspathElements>
             <additionalClasspathElement>${project.build.outputDirectory}</additionalClasspathElement>
           </additionalClasspathElements>
+          <systemPropertyVariables>
+            <java.util.logging.config.file>src/test/resources/junit-logging.properties</java.util.logging.config.file>
+        </systemPropertyVariables>
         </configuration>
         <executions>
           <execution>
