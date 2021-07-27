@@ -21,6 +21,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.ons.ctp.common.utility.ParallelTestLocks;
 import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient;
 import uk.gov.ons.ctp.integration.rhsvc.RHSvcCircuitBreakerConfig;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
@@ -49,7 +50,7 @@ import uk.gov.service.notify.SendEmailResponse;
       "webform-circuit-breaker.wait-duration-seconds-in-open-state=2",
       "webform-circuit-breaker.permitted-number-of-calls-in-half-open-state=1"
     })
-@ResourceLock(value = "WebformServiceImpl_IT", mode = READ_WRITE)
+@ResourceLock(value = ParallelTestLocks.SPRING_TEST, mode = READ_WRITE)
 public class WebformServiceImpl_IT extends WebformServiceImplTestBase {
   private static final int WINDOW_SIZE = 4;
   private static final int TIMEOUT = 1;

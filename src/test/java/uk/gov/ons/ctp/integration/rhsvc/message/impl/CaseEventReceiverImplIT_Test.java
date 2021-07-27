@@ -27,6 +27,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.event.model.CaseEvent;
+import uk.gov.ons.ctp.common.utility.ParallelTestLocks;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.event.impl.CaseEventReceiverImpl;
 import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentDataRepositoryImpl;
@@ -37,7 +38,7 @@ import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentDataRepository
 @ContextConfiguration(classes = {AppConfig.class, CaseEventReceiverImplIT_Config.class})
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("mocked-connection-factory")
-@ResourceLock(value = "CaseEventReceiverImplIT_Test", mode = READ_WRITE)
+@ResourceLock(value = ParallelTestLocks.SPRING_TEST, mode = READ_WRITE)
 public class CaseEventReceiverImplIT_Test {
 
   @Autowired private CaseEventReceiverImpl receiver;

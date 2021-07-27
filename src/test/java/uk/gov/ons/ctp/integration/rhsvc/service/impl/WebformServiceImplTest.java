@@ -37,6 +37,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.ons.ctp.common.config.CustomCircuitBreakerConfig;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.EventPublisher;
+import uk.gov.ons.ctp.common.utility.ParallelTestLocks;
 import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient;
 import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient.Domain;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
@@ -50,7 +51,7 @@ import uk.gov.service.notify.NotificationClientException;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(
     classes = {WebformServiceImpl.class, AppConfig.class, ValidationAutoConfiguration.class})
-@ResourceLock(value = "WebformServiceImplTest", mode = READ_WRITE)
+@ResourceLock(value = ParallelTestLocks.SPRING_TEST, mode = READ_WRITE)
 public class WebformServiceImplTest extends WebformServiceImplTestBase {
   private static final String TEMPLATE_FULL_NAME = "respondent_full_name";
   private static final String TEMPLATE_EMAIL = "respondent_email";

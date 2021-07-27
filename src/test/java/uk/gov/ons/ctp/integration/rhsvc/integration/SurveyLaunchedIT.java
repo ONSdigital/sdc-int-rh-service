@@ -37,6 +37,7 @@ import uk.gov.ons.ctp.common.event.EventPublisher;
 import uk.gov.ons.ctp.common.event.model.Header;
 import uk.gov.ons.ctp.common.event.model.SurveyLaunchedEvent;
 import uk.gov.ons.ctp.common.event.model.SurveyLaunchedResponse;
+import uk.gov.ons.ctp.common.utility.ParallelTestLocks;
 import uk.gov.ons.ctp.integration.rhsvc.endpoint.SurveyLaunchedEndpoint;
 
 /**
@@ -46,7 +47,7 @@ import uk.gov.ons.ctp.integration.rhsvc.endpoint.SurveyLaunchedEndpoint;
 @Disabled
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@ResourceLock(value = "SurveyLaunchedIT", mode = READ_WRITE)
+@ResourceLock(value = ParallelTestLocks.SPRING_TEST, mode = READ_WRITE)
 public class SurveyLaunchedIT {
   @Autowired private SurveyLaunchedEndpoint surveyLaunchedEndpoint;
 
