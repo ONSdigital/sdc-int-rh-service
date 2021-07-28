@@ -1,6 +1,7 @@
 package uk.gov.ons.ctp.integration.rhsvc.message.impl;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -13,6 +14,7 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.parallel.ResourceLock;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.amqp.core.Message;
@@ -32,6 +34,7 @@ import uk.gov.ons.ctp.common.event.model.Header;
 import uk.gov.ons.ctp.common.event.model.UAC;
 import uk.gov.ons.ctp.common.event.model.UACEvent;
 import uk.gov.ons.ctp.common.event.model.UACPayload;
+import uk.gov.ons.ctp.common.utility.ParallelTestLocks;
 import uk.gov.ons.ctp.integration.rhsvc.RespondentHomeFixture;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.event.impl.UACEventReceiverImpl;
@@ -43,6 +46,7 @@ import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentDataRepository
 @ContextConfiguration(classes = {AppConfig.class, UacEventReceiverImplIT_Config.class})
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("mocked-connection-factory")
+@ResourceLock(value = ParallelTestLocks.SPRING_TEST, mode = READ_WRITE)
 public class UacEventReceiverImplIT_Test {
 
   @Autowired private UACEventReceiverImpl receiver;

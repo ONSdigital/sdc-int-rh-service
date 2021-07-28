@@ -23,7 +23,7 @@
     <groupId>ons.sdc.int.common</groupId>
     <artifactId>common</artifactId>
     <!-- change this to the version of ALL common libs to be used by this build -->
-    <version>1.0.18</version>
+    <version>1.0.24</version>
   </parent>
 
   <scm>
@@ -390,6 +390,9 @@
           <additionalClasspathElements>
             <additionalClasspathElement>${project.build.outputDirectory}</additionalClasspathElement>
           </additionalClasspathElements>
+          <systemPropertyVariables>
+            <java.util.logging.config.file>src/test/resources/junit-logging.properties</java.util.logging.config.file>
+          </systemPropertyVariables>
         </configuration>
         <executions>
           <execution>

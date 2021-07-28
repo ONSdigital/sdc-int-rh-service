@@ -1,6 +1,7 @@
 package uk.gov.ons.ctp.integration.rhsvc.message.impl;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -9,6 +10,7 @@ import com.rabbitmq.client.Channel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.parallel.ResourceLock;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.amqp.core.Message;
@@ -25,6 +27,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.event.model.CaseEvent;
+import uk.gov.ons.ctp.common.utility.ParallelTestLocks;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.event.impl.CaseEventReceiverImpl;
 import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentDataRepositoryImpl;
@@ -35,6 +38,7 @@ import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentDataRepository
 @ContextConfiguration(classes = {AppConfig.class, CaseEventReceiverImplIT_Config.class})
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("mocked-connection-factory")
+@ResourceLock(value = ParallelTestLocks.SPRING_TEST, mode = READ_WRITE)
 public class CaseEventReceiverImplIT_Test {
 
   @Autowired private CaseEventReceiverImpl receiver;
