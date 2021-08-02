@@ -38,14 +38,16 @@ export GOOGLE_CLOUD_PROJECT="<name of your project>" e.g. export GOOGLE_CLOUD_PR
 
 ## Running
 
-There are two ways of running this service
+There are several ways of running this service
 
-* The first way is from the command line after moving into the same directory as the pom.xml:
+* Run the service in Eclipse. Run the RHSvcApplication class and update the 'Environment' section to set a value for GOOGLE_CLOUD_PROJECT.
+
+* Alternatively, run a Maven build from the command line:
     ```bash
     mvn clean install
     mvn spring-boot:run
     ```
-* The second way requires that you first create a JAR file using the following mvn command (after moving into the same directory as the pom.xml):
+* A third way requires that you first create a JAR file using the following mvn command (after moving into the same directory as the pom.xml):
     ```bash
     mvn clean package
     ```
@@ -247,7 +249,7 @@ Submit the UAC data (see UAC.java) by sending the following to the 'events' exch
 	    "uac": {
 	      "uacHash": "8a9d5db4bbee34fd16e40aa2aaae52cfbdf1842559023614c30edb480ec252b4",
 	      "active": true,
-	      "questionnaireId": "1110000009",
+	      "questionnaireId": "8710000009",
 	      "caseType": "HH",
 	      "region": "E",
 	      "caseId": "dc4477d1-dd3f-4c69-b181-7ff725dc9fa4",
@@ -259,7 +261,7 @@ Submit the UAC data (see UAC.java) by sending the following to the 'events' exch
 
 3) **Case data**
 
-Submit the case (see CollectionCase.java) by sending the following to the 'events' exchange with the routing key 'event.case.lifecycle':
+Submit the case (see CollectionCase.java) by sending the following to the 'events' exchange with the routing key 'event.case.update':
 
 	{
 	  "event": {
@@ -317,7 +319,7 @@ To calculate the sha256 value for a uac:
 
 5) **Check the get request results**
 
-Firstly confirm that the curl command returned a 200 status.
+Firstly confirm that the curl command, from the previous step, returned a 200 status.
 
 Also verify that it contains a line such as:
 "caseStatus": "OK",
