@@ -1,0 +1,29 @@
+#
+# This docker compose file assumes that you have set the GOOGLE_APPLICATION_CREDENTIALS environment
+# variable to point at a json file which contains valid GCP credentials. 
+# You may need to refresh the credentials by running the following before attempting to run RH:
+#    $ gcloud auth application-default login
+# 
+# It is also assumed that the GOOGLE_CLOUD_PROJECT environment variable is set. This should contain
+# the name of your GCP project, eg, sdc-rh-fred
+#
+# Note that 'spring.rabbitmq.host' is set to allow RH running in the container to connect to the host's
+# Rabbit port.
+#
+
+version: '3.8'
+services:
+  rh-service:
+    container_name: rh-service
+    image: europe-west2-docker.pkg.dev/ons-ci-int/int-docker-snapshot/rh-service:SOCINT-54_Update_docker_compose_for_RHSVC
+    ports:
+    - "8071:8071"
+    volumes:
+    - type: bind
+      source: $GOOGLE_APPLICATION_CREDENTIALS
+      target: /gcp/config/google-credentials-sdc.json
+      read_only: true
+    environment:
+    - GOOGLE_APPLICATION_CREDENTIALS=/gcp/config/google-credentials-sdc.json
+    - GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT}
+    - spring.rabbitmq.host=host.docker.internal
