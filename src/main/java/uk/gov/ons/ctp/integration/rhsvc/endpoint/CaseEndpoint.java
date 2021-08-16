@@ -18,9 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.ons.ctp.common.domain.UniquePropertyReferenceNumber;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.error.CTPException.Fault;
-import uk.gov.ons.ctp.integration.rhsvc.representation.AddressChangeDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
-import uk.gov.ons.ctp.integration.rhsvc.representation.CaseRequestDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.PostalFulfilmentRequestDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.SMSFulfilmentRequestDTO;
 import uk.gov.ons.ctp.integration.rhsvc.service.CaseService;
@@ -32,31 +30,6 @@ import uk.gov.ons.ctp.integration.rhsvc.service.CaseService;
 @RequestMapping(value = "/cases", produces = "application/json")
 public class CaseEndpoint {
   @Autowired private CaseService caseService;
-
-  /**
-   * the POST end point to request the creation of a new case.
-   *
-   * @param requestBodyDTO contains the UPRN and address details for the new case.
-   * @return a CaseDTO for the new case, or details of an existing case if it has the same UPRN as
-   *     the request.
-   * @throws CTPException if something goes wrong.
-   */
-  @RequestMapping(value = "/create", method = RequestMethod.POST)
-  @ResponseStatus(value = HttpStatus.OK)
-  public ResponseEntity<CaseDTO> createNewCase(@Valid @RequestBody CaseRequestDTO requestBodyDTO)
-      throws CTPException {
-    String methodName = "createNewCase";
-    log.info(
-        "Entering POST {}",
-        methodName,
-        kv("UPRN", requestBodyDTO.getUprn()),
-        kv("requestBody", requestBodyDTO));
-
-    CaseDTO caseToReturn = caseService.createNewCase(requestBodyDTO);
-
-    log.debug("Exit POST {}", methodName, kv("UPRN", requestBodyDTO.getUprn()));
-    return ResponseEntity.ok(caseToReturn);
-  }
 
   /**
    * the GET end point to return the latest valid Non HI Case by UPRN
@@ -82,32 +55,6 @@ public class CaseEndpoint {
       log.warn(message, kv("caseId", caseId), kv("dtoName", dtoName));
       throw new CTPException(Fault.BAD_REQUEST, message);
     }
-  }
-
-  /**
-   * the PUT end point to notify of an address change
-   *
-   * @param caseId UUID for case.
-   * @param addressChange AddressChangeDTO new address details for case, note needs to be complete
-   *     address not just changed elements.
-   * @return CaseDTO case details with changed address.
-   * @throws CTPException something went wrong.
-   */
-  @RequestMapping(value = "/{caseId}/address", method = RequestMethod.PUT)
-  public ResponseEntity<CaseDTO> modifyAddress(
-      @PathVariable("caseId") final UUID caseId, @Valid @RequestBody AddressChangeDTO addressChange)
-      throws CTPException {
-    String methodName = "modifyAddress";
-    log.info(
-        "Entering PUT {}",
-        methodName,
-        kv("pathParam.caseId", caseId),
-        kv("requestBody", addressChange));
-
-    validateMatchingCaseId(caseId, addressChange.getCaseId(), methodName);
-    CaseDTO result = caseService.modifyAddress(addressChange);
-    log.debug("Exit {}", methodName, kv("pathParam.caseId", caseId));
-    return ResponseEntity.ok(result);
   }
 
   /**

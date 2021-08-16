@@ -23,7 +23,6 @@ import uk.gov.ons.ctp.common.event.Channel;
 import uk.gov.ons.ctp.common.event.EventPublisher;
 import uk.gov.ons.ctp.common.event.EventType;
 import uk.gov.ons.ctp.common.event.Source;
-import uk.gov.ons.ctp.common.event.model.AddressCompact;
 import uk.gov.ons.ctp.common.event.model.CollectionCase;
 import uk.gov.ons.ctp.common.event.model.Contact;
 import uk.gov.ons.ctp.common.event.model.FulfilmentRequest;
@@ -38,7 +37,6 @@ import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
 import uk.gov.ons.ctp.integration.rhsvc.representation.AddressChangeDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
-import uk.gov.ons.ctp.integration.rhsvc.representation.CaseRequestDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.FulfilmentRequestDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.PostalFulfilmentRequestDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.SMSFulfilmentRequestDTO;
@@ -73,61 +71,6 @@ public class CaseServiceImpl implements CaseService {
     }
   }
 
-  @Override
-  public CaseDTO createNewCase(CaseRequestDTO request) throws CTPException {
-
-    Optional<CaseDTO> existingCase = getLatestNonHICaseByUPRN(request.getUprn());
-
-    CaseDTO caseToReturn;
-    if (existingCase.isPresent()) {
-      // Don't need to create a new case, as we found one with the same UPRN
-      caseToReturn = existingCase.get();
-    } else {
-      // Create a new case as not found for the UPRN in Firestore
-      CaseType caseType = ServiceUtil.determineCaseType(request);
-      CollectionCase newCase =
-          ServiceUtil.createCase(request, caseType, appConfig.getCollectionExerciseId());
-      log.debug("Created new case", kv("caseId", newCase.getId()), kv("primaryCaseType", caseType));
-
-      // Store new case in Firestore
-      dataRepo.writeCollectionCase(newCase);
-
-      // tell RM we have created a case for the selected (HH|CE|SPG) address
-      ServiceUtil.sendNewAddressEvent(eventPublisher, newCase);
-
-      caseToReturn = mapperFacade.map(newCase, CaseDTO.class);
-    }
-
-    return caseToReturn;
-  }
-
-  @Override
-  public CaseDTO modifyAddress(final AddressChangeDTO addressChanges) throws CTPException {
-
-    String caseId = addressChanges.getCaseId().toString();
-
-    Optional<CollectionCase> caseMatch = dataRepo.readCollectionCase(caseId);
-
-    if (caseMatch.isEmpty()) {
-      log.warn("Failed to retrieve Case from storage", kv("caseId", caseId));
-      throw new CTPException(
-          CTPException.Fault.RESOURCE_NOT_FOUND, "Failed to retrieve Case for caseId: {}", caseId);
-    }
-
-    CollectionCase rmCase = caseMatch.get();
-
-    CaseDTO caseData = createModifiedAddressCaseDetails(caseId, rmCase, addressChanges);
-
-    AddressCompact originalAddress = mapperFacade.map(rmCase.getAddress(), AddressCompact.class);
-    AddressCompact updatedAddress = mapperFacade.map(rmCase.getAddress(), AddressCompact.class);
-
-    mapperFacade.map(addressChanges.getAddress(), updatedAddress);
-
-    sendAddressModifiedEvent(caseId, originalAddress, updatedAddress);
-
-    return caseData;
-  }
-
   /**
    * Create case details with updated Address
    *
@@ -152,40 +95,6 @@ public class CaseServiceImpl implements CaseService {
     }
     caseData.setAddress(addressChanges.getAddress());
     return caseData;
-  }
-
-  /**
-   * Send AddressModified event
-   *
-   * @param caseId of updated case
-   * @param originalAddress details of case
-   * @param newAddress details of case
-   */
-  private void sendAddressModifiedEvent(
-      String caseId, AddressCompact originalAddress, AddressCompact newAddress) {
-
-    log.debug(
-        "Generating AddressModified event",
-        kv("caseId", caseId),
-        kv("uprn", originalAddress.getUprn()));
-
-     TODO
-        AddressModification addressModification =
-            AddressModification.builder()
-                .collectionCase(new CollectionCaseCompact(UUID.fromString(caseId)))
-                .originalAddress(originalAddress)
-                .newAddress(newAddress)
-                .build();
-
-        String transactionId =
-            eventPublisher.sendEvent(
-                EventType.ADDRESS_MODIFIED, Source.RESPONDENT_HOME, Channel.RH,
-     addressModification);
-
-        log.debug(
-            "AddressModified event published",
-            kv("caseId", caseId),
-            kv("transactionId", transactionId));
   }
 
   /**
