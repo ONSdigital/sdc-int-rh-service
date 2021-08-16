@@ -10,9 +10,6 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.rabbit.connection.ConnectionFactory;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,6 +17,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.circuitbreaker.resilience4j.Resilience4JCircuitBreakerFactory;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreaker;
+import org.springframework.cloud.gcp.pubsub.core.PubSubTemplate;
+import org.springframework.cloud.gcp.pubsub.support.PublisherFactory;
+import org.springframework.cloud.gcp.pubsub.support.SubscriberFactory;
+import org.springframework.cloud.gcp.pubsub.support.converter.JacksonPubSubMessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Primary;
@@ -37,7 +38,7 @@ import uk.gov.ons.ctp.common.cloud.CloudRetryListener;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.EventPublisher;
 import uk.gov.ons.ctp.common.event.EventSender;
-import uk.gov.ons.ctp.common.event.SpringRabbitEventSender;
+import uk.gov.ons.ctp.common.event.PubSubEventSender;
 import uk.gov.ons.ctp.common.event.persistence.FirestoreEventPersistence;
 import uk.gov.ons.ctp.common.jackson.CustomObjectMapper;
 import uk.gov.ons.ctp.common.rest.RestClient;
@@ -90,25 +91,30 @@ public class RHSvcApplication {
 
   @Bean
   public EventPublisher eventPublisher(
-      final RabbitTemplate rabbitTemplate,
+      @Qualifier("pubSubTemplate") PubSubTemplate pubSubTemplate,
       final FirestoreEventPersistence eventPersistence,
       @Qualifier("eventPublisherCbFactory")
           Resilience4JCircuitBreakerFactory circuitBreakerFactory) {
 
-    EventSender sender = new SpringRabbitEventSender(rabbitTemplate);
+    EventSender sender =
+        new PubSubEventSender(pubSubTemplate, appConfig.getMessaging().getPublish().getTimeout());
     CircuitBreaker circuitBreaker = circuitBreakerFactory.create("eventSendCircuitBreaker");
     return EventPublisher.createWithEventPersistence(sender, eventPersistence, circuitBreaker);
   }
 
   @Bean
-  public RabbitTemplate rabbitTemplate(
-      final ConnectionFactory connectionFactory, RetryTemplate sendRetryTemplate) {
-    final var template = new RabbitTemplate(connectionFactory);
-    template.setMessageConverter(new Jackson2JsonMessageConverter());
-    template.setExchange("events");
-    template.setChannelTransacted(true);
-    template.setRetryTemplate(sendRetryTemplate);
-    return template;
+  public PubSubTemplate pubSubTemplate(
+      PublisherFactory publisherFactory,
+      SubscriberFactory subscriberFactory,
+      JacksonPubSubMessageConverter jacksonPubSubMessageConverter) {
+    PubSubTemplate pubSubTemplate = new PubSubTemplate(publisherFactory, subscriberFactory);
+    pubSubTemplate.setMessageConverter(jacksonPubSubMessageConverter);
+    return pubSubTemplate;
+  }
+
+  @Bean
+  public JacksonPubSubMessageConverter messageConverter() {
+    return new JacksonPubSubMessageConverter(customObjectMapper());
   }
 
   @Bean

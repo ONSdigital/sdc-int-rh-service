@@ -3,7 +3,6 @@ package uk.gov.ons.ctp.integration.rhsvc.service.impl;
 import static uk.gov.ons.ctp.common.log.ScopedStructuredArguments.kv;
 
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import ma.glasnost.orika.MapperFacade;
@@ -14,16 +13,14 @@ import uk.gov.ons.ctp.common.domain.AddressLevel;
 import uk.gov.ons.ctp.common.domain.CaseType;
 import uk.gov.ons.ctp.common.domain.FormType;
 import uk.gov.ons.ctp.common.error.CTPException;
+import uk.gov.ons.ctp.common.event.Channel;
 import uk.gov.ons.ctp.common.event.EventPublisher;
-import uk.gov.ons.ctp.common.event.EventPublisher.Channel;
-import uk.gov.ons.ctp.common.event.EventPublisher.EventType;
-import uk.gov.ons.ctp.common.event.EventPublisher.Source;
+import uk.gov.ons.ctp.common.event.EventType;
+import uk.gov.ons.ctp.common.event.Source;
 import uk.gov.ons.ctp.common.event.model.CollectionCase;
 import uk.gov.ons.ctp.common.event.model.CollectionCaseNewAddress;
-import uk.gov.ons.ctp.common.event.model.NewAddress;
-import uk.gov.ons.ctp.common.event.model.QuestionnaireLinkedDetails;
-import uk.gov.ons.ctp.common.event.model.RespondentAuthenticatedResponse;
 import uk.gov.ons.ctp.common.event.model.UAC;
+import uk.gov.ons.ctp.common.event.model.UacAuthenticateResponse;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseRequestDTO;
@@ -142,6 +139,7 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
       }
 
       validateUACCase(uac, primaryCase); // will abort here if invalid combo
+
     } else {
       // Create a new case as not found for the UPRN in Firestore
       CaseType primaryCaseType = ServiceUtil.determineCaseType(request);
@@ -223,15 +221,15 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
         kv("caseId", data.getCaseId()),
         kv("questionnaireId", data.getQuestionnaireId()));
 
-    RespondentAuthenticatedResponse response =
-        RespondentAuthenticatedResponse.builder()
+    UacAuthenticateResponse response =
+        UacAuthenticateResponse.builder()
             .questionnaireId(data.getQuestionnaireId())
             .caseId(data.getCaseId())
             .build();
 
     String transactionId =
         eventPublisher.sendEvent(
-            EventType.RESPONDENT_AUTHENTICATED, Source.RESPONDENT_HOME, Channel.RH, response);
+            EventType.UAC_AUTHENTICATE, Source.RESPONDENT_HOME, Channel.RH, response);
 
     log.debug(
         "RespondentAuthenticated event published for caseId: "
@@ -251,17 +249,18 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
     caseNewAddress.setSurvey("CENSUS");
     caseNewAddress.setAddress(collectionCase.getAddress());
 
-    NewAddress newAddress = new NewAddress();
-    newAddress.setCollectionCase(caseNewAddress);
-
-    String transactionId =
-        eventPublisher.sendEvent(
-            EventType.NEW_ADDRESS_REPORTED, Source.RESPONDENT_HOME, Channel.RH, newAddress);
-
-    log.debug(
-        "NewAddressReported event published",
-        kv("caseId", caseId),
-        kv("transactionId", transactionId));
+    // TODO
+    //    NewAddress newAddress = new NewAddress();
+    //    newAddress.setCollectionCase(caseNewAddress);
+    //
+    //    String transactionId =
+    //        eventPublisher.sendEvent(
+    //            EventType.NEW_ADDRESS_REPORTED, Source.RESPONDENT_HOME, Channel.RH, newAddress);
+    //
+    //    log.debug(
+    //        "NewAddressReported event published",
+    //        kv("caseId", caseId),
+    //        kv("transactionId", transactionId));
   }
 
   private void sendQuestionnaireLinkedEvent(
@@ -273,21 +272,23 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
         kv("questionnaireId", questionnaireId),
         kv("individualCaseId", individualCaseId));
 
-    QuestionnaireLinkedDetails response =
-        QuestionnaireLinkedDetails.builder()
-            .questionnaireId(questionnaireId)
-            .caseId(UUID.fromString(caseId))
-            .individualCaseId(individualCaseId == null ? null : UUID.fromString(individualCaseId))
-            .build();
-
-    String transactionId =
-        eventPublisher.sendEvent(
-            EventType.QUESTIONNAIRE_LINKED, Source.RESPONDENT_HOME, Channel.RH, response);
-
-    log.debug(
-        "QuestionnaireLinked event published",
-        kv("CaseId", caseId),
-        kv("transactionId", transactionId));
+    // TODO
+    //    QuestionnaireLinkedDetails response =
+    //        QuestionnaireLinkedDetails.builder()
+    //            .questionnaireId(questionnaireId)
+    //            .caseId(UUID.fromString(caseId))
+    //            .individualCaseId(individualCaseId == null ? null :
+    // UUID.fromString(individualCaseId))
+    //            .build();
+    //
+    //    String transactionId =
+    //        eventPublisher.sendEvent(
+    //            EventType.QUESTIONNAIRE_LINKED, Source.RESPONDENT_HOME, Channel.RH, response);
+    //
+    //    log.debug(
+    //        "QuestionnaireLinked event published",
+    //        kv("CaseId", caseId),
+    //        kv("transactionId", transactionId));
   }
 
   private AddressLevel determineAddressLevel(CaseType caseType, UAC uac) {

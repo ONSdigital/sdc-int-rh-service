@@ -16,11 +16,11 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.gov.ons.ctp.common.event.Channel;
 import uk.gov.ons.ctp.common.event.EventPublisher;
-import uk.gov.ons.ctp.common.event.EventPublisher.Channel;
-import uk.gov.ons.ctp.common.event.EventPublisher.EventType;
-import uk.gov.ons.ctp.common.event.EventPublisher.Source;
-import uk.gov.ons.ctp.common.event.model.SurveyLaunchedResponse;
+import uk.gov.ons.ctp.common.event.EventType;
+import uk.gov.ons.ctp.common.event.Source;
+import uk.gov.ons.ctp.common.event.model.SurveyLaunchResponse;
 import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient;
 import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient.Domain;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
@@ -39,7 +39,7 @@ public class SurveyLaunchedServiceImplTest {
 
   @InjectMocks SurveyLaunchedServiceImpl surveyLaunchedService;
 
-  @Captor ArgumentCaptor<SurveyLaunchedResponse> sendEventCaptor;
+  @Captor ArgumentCaptor<SurveyLaunchResponse> sendEventCaptor;
 
   private SurveyLaunchedDTO surveyLaunchedDTO;
 
@@ -83,11 +83,11 @@ public class SurveyLaunchedServiceImplTest {
     // Get hold of the event pay load that surveyLaunchedService created
     verify(publisher)
         .sendEvent(
-            eq(EventType.SURVEY_LAUNCHED),
+            eq(EventType.SURVEY_LAUNCH),
             eq(Source.RESPONDENT_HOME),
             eq(expectedChannel),
             sendEventCaptor.capture());
-    SurveyLaunchedResponse eventPayload = sendEventCaptor.getValue();
+    SurveyLaunchResponse eventPayload = sendEventCaptor.getValue();
 
     // Verify contents of pay load object
     assertEquals(surveyLaunchedDTO.getQuestionnaireId(), eventPayload.getQuestionnaireId());

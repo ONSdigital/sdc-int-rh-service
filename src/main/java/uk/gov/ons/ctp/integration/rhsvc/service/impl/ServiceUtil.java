@@ -11,13 +11,9 @@ import uk.gov.ons.ctp.common.domain.AddressType;
 import uk.gov.ons.ctp.common.domain.CaseType;
 import uk.gov.ons.ctp.common.domain.EstabType;
 import uk.gov.ons.ctp.common.event.EventPublisher;
-import uk.gov.ons.ctp.common.event.EventPublisher.Channel;
-import uk.gov.ons.ctp.common.event.EventPublisher.EventType;
-import uk.gov.ons.ctp.common.event.EventPublisher.Source;
 import uk.gov.ons.ctp.common.event.model.Address;
 import uk.gov.ons.ctp.common.event.model.CollectionCase;
 import uk.gov.ons.ctp.common.event.model.CollectionCaseNewAddress;
-import uk.gov.ons.ctp.common.event.model.NewAddress;
 import uk.gov.ons.ctp.common.time.DateTimeUtil;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseRequestDTO;
 
@@ -89,16 +85,17 @@ public class ServiceUtil {
     caseNewAddress.setCeExpectedCapacity(collectionCase.getCeExpectedCapacity());
     caseNewAddress.setAddress(collectionCase.getAddress());
 
-    NewAddress newAddress = new NewAddress();
-    newAddress.setCollectionCase(caseNewAddress);
-
-    String transactionId =
-        eventPublisher.sendEvent(
-            EventType.NEW_ADDRESS_REPORTED, Source.RESPONDENT_HOME, Channel.RH, newAddress);
-
-    log.debug(
-        "NewAddressReported event published",
-        kv("caseId", caseId),
-        kv("transactionId", transactionId));
+    // TODO
+    //    NewAddress newAddress = new NewAddress();
+    //    newAddress.setCollectionCase(caseNewAddress);
+    //
+    //    String transactionId =
+    //        eventPublisher.sendEvent(
+    //            EventType.NEW_ADDRESS_REPORTED, Source.RESPONDENT_HOME, Channel.RH, newAddress);
+    //
+    //    log.debug(
+    //        "NewAddressReported event published",
+    //        kv("caseId", caseId),
+    //        kv("transactionId", transactionId));
   }
 }

@@ -84,26 +84,27 @@ spec:
             configMapKeyRef:
               name: rh-config
               key: messaging-publish-max-attempts
-        - name: SPRING_RABBITMQ_HOST
-          valueFrom:
-            configMapKeyRef:
-              name: rh-config
-              key: rabbitmq-host
-        - name: SPRING_RABBITMQ_PORT
-          valueFrom:
-            configMapKeyRef:
-              name: rh-config
-              key: rabbitmq-port
-        - name: SPRING_RABBITMQ_USERNAME
-          valueFrom:
-            secretKeyRef:
-              name: rabbit-identity
-              key: username
-        - name: SPRING_RABBITMQ_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: rabbit-identity
-              key: password
+              #TODO Replace with gcp config
+#        - name: SPRING_RABBITMQ_HOST
+#          valueFrom:
+#            configMapKeyRef:
+#              name: rh-config
+#              key: rabbitmq-host
+#        - name: SPRING_RABBITMQ_PORT
+#          valueFrom:
+#            configMapKeyRef:
+#              name: rh-config
+#              key: rabbitmq-port
+#        - name: SPRING_RABBITMQ_USERNAME
+#          valueFrom:
+#            secretKeyRef:
+#              name: rabbit-identity
+#              key: username
+#        - name: SPRING_RABBITMQ_PASSWORD
+#          valueFrom:
+#            secretKeyRef:
+#              name: rabbit-identity
+#              key: password
         - name: NOTIFY_API_KEY
           valueFrom:
             secretKeyRef:

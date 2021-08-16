@@ -12,11 +12,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
-import uk.gov.ons.ctp.common.event.EventPublisher.EventType;
+import uk.gov.ons.ctp.common.event.EventType;
 import uk.gov.ons.ctp.common.event.model.Header;
 import uk.gov.ons.ctp.common.event.model.UAC;
-import uk.gov.ons.ctp.common.event.model.UACEvent;
-import uk.gov.ons.ctp.common.event.model.UACPayload;
+import uk.gov.ons.ctp.common.event.model.UacEvent;
+import uk.gov.ons.ctp.common.event.model.UacPayload;
 import uk.gov.ons.ctp.integration.rhsvc.RespondentHomeFixture;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.config.QueueConfig;
@@ -29,7 +29,7 @@ public class UacEventReceiverImplUnit_Test {
 
   private RespondentDataRepository mockRespondentDataRepo;
   private UACEventReceiverImpl target;
-  private UACEvent uacEventFixture;
+  private UacEvent UacEventFixture;
   private UAC uacFixture;
   private AppConfig appConfig = new AppConfig();
 
@@ -46,24 +46,24 @@ public class UacEventReceiverImplUnit_Test {
 
   @SneakyThrows
   private void prepareAndAcceptEvent(String qid, EventType type) {
-    // Construct UACEvent
-    uacEventFixture = new UACEvent();
-    UACPayload uacPayloadFixture = uacEventFixture.getPayload();
+    // Construct UacEvent
+    UacEventFixture = new UacEvent();
+    UacPayload uacPayloadFixture = UacEventFixture.getPayload();
     uacFixture = uacPayloadFixture.getUac();
     uacFixture.setQuestionnaireId(qid);
 
     Header headerFixture = new Header();
     headerFixture.setType(type);
     headerFixture.setTransactionId("c45de4dc-3c3b-11e9-b210-d663bd873d93");
-    uacEventFixture.setEvent(headerFixture);
+    UacEventFixture.setEvent(headerFixture);
 
     // execution
-    target.acceptUACEvent(uacEventFixture);
+    target.acceptUACEvent(UacEventFixture);
   }
 
   @SneakyThrows
   private void acceptUacEvent(String qid) {
-    acceptUacEvent(qid, EventType.UAC_UPDATED);
+    acceptUacEvent(qid, EventType.UAC_UPDATE);
   }
 
   @SneakyThrows
@@ -74,7 +74,7 @@ public class UacEventReceiverImplUnit_Test {
 
   @SneakyThrows
   private void filterUacEvent(String qid) {
-    prepareAndAcceptEvent(qid, EventType.UAC_UPDATED);
+    prepareAndAcceptEvent(qid, EventType.UAC_UPDATE);
     verify(mockRespondentDataRepo, never()).writeUAC(uacFixture);
   }
 
@@ -115,6 +115,6 @@ public class UacEventReceiverImplUnit_Test {
 
   @Test
   public void shouldAcceptUacCreatedEvent() {
-    acceptUacEvent(RespondentHomeFixture.QID_01, EventType.UAC_CREATED);
+    acceptUacEvent(RespondentHomeFixture.QID_01, EventType.UAC_UPDATE);
   }
 }

@@ -19,14 +19,12 @@ import uk.gov.ons.ctp.common.domain.CaseType;
 import uk.gov.ons.ctp.common.domain.UniquePropertyReferenceNumber;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.error.CTPException.Fault;
+import uk.gov.ons.ctp.common.event.Channel;
 import uk.gov.ons.ctp.common.event.EventPublisher;
-import uk.gov.ons.ctp.common.event.EventPublisher.Channel;
-import uk.gov.ons.ctp.common.event.EventPublisher.EventType;
-import uk.gov.ons.ctp.common.event.EventPublisher.Source;
+import uk.gov.ons.ctp.common.event.EventType;
+import uk.gov.ons.ctp.common.event.Source;
 import uk.gov.ons.ctp.common.event.model.AddressCompact;
-import uk.gov.ons.ctp.common.event.model.AddressModification;
 import uk.gov.ons.ctp.common.event.model.CollectionCase;
-import uk.gov.ons.ctp.common.event.model.CollectionCaseCompact;
 import uk.gov.ons.ctp.common.event.model.Contact;
 import uk.gov.ons.ctp.common.event.model.FulfilmentRequest;
 import uk.gov.ons.ctp.integration.common.product.ProductReference;
@@ -171,21 +169,23 @@ public class CaseServiceImpl implements CaseService {
         kv("caseId", caseId),
         kv("uprn", originalAddress.getUprn()));
 
-    AddressModification addressModification =
-        AddressModification.builder()
-            .collectionCase(new CollectionCaseCompact(UUID.fromString(caseId)))
-            .originalAddress(originalAddress)
-            .newAddress(newAddress)
-            .build();
+     TODO
+        AddressModification addressModification =
+            AddressModification.builder()
+                .collectionCase(new CollectionCaseCompact(UUID.fromString(caseId)))
+                .originalAddress(originalAddress)
+                .newAddress(newAddress)
+                .build();
 
-    String transactionId =
-        eventPublisher.sendEvent(
-            EventType.ADDRESS_MODIFIED, Source.RESPONDENT_HOME, Channel.RH, addressModification);
+        String transactionId =
+            eventPublisher.sendEvent(
+                EventType.ADDRESS_MODIFIED, Source.RESPONDENT_HOME, Channel.RH,
+     addressModification);
 
-    log.debug(
-        "AddressModified event published",
-        kv("caseId", caseId),
-        kv("transactionId", transactionId));
+        log.debug(
+            "AddressModified event published",
+            kv("caseId", caseId),
+            kv("transactionId", transactionId));
   }
 
   /**
@@ -295,8 +295,7 @@ public class CaseServiceImpl implements CaseService {
       FulfilmentRequest payload =
           createFulfilmentRequestPayload(request.getCaseId(), contact, product, caseDetails);
 
-      eventPublisher.sendEvent(
-          EventType.FULFILMENT_REQUESTED, Source.RESPONDENT_HOME, Channel.RH, payload);
+      eventPublisher.sendEvent(EventType.FULFILMENT, Source.RESPONDENT_HOME, Channel.RH, payload);
     }
   }
 

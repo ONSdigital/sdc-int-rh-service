@@ -3,3 +3,10 @@ logging:
     uk.gov.ons.ctp: DEBUG
     org.springframework: WARN
   profile: CLOUD
+
+spring:
+  cloud:
+    gcp:
+      pubsub:
+        emulator-host: localhost:8085
+        project-id: dummy
