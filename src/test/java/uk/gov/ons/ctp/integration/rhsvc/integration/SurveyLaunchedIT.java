@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.ons.ctp.common.MvcHelper.postJson;
@@ -23,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.cloud.gcp.pubsub.core.PubSubException;
 import org.springframework.cloud.gcp.pubsub.core.PubSubTemplate;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -88,7 +90,7 @@ public class SurveyLaunchedIT {
         .andExpect(status().isOk());
 
     // Get ready to capture the survey details published to the exchange
-    Mockito.verify(pubSubTemplate).publish(eq("event_survey-launch"), publishCaptor.capture());
+    Mockito.verify(pubSubTemplate).publish(eq("event_uac-authenticate"), publishCaptor.capture());
     SurveyLaunchEvent publishedEvent = publishCaptor.getValue();
 
     // Validate contents of the published event
@@ -105,24 +107,23 @@ public class SurveyLaunchedIT {
     assertNull(response.getAgentId());
   }
 
-  //  /**
-  //   * This simulates a Rabbit failure during event posting, which should result in a 500
-  // (internal
-  //   * server) error.
-  //   */
-  //  @Test
-  //  public void surveyLaunched_failsOnSend() throws Exception {
-  //    // Simulate event posting failure
-  //    Mockito.doThrow(AmqpException.class)
-  //        .when(rabbitTemplate)
-  //        .convertAndSend((String) eq("event.response.authentication"), (Object) any());
-  //
-  //    // Read request body from resource file
-  //    ObjectNode surveyLaunchedRequestBody = FixtureHelper.loadClassObjectNode();
-  //
-  //    // Send a Post request to the /surveyLaunched endpoint
-  //    mockMvc
-  //        .perform(postJson("/surveyLaunched", surveyLaunchedRequestBody.toString()))
-  //        .andExpect(status().isInternalServerError());
-  //  }
+  /**
+   * This simulates a Rabbit failure during event posting, which should result in a 500 (internal
+   * server) error.
+   */
+  @Test
+  public void surveyLaunched_failsOnSend() throws Exception {
+    // Simulate event posting failure
+    Mockito.doThrow(PubSubException.class)
+        .when(pubSubTemplate)
+        .publish(eq("event_uac-authenticate"), (Object) any());
+
+    // Read request body from resource file
+    ObjectNode surveyLaunchedRequestBody = FixtureHelper.loadClassObjectNode();
+
+    // Send a Post request to the /surveyLaunched endpoint
+    mockMvc
+        .perform(postJson("/surveyLaunched", surveyLaunchedRequestBody.toString()))
+        .andExpect(status().isInternalServerError());
+  }
 }
