@@ -2,6 +2,6 @@ version: '3.8'
 services:
   mock-envoy:
     container_name: mock-envoy
-    image: europe-west2-docker.pkg.dev/ons-ci-int/int-docker-snapshot/mock-envoy:update-dependencies
+    image: mock-envoy
     ports:
     - "8181:8181"

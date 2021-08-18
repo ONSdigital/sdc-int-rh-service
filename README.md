@@ -42,6 +42,8 @@ There are several ways of running this service
 
 * Run the service in Eclipse. Run the RHSvcApplication class and update the 'Environment' section to set a value for GOOGLE_CLOUD_PROJECT.
 
+* Docker. To run the RH Service and its required mocks you can run a docker compose script. See 'docker/README.md' for details.
+
 * Alternatively, run a Maven build from the command line:
     ```bash
     mvn clean install
@@ -55,7 +57,7 @@ This will create the JAR file in the Target directory. You can then right-click 
 
 In order to run the Rabbitmq service, so that you can publish CaseCreated, CaseUpdated, and UACUpdated, messages for this rh-service to receive and store in Google CLoud Platform, enter the following command (from the same directory as the docker-compose.yml):
     ```bash
-    docker-compose up -d
+    docker-compose up -d --no-recreate
     ```
 Messages that are published to the events exchange will be routed to either the Case.Gateway or UAC.Gateway queue (depending on their binding).
 They will then be received by sdc-int-rh-service and stored in either the case_schema or the uac_schema (as appropriate) of the relevant Google Firestore datastore.

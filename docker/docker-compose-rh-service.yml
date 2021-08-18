@@ -15,7 +15,7 @@ version: '3.8'
 services:
   rh-service:
     container_name: rh-service
-    image: europe-west2-docker.pkg.dev/ons-ci-int/int-docker-snapshot/rh-service:SOCINT-54_Update_docker_compose_for_RHSVC
+    image: rh-service
     ports:
     - "8071:8071"
     volumes:
