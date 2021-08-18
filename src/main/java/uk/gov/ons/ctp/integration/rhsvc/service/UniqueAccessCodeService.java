@@ -14,15 +14,4 @@ public interface UniqueAccessCodeService {
    * @throws CTPException something went wrong
    */
   UniqueAccessCodeDTO getAndAuthenticateUAC(String uacHash) throws CTPException;
-
-  // TODO
-  //  /**
-  //   * Link a UAC to a case and return a representation of the UAC.
-  //   *
-  //   * @param uacHash hashed unique access code for which to retrieve data.
-  //   * @param request contains the address detail to link to.
-  //   * @return UniqueAccessCodeDTO representing data for UAC.
-  //   * @throws CTPException something went wrong.
-  //   */
-  //  UniqueAccessCodeDTO linkUACCase(String uacHash, CaseRequestDTO request) throws CTPException;
 }

@@ -104,28 +104,4 @@ public class TestUtil {
 
     validateCase(expectedCaseType, expectedAddress, firestoreCaptor.getValue());
   }
-
-  void verifyNewAddressEventSent(
-      String caseId, CaseType expectedCaseType, Address expectedAddress) {
-
-    // TODO
-    //    ArgumentCaptor<NewAddress> newAddressCapture = ArgumentCaptor.forClass(NewAddress.class);
-    //
-    //    verify(eventPublisher, times(1))
-    //        .sendEvent(
-    //            eq(EventType.NEW_ADDRESS_REPORTED),
-    //            eq(Source.RESPONDENT_HOME),
-    //            eq(Channel.RH),
-    //            newAddressCapture.capture());
-    //
-    //    NewAddress newAddress = newAddressCapture.getValue();
-    //    CollectionCaseNewAddress caseNewAddress = newAddress.getCollectionCase();
-    //    assertEquals(expectedCaseType.name(), caseNewAddress.getCaseType());
-    //    assertEquals(caseId, caseNewAddress.getId());
-    //    assertEquals("CENSUS", caseNewAddress.getSurvey());
-    //    assertEquals(COLLECTION_EXERCISE_ID, caseNewAddress.getCollectionExerciseId());
-    //    assertNull(caseNewAddress.getFieldCoordinatorId());
-    //    assertNull(caseNewAddress.getFieldOfficerId());
-    //    assertEquals(expectedAddress, caseNewAddress.getAddress());
-  }
 }

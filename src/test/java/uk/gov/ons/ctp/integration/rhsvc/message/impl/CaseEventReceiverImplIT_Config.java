@@ -18,4 +18,9 @@ public class CaseEventReceiverImplIT_Config {
   public CaseEventReceiverImpl caseEventReceiver() {
     return Mockito.spy(new CaseEventReceiverImpl());
   }
+
+  //  @Bean
+  //  public PubSubInboundChannelAdapter caseEventInboundTest() {return Mockito.spy(new
+  // PubSubTemplate(publisherFactory, subscriberFactory));
+  //  }
 }

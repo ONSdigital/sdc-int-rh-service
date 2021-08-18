@@ -36,12 +36,12 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.web.server.ResponseStatusException;
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.domain.CaseType;
+import uk.gov.ons.ctp.common.domain.Channel;
+import uk.gov.ons.ctp.common.domain.Source;
 import uk.gov.ons.ctp.common.domain.UniquePropertyReferenceNumber;
 import uk.gov.ons.ctp.common.error.CTPException;
-import uk.gov.ons.ctp.common.event.Channel;
 import uk.gov.ons.ctp.common.event.EventPublisher;
 import uk.gov.ons.ctp.common.event.EventType;
-import uk.gov.ons.ctp.common.event.Source;
 import uk.gov.ons.ctp.common.event.model.CollectionCase;
 import uk.gov.ons.ctp.common.event.model.Contact;
 import uk.gov.ons.ctp.common.event.model.FulfilmentRequest;
@@ -614,7 +614,7 @@ public class CaseServiceImplFulfilmentTest {
 
     for (int i = 0; i < fulfilmentCodes.length; i++) {
       // Validate message routing
-      assertEquals("FULFILMENT_REQUESTED", eventTypeCaptor.getAllValues().get(i).toString());
+      assertEquals("FULFILMENT", eventTypeCaptor.getAllValues().get(i).toString());
       assertEquals("RESPONDENT_HOME", sourceCaptor.getAllValues().get(i).toString());
       assertEquals("RH", channelCaptor.getAllValues().get(i).toString());
 

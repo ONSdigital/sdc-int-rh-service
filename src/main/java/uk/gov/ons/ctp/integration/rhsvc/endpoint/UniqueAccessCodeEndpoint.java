@@ -40,24 +40,4 @@ public class UniqueAccessCodeEndpoint {
 
     return ResponseEntity.ok(uacDTO);
   }
-
-  // TODO Remove?
-  //  /**
-  //   * the POST end-point to link a UAC to a case.
-  //   *
-  //   * @param uacHash the hashed UAC.
-  //   * @param request the request DTO
-  //   * @return details about the address the uac to.
-  //   * @throws CTPException something went wrong.
-  //   */
-  //  @RequestMapping(value = "/{uacHash}/link", method = RequestMethod.POST)
-  //  public ResponseEntity<UniqueAccessCodeDTO> linkUACtoCase(
-  //      @PathVariable("uacHash") final String uacHash, @Valid @RequestBody CaseRequestDTO request)
-  //      throws CTPException {
-  //
-  //    log.info("Entering POST linkUACtoCase", kv("uacHash", uacHash));
-  //    UniqueAccessCodeDTO uacDTO = uacService.linkUACCase(uacHash, request);
-  //
-  //    return ResponseEntity.ok(uacDTO);
-  //  }
 }

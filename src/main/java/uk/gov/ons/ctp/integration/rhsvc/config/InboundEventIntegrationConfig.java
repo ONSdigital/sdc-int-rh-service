@@ -27,14 +27,14 @@ public class InboundEventIntegrationConfig {
   }
 
   @Bean
-  PubSubInboundChannelAdapter caseEventInbound(
+  public PubSubInboundChannelAdapter caseEventInbound(
       @Qualifier("acceptCaseEvent") MessageChannel channel, PubSubTemplate pubSubTemplate) {
     return makeAdapter(
         channel, pubSubTemplate, appConfig.getQueueConfig().getCaseSubscription(), CaseEvent.class);
   }
 
   @Bean
-  PubSubInboundChannelAdapter uacEventInbound(
+  public PubSubInboundChannelAdapter uacEventInbound(
       @Qualifier("acceptUACEvent") MessageChannel channel, PubSubTemplate pubSubTemplate) {
     return makeAdapter(
         channel, pubSubTemplate, appConfig.getQueueConfig().getUacSubscription(), UacEvent.class);

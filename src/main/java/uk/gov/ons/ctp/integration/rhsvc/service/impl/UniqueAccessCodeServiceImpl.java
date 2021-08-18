@@ -10,15 +10,16 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.ons.ctp.common.domain.CaseType;
+import uk.gov.ons.ctp.common.domain.Channel;
 import uk.gov.ons.ctp.common.domain.FormType;
+import uk.gov.ons.ctp.common.domain.Source;
 import uk.gov.ons.ctp.common.error.CTPException;
-import uk.gov.ons.ctp.common.event.Channel;
 import uk.gov.ons.ctp.common.event.EventPublisher;
 import uk.gov.ons.ctp.common.event.EventType;
-import uk.gov.ons.ctp.common.event.Source;
 import uk.gov.ons.ctp.common.event.model.CollectionCase;
 import uk.gov.ons.ctp.common.event.model.UAC;
 import uk.gov.ons.ctp.common.event.model.UacAuthenticateResponse;
+import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
 import uk.gov.ons.ctp.integration.rhsvc.representation.UniqueAccessCodeDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.UniqueAccessCodeDTO.CaseStatus;
@@ -28,6 +29,7 @@ import uk.gov.ons.ctp.integration.rhsvc.service.UniqueAccessCodeService;
 @Slf4j
 @Service
 public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
+  @Autowired private AppConfig appConfig;
   @Autowired private RespondentDataRepository dataRepo;
   @Autowired private EventPublisher eventPublisher;
   @Autowired private MapperFacade mapperFacade;
@@ -100,51 +102,6 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
     return data;
   }
 
-  //  @Override
-  //  public UniqueAccessCodeDTO linkUACCase(String uacHash, CaseRequestDTO request)
-  //      throws CTPException {
-  //    log.debug("Enter linkUACCase()", kv("uacHash", uacHash), kv("request", request));
-  //
-  //    // First get UAC from firestore
-  //    Optional<UAC> uacOptional = dataRepo.readUAC(uacHash);
-  //    if (uacOptional.isEmpty()) {
-  //      log.warn("Failed to retrieve UAC", kv("UACHash", uacHash));
-  //      throw new CTPException(CTPException.Fault.RESOURCE_NOT_FOUND, "Failed to retrieve UAC");
-  //    }
-  //    UAC uac = uacOptional.get();
-  //
-  //    CollectionCase primaryCase;
-  //
-  //    // Read the Case(s) for the UPRN from firestore if we can
-  //    Optional<CollectionCase> primaryCaseOptional =
-  //        dataRepo.readNonHILatestCollectionCaseByUprn(
-  //            Long.toString(request.getUprn().getValue()), true);
-  //    if (primaryCaseOptional.isPresent()) {
-  //      primaryCase = primaryCaseOptional.get();
-  //      log.debug("Found existing case", kv("primaryCaseId", primaryCase.getId()));
-  //
-  //      if (!primaryCase.getId().equals(uac.getCaseId())) {
-  //        log.warn("Failed to link Case", kv("primaryCaseId", primaryCase.getId()));
-  //        throw new CTPException(CTPException.Fault.RESOURCE_NOT_FOUND, "Failed to link Case");
-  //      }
-  //
-  //      validateUACCase(uac, primaryCase); // will abort here if invalid combo
-  //
-  //    } else {
-  //      log.warn("Failed to retrieve Case", kv("UACHash", uacHash));
-  //      throw new CTPException(CTPException.Fault.RESOURCE_NOT_FOUND, "Failed to retrieve Case");
-  //    }
-  //
-  //    UniqueAccessCodeDTO uniqueAccessCodeDTO = createUniqueAccessCodeDTO(uac,
-  // Optional.of(primaryCase), CaseStatus.OK);
-  //
-  //    log.debug(
-  //        "Exit linkUACCase()",
-  //        kv("uacHash", uacHash),
-  //        kv("uniqueAccessCodeDTO", uniqueAccessCodeDTO));
-  //    return uniqueAccessCodeDTO;
-  //  }
-
   /** Send RespondentAuthenticated event */
   private void sendRespondentAuthenticatedEvent(UniqueAccessCodeDTO data) throws CTPException {
 
@@ -168,29 +125,6 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
             + response.getCaseId()
             + ", transactionId: "
             + transactionId);
-  }
-
-  private void validateUACCase(UAC uac, CollectionCase collectionCase) throws CTPException {
-    // validate that the combination UAC.formType, UAC.caseType, Case.caseType are ALLOWED to be
-    // linked
-    // rather than disallowed. ie we will only link those combinations indicated as LINK:YES in the
-    // matrix included in
-    // https://collaborate2.ons.gov.uk/confluence/display/SDC/RH+-+Authentication+-+Unlinked+UAC
-
-    FormType uacFormType = FormType.valueOf(uac.getFormType());
-    CaseType caseCaseType = CaseType.valueOf(collectionCase.getCaseType());
-    Optional<LinkingCombination> linkCombo = LinkingCombination.lookup(uacFormType, caseCaseType);
-
-    if (linkCombo.isEmpty()) {
-      String failureDetails = uacFormType + ", " + caseCaseType;
-      log.warn(
-          "Failed to link UAC to case. Incompatible combination",
-          kv("uacFormType", uacFormType),
-          kv("caseCaseType", caseCaseType),
-          kv("failureDetails", failureDetails));
-      throw new CTPException(
-          CTPException.Fault.BAD_REQUEST, "Case and UAC incompatible: " + failureDetails);
-    }
   }
 
   private UniqueAccessCodeDTO createUniqueAccessCodeDTO(
