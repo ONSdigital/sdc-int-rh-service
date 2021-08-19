@@ -22,7 +22,7 @@ If Docker pull commands fail with a permissions error run the following and re-a
 
 ### Google credentials
 
-The docker compose file for RH depends on the $GOOGLE_APPLICATION_CREDENTIALS evironment
+The docker compose file for RH depends on the $GOOGLE_APPLICATION_CREDENTIALS environment
 variable. This must point to a file containing your Google credentials.
 
 Depending on how you've set this up you may need to refresh your credentials by running 

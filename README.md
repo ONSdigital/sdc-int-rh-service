@@ -42,7 +42,7 @@ There are several ways of running this service
 
 * Run the service in Eclipse. Run the RHSvcApplication class and update the 'Environment' section to set a value for GOOGLE_CLOUD_PROJECT.
 
-* Docker. To run the RH Service and its required mocks you can run a docker compose script. See 'docker/README.md' for details.
+* Docker. To run the RH Service and its required mocks you can run a docker compose script. See the [Readme](docker/README.md) in the docker directory for details.
 
 * Alternatively, run a Maven build from the command line:
     ```bash
