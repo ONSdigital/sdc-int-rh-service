@@ -26,9 +26,9 @@ The docker compose file for RH depends on the $GOOGLE_APPLICATION_CREDENTIALS en
 variable. This must point to a file containing your Google credentials.
 
 Depending on how you've set this up you may need to refresh your credentials by running 
-'gcloud auth application-default login' before attemping to start the services.
+'gcloud auth application-default login' before attempting to start the services.
 
-If your credentials are not valid you can see that the attempt to do an intial write to 
+If your credentials are not valid you can see that the attempt to do an initial write to 
 the Firestore startup collection fails. In this circumstance the /info endpoint also 
 seems to produce an empty response.
 
