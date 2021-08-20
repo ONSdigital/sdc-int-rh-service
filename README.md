@@ -393,47 +393,6 @@ Format the event text and make sure it looks like:
 	    }
 	  }
 	}
-
-
-## Manual testing with EventGenerator
-
-This section does the same testing as the previous section but automates much of the work by using the EventGenerator. To run the whole test copy and paste the following in one go. Then check that, as in the privous section, that the respondent authenticated event has been published. Note that these commands require Httpie to be installed. They also assume that local RH and EventGenerator services are running.
-
-This is how the hash of the UAC was calculated:
-    $ echo -n "aaaabbbbccccdddd" | shasum -a 256
-    147eb9dcde0e090429c01dbf634fd9b69a7f141f005c387a9c00498908499dde  -
-
-This example uses a case uuid of: f868fcfc-7280-40ea-ab01-b173ac245da3
- 
-    # Create UAC payload 
-    cat > /tmp/uac_updated.json <<EOF
-    {
-        "eventType": "UAC_UPDATED",
-        "source": "SAMPLE_LOADER",
-        "channel": "RM",
-        "contexts": [
-            {
-                "uacHash": "147eb9dcde0e090429c01dbf634fd9b69a7f141f005c387a9c00498908499dde",
-                "caseId": "f868fcfc-7280-40ea-ab01-b173ac245da3"
-            }
-        ]
-    }
-    EOF
-    
-    # Create case updated payload
-    cat > /tmp/case_updated.json <<EOF 
-    {
-        "eventType": "CASE_UPDATED",
-        "source": "SAMPLE_LOADER",
-        "channel": "RM",
-        "contexts": [
-            {
-                "id": "f868fcfc-7280-40ea-ab01-b173ac245da3"
-            }
-        ]
-    }
-    EOF
-
     
 Modified endpoint /cases/uprn/ - method name changed from 
 getHHCaseByUPRN to
