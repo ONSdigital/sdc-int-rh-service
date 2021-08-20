@@ -12,7 +12,6 @@ import static org.mockito.Mockito.when;
 import java.util.Optional;
 import java.util.UUID;
 import ma.glasnost.orika.MapperFacade;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -20,7 +19,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.domain.Channel;
 import uk.gov.ons.ctp.common.domain.Source;
@@ -31,7 +29,6 @@ import uk.gov.ons.ctp.common.event.model.CollectionCase;
 import uk.gov.ons.ctp.common.event.model.UAC;
 import uk.gov.ons.ctp.common.event.model.UacAuthenticateResponse;
 import uk.gov.ons.ctp.integration.rhsvc.RHSvcBeanMapper;
-import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
 import uk.gov.ons.ctp.integration.rhsvc.representation.UniqueAccessCodeDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.UniqueAccessCodeDTO.CaseStatus;
@@ -44,9 +41,6 @@ public class UniqueAccessCodeServiceImplTest {
       "8a9d5db4bbee34fd16e40aa2aaae52cfbdf1842559023614c30edb480ec252b4";
   private static final String CASE_ID = "bfb5cdca-3119-4d2c-a807-51ae55443b33";
 
-  // the actual census id as per the application.yml and also RM
-  private static final String COLLECTION_EXERCISE_ID = "34d7f3bb-91c9-45d0-bb2d-90afce4fc790";
-
   @InjectMocks private UniqueAccessCodeServiceImpl uacSvc;
 
   @Mock private RespondentDataRepository dataRepo;
@@ -54,19 +48,6 @@ public class UniqueAccessCodeServiceImplTest {
   @Mock private EventPublisher eventPublisher;
 
   @Spy private MapperFacade mapperFacade = new RHSvcBeanMapper();
-
-  @Spy private AppConfig appConfig = new AppConfig();
-
-  private TestUtil testUtil;
-
-  /** Setup tests */
-  @BeforeEach
-  public void setUp() throws Exception {
-    appConfig.setCollectionExerciseId(COLLECTION_EXERCISE_ID);
-    ReflectionTestUtils.setField(uacSvc, "appConfig", appConfig);
-
-    testUtil = new TestUtil(dataRepo, eventPublisher);
-  }
 
   @Test
   public void getUACLinkedToExistingCase() throws Exception {

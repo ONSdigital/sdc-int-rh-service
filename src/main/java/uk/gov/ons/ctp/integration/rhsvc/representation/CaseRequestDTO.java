@@ -25,3 +25,4 @@ public class CaseRequestDTO {
 
   @NotNull private AddressType addressType;
 }
+/**/

@@ -9,7 +9,6 @@ public class MessagingConfig {
 
   @Data
   public static class PublishConfig {
-    private int maxAttempts;
     private int timeout;
   }
 }

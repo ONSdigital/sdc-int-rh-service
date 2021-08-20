@@ -1,8 +1,5 @@
 package uk.gov.ons.ctp.integration.rhsvc;
 
-import io.micrometer.core.instrument.Meter;
-import io.micrometer.core.instrument.config.MeterFilter;
-import io.micrometer.core.instrument.config.MeterFilterReply;
 import io.micrometer.stackdriver.StackdriverConfig;
 import io.micrometer.stackdriver.StackdriverMeterRegistry;
 import java.time.Duration;
@@ -26,15 +23,9 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpStatus;
 import org.springframework.integration.annotation.IntegrationComponentScan;
-import org.springframework.retry.RetryCallback;
-import org.springframework.retry.RetryContext;
-import org.springframework.retry.RetryListener;
-import org.springframework.retry.policy.SimpleRetryPolicy;
-import org.springframework.retry.support.RetryTemplate;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import uk.gov.ons.ctp.common.cloud.CloudRetryListener;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.EventPublisher;
 import uk.gov.ons.ctp.common.event.EventSender;
@@ -45,7 +36,6 @@ import uk.gov.ons.ctp.common.rest.RestClient;
 import uk.gov.ons.ctp.common.rest.RestClientConfig;
 import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
-import uk.gov.ons.ctp.integration.rhsvc.config.MessagingConfig.PublishConfig;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientApi;
 
@@ -118,27 +108,6 @@ public class RHSvcApplication {
   }
 
   @Bean
-  public RetryTemplate sendRetryTemplate(RetryListener sendRetryListener) {
-    RetryTemplate template = new RetryTemplate();
-    template.registerListener(sendRetryListener);
-    PublishConfig publishConfig = appConfig.getMessaging().getPublish();
-    template.setRetryPolicy(new SimpleRetryPolicy(publishConfig.getMaxAttempts()));
-    return template;
-  }
-
-  @Bean
-  public RetryListener sendRetryListener() {
-    return new CloudRetryListener() {
-      @Override
-      public <T, E extends Throwable> boolean open(
-          RetryContext context, RetryCallback<T, E> callback) {
-        context.setAttribute(RetryContext.NAME, "publish-event");
-        return true;
-      }
-    };
-  }
-
-  @Bean
   public RateLimiterClient rateLimiterClient() throws CTPException {
     RestClientConfig clientConfig = appConfig.getRateLimiter().getRestClientConfig();
     log.info("Rate Limiter configuration: {}", appConfig.getRateLimiter());
@@ -189,24 +158,6 @@ public class RHSvcApplication {
       @Override
       public String get(String key) {
         return null;
-      }
-    };
-  }
-
-  @Bean
-  public MeterFilter meterFilter() {
-    return new MeterFilter() {
-      @Override
-      public MeterFilterReply accept(Meter.Id id) {
-        // RM use this to remove Rabbit clutter from the metrics as they have alternate means of
-        // monitoring it
-        // We will probable want to experiment with removing this to see what value we get from
-        // rabbit metrics
-        // a) once we have Grafana setup, and b) once we try out micrometer in a perf environment
-        if (id.getName().startsWith("rabbitmq")) {
-          return MeterFilterReply.DENY;
-        }
-        return MeterFilterReply.NEUTRAL;
       }
     };
   }

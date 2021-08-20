@@ -28,7 +28,6 @@ import uk.gov.ons.ctp.integration.common.product.ProductReference;
 import uk.gov.ons.ctp.integration.rhsvc.RHSvcBeanMapper;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
-import uk.gov.ons.ctp.integration.rhsvc.representation.AddressChangeDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
 
 @ExtendWith(MockitoExtension.class)
@@ -52,21 +51,15 @@ public class CaseServiceImplTest {
 
   @Spy private AppConfig appConfig = new AppConfig();
 
-  private TestUtil testUtil;
-
   private List<CollectionCase> collectionCase;
-  private List<AddressChangeDTO> addressChangeDTO;
 
   /** Setup tests */
   @BeforeEach
   public void setUp() {
     this.collectionCase = FixtureHelper.loadClassFixtures(CollectionCase[].class);
-    this.addressChangeDTO = FixtureHelper.loadClassFixtures(AddressChangeDTO[].class);
 
     appConfig.setCollectionExerciseId(COLLECTION_EXERCISE_ID);
     ReflectionTestUtils.setField(caseSvc, "appConfig", appConfig);
-
-    testUtil = new TestUtil(dataRepo, eventPublisher);
   }
 
   /** Test returns valid CaseDTO for valid UPRN */

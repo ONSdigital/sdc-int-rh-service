@@ -57,7 +57,7 @@ public class CaseEventReceiverImplIT_Test {
     CaseEvent caseEvent = FixtureHelper.loadPackageFixtures(CaseEvent[].class).get(0);
 
     // Construct message
-    Message message = new GenericMessage(caseEvent, new HashMap<>());
+    Message<CaseEvent> message = new GenericMessage<>(caseEvent, new HashMap<>());
     // Send message to container
     caseEventInbound.getOutputChannel().send(message);
 
@@ -78,7 +78,7 @@ public class CaseEventReceiverImplIT_Test {
     caseEvent.getEvent().setDateTime(sdf.parse("2011-08-12T20:17:46Z"));
 
     // Construct message
-    Message message = new GenericMessage(caseEvent, new HashMap<>());
+    Message<CaseEvent> message = new GenericMessage<>(caseEvent, new HashMap<>());
 
     // Send message to container
     caseEventInbound.getOutputChannel().send(message);

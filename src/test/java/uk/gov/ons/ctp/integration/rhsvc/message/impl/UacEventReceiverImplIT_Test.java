@@ -51,7 +51,6 @@ import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentDataRepository
 @ResourceLock(value = ParallelTestLocks.SPRING_TEST, mode = READ_WRITE)
 public class UacEventReceiverImplIT_Test {
 
-  private static final String UPDATE_SAMPLE_SENSITIVE_TOPIC = "event_update-sample-sensitive";
   @Autowired private PubSubInboundChannelAdapter uacEventInbound;
   @Autowired private AppConfig appConfig;
   @Autowired private UACEventReceiverImpl receiver;
@@ -68,7 +67,7 @@ public class UacEventReceiverImplIT_Test {
     UacEvent UacEvent = createUAC(RespondentHomeFixture.A_QID, type);
 
     // Construct message
-    Message message = new GenericMessage(UacEvent, new HashMap<>());
+    Message<UacEvent> message = new GenericMessage<>(UacEvent, new HashMap<>());
     // Send message to container
     uacEventInbound.getOutputChannel().send(message);
 
@@ -92,7 +91,7 @@ public class UacEventReceiverImplIT_Test {
     UacEvent UacEvent = createUAC(RespondentHomeFixture.QID_12, EventType.UAC_UPDATE);
 
     // Construct message
-    Message message = new GenericMessage(UacEvent, new HashMap<>());
+    Message<UacEvent> message = new GenericMessage<>(UacEvent, new HashMap<>());
     // Send message to container
     uacEventInbound.getOutputChannel().send(message);
 
@@ -114,7 +113,7 @@ public class UacEventReceiverImplIT_Test {
     UacEvent.getEvent().setDateTime(sdf.parse("2011-08-12T20:17:46Z"));
 
     // Construct message
-    Message message = new GenericMessage(UacEvent, new HashMap<>());
+    Message<UacEvent> message = new GenericMessage<>(UacEvent, new HashMap<>());
     // Send message to container
     uacEventInbound.getOutputChannel().send(message);
 

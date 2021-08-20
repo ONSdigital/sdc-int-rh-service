@@ -13,7 +13,6 @@ import static uk.gov.ons.ctp.common.MvcHelper.postJson;
 import static uk.gov.ons.ctp.common.utility.MockMvcControllerAdviceHelper.mockAdviceFor;
 import static uk.gov.ons.ctp.integration.rhsvc.RespondentHomeFixture.EXPECTED_JSON_CONTENT_TYPE;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
@@ -44,18 +43,12 @@ public class CaseEndpointUnitTest {
   private static final String ERROR_MESSAGE = "Failed to retrieve UPRN";
   private static final String INVALID_CODE = "VALIDATION_FAILED";
   private static final String INVALID_MESSAGE = "Provided json is incorrect.";
-  private static final String CASEID_UPRN_INCONSISTENT =
-      "The UPRN of the referenced Case and the provided Address UPRN must be matching";
-  private static final String CASEID_INCONSISTENT =
-      "The path parameter caseId does not match the caseId in the request body";
 
   @InjectMocks private CaseEndpoint caseEndpoint;
 
   @Mock CaseService caseService;
 
   private MockMvc mockMvc;
-
-  private ObjectMapper mapper = new ObjectMapper();
 
   private List<CaseDTO> caseDTO;
 

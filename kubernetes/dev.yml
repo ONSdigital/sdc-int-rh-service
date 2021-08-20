@@ -57,8 +57,6 @@ spec:
           value: "-XX:+UseContainerSupport
             -Xms1500m
             -Xmx1500m
-            -Dmessaging.uac-case-listener.consuming-threads=50
-            -Dmessaging.uac-case-listener.prefetch-count=250
             -Dspring.profiles.active=dev"
         - name: CLOUD_STORAGE_CASE_SCHEMA_NAME
           valueFrom:

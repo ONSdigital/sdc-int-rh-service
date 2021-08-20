@@ -73,7 +73,7 @@ public class SurveyLaunchedIT {
   }
 
   /**
-   * This test Posts a survey launched event and uses a mock rabbit template to confirm that a
+   * This test Posts a survey launched event and uses a mock pubsub template to confirm that a
    * survey launched event is published.
    */
   @Test

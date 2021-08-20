@@ -70,16 +70,15 @@ spring:
         emulator-host: localhost:8085
 
 queueconfig:
-  case-subscription: case-rh-case
+  case-subscription: event_case-update_rh
   case-topic: event_case-update
-  uac-subscription: case-rh-uac
+  uac-subscription: event_uac-update_rh
   uac-topic: event_uac-update
   qid-filter-prefixes:
 
 messaging:
   publish:
-    max-attempts: 10
-    timeout: 60
+    timeout: 4
     
 # circuit breaker configuration can be tuned by setting many other variables:
 # see CustomCircuitBreakerConfig.java . 

@@ -35,7 +35,6 @@ import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient;
 import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient.Domain;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
-import uk.gov.ons.ctp.integration.rhsvc.representation.AddressChangeDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.FulfilmentRequestDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.PostalFulfilmentRequestDTO;
@@ -69,32 +68,6 @@ public class CaseServiceImpl implements CaseService {
       log.warn("No cases returned for uprn", kv("uprn", uprn));
       throw new CTPException(Fault.RESOURCE_NOT_FOUND, "Failed to retrieve Case");
     }
-  }
-
-  /**
-   * Create case details with updated Address
-   *
-   * @param caseId requested caseId for which to update address
-   * @param rmCase original Case from repository
-   * @param addressChanges Changed address details from request
-   * @return CaseDTO updated case details
-   * @throws CTPException UPRN of stored address and request change do not match
-   */
-  private CaseDTO createModifiedAddressCaseDetails(
-      String caseId, CollectionCase rmCase, AddressChangeDTO addressChanges) throws CTPException {
-
-    CaseDTO caseData = mapperFacade.map(rmCase, CaseDTO.class);
-    if (!caseData.getAddress().getUprn().equals(addressChanges.getAddress().getUprn())) {
-      log.warn(
-          "The UPRN of the referenced Case and the provided Address UPRN must be matching",
-          kv("caseId", caseId),
-          kv("uprn", addressChanges.getAddress().getUprn().toString()));
-      throw new CTPException(
-          CTPException.Fault.BAD_REQUEST,
-          "The UPRN of the referenced Case and the provided Address UPRN must be matching");
-    }
-    caseData.setAddress(addressChanges.getAddress());
-    return caseData;
   }
 
   /**
@@ -274,22 +247,5 @@ public class CaseServiceImpl implements CaseService {
           "The fulfilment is for an individual so none of the following fields can be empty: "
               + "'forename' and 'surname'");
     }
-  }
-
-  // get the latest Case , which can have a valid, or invalid address, but must not have a casetype
-  // of HI.
-  private Optional<CaseDTO> getLatestNonHICaseByUPRN(UniquePropertyReferenceNumber uprn)
-      throws CTPException {
-    Optional<CaseDTO> result = Optional.empty();
-
-    Optional<CollectionCase> caseFound =
-        dataRepo.readNonHILatestCollectionCaseByUprn(Long.toString(uprn.getValue()), false);
-    if (caseFound.isPresent()) {
-      log.debug(
-          "Existing case found by UPRN", kv("case", caseFound.get().getId()), kv("uprn", uprn));
-      result = Optional.of(mapperFacade.map(caseFound.get(), CaseDTO.class));
-    }
-
-    return result;
   }
 }
