@@ -75,7 +75,7 @@ To start pubsub
 
     gcloud beta emulators pubsub start --project=<fake_project_id>
 
-`<fake_project_id>` Can be anything as it's not a real project, however the `application.yml` and all commands below are expecting it to be`local`, so be sure to change them if you use something else.
+`<fake_project_id>` Can be anything as it's not a real project, however the `application.yml` and all commands below are expecting it to be `local`, so be sure to change them if you use something else.
 
     gcloud beta emulators pubsub start --project=local
 
@@ -355,7 +355,7 @@ In a new terminal window run:
     $(gcloud beta emulators pubsub env-init)
     python3 subscriber.py local receive fake_subscription
 
-7) **Generate respondent authenticated event**
+6) **Generate respondent authenticated event**
 
 If you know the case id which matches the stored UAC hash then you can supply it in the UACS get request:
   
@@ -367,14 +367,14 @@ To calculate the sha256 value for a uac:
     8a9d5db4bbee34fd16e40aa2aaae52cfbdf1842559023614c30edb480ec252b4  -
 
 
-5) **Check the get request results**
+7) **Check the get request results**
 
 Firstly confirm that the curl command returned a 200 status.
 
 Also verify that it contains a line such as:
 "caseStatus": "OK",
 
-6) **Check the respondent authenticated event in the terminal window listening to the subscription**
+8) **Check the respondent authenticated event in the terminal window listening to the subscription**
 
 Format the event text and make sure it looks like:
 
