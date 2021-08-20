@@ -60,12 +60,8 @@ There are two ways of running this service
     ```
 This will create the JAR file in the Target directory. You can then right-click on the JAR file (in Intellij) and choose 'Run'.
 
-In order to run the Rabbitmq service, so that you can publish CaseCreated, CaseUpdated, and UACUpdated, messages for this rh-service to receive and store in Google CLoud Platform, enter the following command (from the same directory as the docker-compose.yml):
-    ```bash
-    docker-compose up -d
-    ```
-Messages that are published to the events exchange will be routed to either the Case.Gateway or UAC.Gateway queue (depending on their binding).
-They will then be received by sdc-int-rh-service and stored in either the case_schema or the uac_schema (as appropriate) of the relevant Google Firestore datastore.
+You will need to complete the PubSub steps below and the first step in the `## Manual Testing` section.
+Messages that are published to either the `event_case-update` or `event_uac-update` topic will be received by sdc-int-rh-service and stored in either the case_schema or the uac_schema (as appropriate) of the relevant Google Firestore datastore.
 The project to use is given by the Application Default Credentials (These are the credential associated with the service account that your app engine app runs as - to set these up please follow the steps given in the previous section).
 
 
@@ -82,6 +78,35 @@ To start pubsub
 Switch to a new temrinal window and run the following to set up environment variables. You will need to run this in every terminal that you wish to use to interact with the emulator.
 
     $(gcloud beta emulators pubsub env-init)
+
+From the python pubsub project's `python-pubsub/samples/snippets` directory run the following commands to create a topic and subscription:
+
+Topic: `python publisher.py <DUMMY_PROJECT_NAME> create <TOPIC_NAME>`
+
+Subcription: `python subscriber.py <DUMMY_PROJECT_NAME> create <TOPIC_NAME> <SUBSCRIPTION_NAME>`
+
+**Note: Python3 is required for this project, if your default `python` points to python 2, use `python3` in the above commands instead**
+
+All commands below will assume that your dummy project name is `local`
+
+Create the following topics/subscriptions:
+
+      Topic                          | Subscription
+    ---------------------------------+--------------------------------
+      event_case-update              | event_case-update_rh
+      event_uac-update               | event_uac-update_rh
+      event_uac-authenticate         | N/A
+      event_survey-launch            | N/A
+      event_fulfilment               | N/A
+
+    python publisher.py local create event_case-update
+    python publisher.py local create event_uac-update
+    python publisher.py local create event_uac-authenticate
+    python publisher.py local create event_survey-launch
+    python publisher.py local create event_fulfilment
+
+    python subscriber.py local create event_case-update event_case-update_rh
+    python subscriber.py local create event_uac-update event_uac-update_rh
 
 You can test pubsub with the steps detailed in the `## Manual testing` section below.
 
@@ -100,11 +125,10 @@ an exponential backoff. See this page for details: https://cloud.google.com/stor
 
 CR-555 added datastore backoff support to RH service. It uses Spring @Retryable annotation in RespondentDataRepositoryImpl to
 do an exponential backoff for DataStoreContentionException exceptions. If the maximum number of retries is used without
-success then the 'doRecover' method throws the failing exception, which will then use the standard Rabbit retry 
-mechanism to try again.
+success then the 'doRecover' method throws the failing exception.
 
 
-The explicit handling of contention exceptions has some advantages over increasing the level of Rabbit retries:
+The explicit handling of contention exceptions has some advantages:
 
   - Keeps log files clean when contention is happening, as an exception is only logged once both layers of retries have been exhausted.
   - Easy analysis on the quantity of contention, as a custom retry listener does a single line log entry on completion of the retries.
@@ -153,7 +177,7 @@ The retry of Firestore puts is controlled by the following properties:
 The default values for these properties has been set to give a very slow rate escalation. This should mean that the
 number of successful Firestore transactions is just a fraction below the actual maximum possible rate. The shallow
 escalation also means that we will try many times, and combined with a relatively high maximum wait, will mean 
-that we should hopefully never see a transaction (which is failing due to contention) going back to Rabbit. 
+that we should hopefully never see a transaction (which is failing due to contention) going back to PubSub. 
 
 Under extreme contention RH should slow down to the extent that each RH thread is only doing one Firestore add per
 minute. This should mean that RH is submitting requests 100's of times slower than Firestore can handle.
@@ -222,34 +246,7 @@ To manually test RH:
 
 1) **Queue setup**
 
-From the python pubsub project's `python-pubsub/samples/snippets` directory run the following commands to create a topic and subscription:
-
-  Topic: `python publisher.py <DUMMY_PROJECT_NAME> create <TOPIC_NAME>`
-
-  Subcription: `python subscriber.py <DUMMY_PROJECT_NAME> create <TOPIC_NAME> <SUBSCRIPTION_NAME>`
-
-  **Note: Python3 is required for this project, if your default `python` points to python 2, use `python3` in the above commands instead**
-
-  All commands below will assume that your dummy project name is `local`
- 
-Create the following topics/subscriptions:
-
-      Topic                          | Subscription
-    ---------------------------------+--------------------------------
-      event_case-update              | event_case-update_rh
-      event_uac-update               | event_uac-update_rh
-      event_uac-authenticate         | N/A
-      event_survey-launch            | N/A
-      event_fulfilment               | N/A
-
-    python publisher.py local create event_case-update
-    python publisher.py local create event_uac-update
-    python publisher.py local create event_uac-authenticate
-    python publisher.py local create event_survey-launch
-    python publisher.py local create event_fulfilment
-
-    python subscriber.py local create event_case-update event_case-update_rh
-    python subscriber.py local create event_uac-update event_uac-update_rh
+Ensure that the steps in the `## PubSub` section above have been completed first, and navigate to the python pubsub project's `python-pubsub/samples/snippets` directory
 
 2) **UAC Data**
 

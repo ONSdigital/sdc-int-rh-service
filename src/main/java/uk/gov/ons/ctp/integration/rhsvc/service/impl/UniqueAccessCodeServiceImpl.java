@@ -70,11 +70,11 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
     return data;
   }
 
-  /** Send RespondentAuthenticated event */
+  /** Send UacAuthenticated event */
   private void sendUacAuthenticatedEvent(UniqueAccessCodeDTO data) throws CTPException {
 
     log.info(
-        "Generating RespondentAuthenticated event for caseId",
+        "Generating UacAuthenticated event for caseId",
         kv("caseId", data.getCaseId()),
         kv("questionnaireId", data.getQuestionnaireId()));
 
@@ -89,7 +89,7 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
             EventType.UAC_AUTHENTICATE, Source.RESPONDENT_HOME, Channel.RH, response);
 
     log.debug(
-        "RespondentAuthenticated event published for caseId: "
+        "UacAuthenticated event published for caseId: "
             + response.getCaseId()
             + ", transactionId: "
             + transactionId);
