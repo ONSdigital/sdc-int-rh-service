@@ -1,7 +1,8 @@
 #
-# This docker compose file assumes that you have set the GOOGLE_APPLICATION_CREDENTIALS environment
+# This docker compose file assumes that you have set the DOCKER_GCP_CREDENTIALS environment
 # variable to point at a json file which contains valid GCP credentials. 
-# You may need to refresh the credentials by running the following before attempting to run RH:
+# The credentials file may be either a downloaded credentials file for your personal GCP
+# environment (see the Readme) or the credentials than are refreshed by running:
 #    $ gcloud auth application-default login
 # 
 # It is also assumed that the GOOGLE_CLOUD_PROJECT environment variable is set. This should contain
@@ -20,10 +21,10 @@ services:
     - "8071:8071"
     volumes:
     - type: bind
-      source: $GOOGLE_APPLICATION_CREDENTIALS
-      target: /gcp/config/google-credentials-sdc.json
+      source: $DOCKER_GCP_CREDENTIALS
+      target: /gcp/config/google-credentials.json
       read_only: true
     environment:
-    - GOOGLE_APPLICATION_CREDENTIALS=/gcp/config/google-credentials-sdc.json
+    - GOOGLE_APPLICATION_CREDENTIALS=/gcp/config/google-credentials.json
     - GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT}
     - spring.rabbitmq.host=host.docker.internal
