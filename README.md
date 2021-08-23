@@ -37,14 +37,18 @@ export GOOGLE_CLOUD_PROJECT="<name of your project>" e.g. export GOOGLE_CLOUD_PR
 
 ## Running
 
-There are two ways of running this service
+There are several ways of running this service
 
-* The first way is from the command line after moving into the same directory as the pom.xml:
+* Run the service in Eclipse. Run the RHSvcApplication class and update the 'Environment' section to set a value for GOOGLE_CLOUD_PROJECT.
+
+* Docker. To run the RH Service and its required mocks you can run a docker compose script. See the [Readme](docker/README.md) in the docker directory for details.
+
+* Alternatively, run a Maven build from the command line:
     ```bash
     mvn clean install
     mvn spring-boot:run
     ```
-* The second way requires that you first create a JAR file using the following mvn command (after moving into the same directory as the pom.xml):
+* A third way requires that you first create a JAR file using the following mvn command (after moving into the same directory as the pom.xml):
     ```bash
     mvn clean package
     ```
@@ -52,7 +56,7 @@ This will create the JAR file in the Target directory. You can then right-click 
 
 In order to run the Rabbitmq service, so that you can publish CaseCreated, CaseUpdated, and UACUpdated, messages for this rh-service to receive and store in Google CLoud Platform, enter the following command (from the same directory as the docker-compose.yml):
     ```bash
-    docker-compose up -d
+    docker-compose up -d --no-recreate
     ```
 Messages that are published to the events exchange will be routed to either the Case.Gateway or UAC.Gateway queue (depending on their binding).
 They will then be received by sdc-int-rh-service and stored in either the case_schema or the uac_schema (as appropriate) of the relevant Google Firestore datastore.
@@ -246,7 +250,7 @@ Submit the UAC data (see UAC.java) by sending the following to the 'events' exch
 	    "uac": {
 	      "uacHash": "8a9d5db4bbee34fd16e40aa2aaae52cfbdf1842559023614c30edb480ec252b4",
 	      "active": true,
-	      "questionnaireId": "1110000009",
+	      "questionnaireId": "8710000009",
 	      "caseType": "HH",
 	      "region": "E",
 	      "caseId": "dc4477d1-dd3f-4c69-b181-7ff725dc9fa4",
@@ -258,7 +262,7 @@ Submit the UAC data (see UAC.java) by sending the following to the 'events' exch
 
 3) **Case data**
 
-Submit the case (see CollectionCase.java) by sending the following to the 'events' exchange with the routing key 'event.case.lifecycle':
+Submit the case (see CollectionCase.java) by sending the following to the 'events' exchange with the routing key 'event.case.update':
 
 	{
 	  "event": {
@@ -316,7 +320,7 @@ To calculate the sha256 value for a uac:
 
 5) **Check the get request results**
 
-Firstly confirm that the curl command returned a 200 status.
+Firstly confirm that the curl command, from the previous step, returned a 200 status.
 
 Also verify that it contains a line such as:
 "caseStatus": "OK",
