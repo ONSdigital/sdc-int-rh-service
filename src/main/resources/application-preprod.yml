@@ -3,7 +3,3 @@ logging:
     uk.gov.ons.ctp: INFO
     org.springframework: OFF
   profile: CLOUD
-
-messaging:
-  consumingThreads: 60
-  prefetchCount: 1
