@@ -67,7 +67,6 @@ spring:
     gcp:
       pubsub:
         project-id: local
-        emulator-host: localhost:8085
 
 queueconfig:
   case-subscription: event_case-update_rh

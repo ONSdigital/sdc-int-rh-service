@@ -47,6 +47,12 @@ export GOOGLE_CLOUD_PROJECT="<name of your project>" e.g. export GOOGLE_CLOUD_PR
 
 ## Running
 
+To run locally, either through terminal or through an IDE, you must set your profile to local so that the `application-local.yml` is picked up.
+
+Use this flag to do this: 
+
+    -Dspring.profiles.active=local
+
 There are two ways of running this service
 
 * The first way is from the command line after moving into the same directory as the pom.xml:
