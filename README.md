@@ -37,10 +37,14 @@ For initial PubSub emulator setup:
 * Clone https://github.com/googleapis/python-pubsub
 * Install the emulator
   
-  ```
-  gcloud components install pubsub-emulator
-  gcloud components update
-  ```
+
+    gcloud components install pubsub-emulator
+    gcloud components update
+
+* Install python dependencies, in the above repo navigate to `samples/snipets` and run:
+
+
+    pip install -r requirements.txt
 
 Finally, create an environment variable to hold the name of your Google Cloud Platform project, using the export command at the terminal (in your census-rh-service repo):
 export GOOGLE_CLOUD_PROJECT="<name of your project>" e.g. export GOOGLE_CLOUD_PROJECT="census-rh-ellacook1"
@@ -114,7 +118,9 @@ Create the following topics/subscriptions:
     python subscriber.py local create event_case-update event_case-update_rh
     python subscriber.py local create event_uac-update event_uac-update_rh
 
-You can test pubsub with the steps detailed in the `## Manual testing` section below.
+There's a script to create the above topics and subscriptions in the scripts folder of this project called `pubsub-setup.sh`. It must be run from the `source/snipets of the python pubsub project.
+
+You can now run rhsvc locally with pubsub using the steps detailed in the `## Manual testing` section below.
 
 Further help as well as the source of all pubsub commands in this README can be found here:
 
