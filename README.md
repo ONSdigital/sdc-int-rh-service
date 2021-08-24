@@ -57,14 +57,18 @@ Use this flag to do this:
 
     -Dspring.profiles.active=local
 
-There are two ways of running this service
+There are several ways of running this service
 
-* The first way is from the command line after moving into the same directory as the pom.xml:
+* Run the service in Eclipse. Run the RHSvcApplication class and update the 'Environment' section to set a value for GOOGLE_CLOUD_PROJECT.
+
+* Docker. To run the RH Service and its required mocks you can run a docker compose script. See the [Readme](docker/README.md) in the docker directory for details.
+
+* Alternatively, run a Maven build from the command line:
     ```bash
     mvn clean install
     mvn spring-boot:run
     ```
-* The second way requires that you first create a JAR file using the following mvn command (after moving into the same directory as the pom.xml):
+* A third way requires that you first create a JAR file using the following mvn command (after moving into the same directory as the pom.xml):
     ```bash
     mvn clean package
     ```
@@ -72,6 +76,7 @@ This will create the JAR file in the Target directory. You can then right-click 
 
 You will need to complete the PubSub steps below and the first step in the `## Manual Testing` section.
 Messages that are published to either the `event_case-update` or `event_uac-update` topic will be received by sdc-int-rh-service and stored in either the case_schema or the uac_schema (as appropriate) of the relevant Google Firestore datastore.
+
 The project to use is given by the Application Default Credentials (These are the credential associated with the service account that your app engine app runs as - to set these up please follow the steps given in the previous section).
 
 
@@ -289,7 +294,7 @@ Submit the UAC data (see UAC.java) by swapping `<EVENT_JSON>` from above to the 
 	    "uac": {
 	      "uacHash": "8a9d5db4bbee34fd16e40aa2aaae52cfbdf1842559023614c30edb480ec252b4",
 	      "active": true,
-	      "questionnaireId": "1110000009",
+	      "questionnaireId": "8710000009",
 	      "caseType": "HH",
 	      "region": "E",
 	      "caseId": "dc4477d1-dd3f-4c69-b181-7ff725dc9fa4",
@@ -378,7 +383,7 @@ To calculate the sha256 value for a uac:
 
 7) **Check the get request results**
 
-Firstly confirm that the curl command returned a 200 status.
+Firstly confirm that the curl command, from the previous step, returned a 200 status.
 
 Also verify that it contains a line such as:
 "caseStatus": "OK",
