@@ -10,6 +10,7 @@ set -e
 # Prerequisites. See Readme.md in this directory.
 #
 
+PUBSUB_EMULATOR_VERSION="europe-west2-docker.pkg.dev/ons-ci-int/int-docker-ci/pubsubemu:latest"
 MOCK_ENVOY_VERSION="europe-west2-docker.pkg.dev/ons-ci-int/int-docker-release/mock-envoy:latest"
 RH_SERVICE_VERSION="europe-west2-docker.pkg.dev/ons-ci-int/int-docker-release/rh-service:latest"
 
@@ -21,14 +22,16 @@ echo "1/4 Checking environment variables"
 [ -z "$GOOGLE_CLOUD_PROJECT" ] && echo "Need to set GOOGLE_CLOUD_PROJECT" && exit 1;
 
 echo "2/4 Pulling images ..."
+docker pull $PUBSUB_EMULATOR_VERSION
 docker pull $MOCK_ENVOY_VERSION
 docker pull $RH_SERVICE_VERSION
 
 echo "3/4 Tagging images ..."
+docker tag $PUBSUB_EMULATOR_VERSION mock-envoy
 docker tag $MOCK_ENVOY_VERSION mock-envoy
 docker tag $RH_SERVICE_VERSION rh-service
 
 echo "4/4 Starting services ..."
-docker compose -f $SCRIPT_DIR/docker-compose-rabbit-mq.yml up -d --no-recreate
+docker compose -f $SCRIPT_DIR/docker-compose-pubsub-emulator.yml up -d
 docker compose -f $SCRIPT_DIR/docker-compose-mock-envoy.yml up -d
 docker compose -f $SCRIPT_DIR/docker-compose-rh-service.yml up -d

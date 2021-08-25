@@ -1,0 +1,7 @@
+version: '3.8'
+services:
+  pubsub-emulator:
+    container_name: pubsub-emulator
+    image: pubsub-emulator
+    ports:
+    - "8538:8538"
