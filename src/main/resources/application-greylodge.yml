@@ -4,6 +4,3 @@ logging:
     org.springframework: WARN
   profile: CLOUD
 
-messaging:
-  consumingThreads: 60
-  prefetchCount: 1

@@ -1,6 +1,6 @@
 {
   "event" : {
-    "type" : "CASE_UPDATED",
+    "type" : "CASE_UPDATE",
     "source" : "CONTACT_CENTRE_API",
     "channel" : "CC",
     "dateTime" : "2020-06-08T07:28:45.117Z",

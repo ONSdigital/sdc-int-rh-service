@@ -57,8 +57,6 @@ spec:
           value: "-XX:+UseContainerSupport
             -Xms1500m
             -Xmx1500m
-            -Dmessaging.uac-case-listener.consuming-threads=50
-            -Dmessaging.uac-case-listener.prefetch-count=250
             -Dspring.profiles.active=dev"
         - name: CLOUD_STORAGE_CASE_SCHEMA_NAME
           valueFrom:
@@ -84,26 +82,11 @@ spec:
             configMapKeyRef:
               name: rh-config
               key: messaging-publish-max-attempts
-        - name: SPRING_RABBITMQ_HOST
+        - name: SPRING_CLOUD_GCP_PUBSUB_PROJECTID
           valueFrom:
             configMapKeyRef:
               name: rh-config
-              key: rabbitmq-host
-        - name: SPRING_RABBITMQ_PORT
-          valueFrom:
-            configMapKeyRef:
-              name: rh-config
-              key: rabbitmq-port
-        - name: SPRING_RABBITMQ_USERNAME
-          valueFrom:
-            secretKeyRef:
-              name: rabbit-identity
-              key: username
-        - name: SPRING_RABBITMQ_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: rabbit-identity
-              key: password
+              key: project-id
         - name: NOTIFY_API_KEY
           valueFrom:
             secretKeyRef:

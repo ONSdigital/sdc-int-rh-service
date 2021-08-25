@@ -1,8 +1,5 @@
 package uk.gov.ons.ctp.integration.rhsvc;
 
-import io.micrometer.core.instrument.Meter;
-import io.micrometer.core.instrument.config.MeterFilter;
-import io.micrometer.core.instrument.config.MeterFilterReply;
 import io.micrometer.stackdriver.StackdriverConfig;
 import io.micrometer.stackdriver.StackdriverMeterRegistry;
 import java.time.Duration;
@@ -10,9 +7,6 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.rabbit.connection.ConnectionFactory;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,31 +14,28 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.circuitbreaker.resilience4j.Resilience4JCircuitBreakerFactory;
 import org.springframework.cloud.client.circuitbreaker.CircuitBreaker;
+import org.springframework.cloud.gcp.pubsub.core.PubSubTemplate;
+import org.springframework.cloud.gcp.pubsub.support.PublisherFactory;
+import org.springframework.cloud.gcp.pubsub.support.SubscriberFactory;
+import org.springframework.cloud.gcp.pubsub.support.converter.JacksonPubSubMessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpStatus;
 import org.springframework.integration.annotation.IntegrationComponentScan;
-import org.springframework.retry.RetryCallback;
-import org.springframework.retry.RetryContext;
-import org.springframework.retry.RetryListener;
-import org.springframework.retry.policy.SimpleRetryPolicy;
-import org.springframework.retry.support.RetryTemplate;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import uk.gov.ons.ctp.common.cloud.CloudRetryListener;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.EventPublisher;
 import uk.gov.ons.ctp.common.event.EventSender;
-import uk.gov.ons.ctp.common.event.SpringRabbitEventSender;
+import uk.gov.ons.ctp.common.event.PubSubEventSender;
 import uk.gov.ons.ctp.common.event.persistence.FirestoreEventPersistence;
 import uk.gov.ons.ctp.common.jackson.CustomObjectMapper;
 import uk.gov.ons.ctp.common.rest.RestClient;
 import uk.gov.ons.ctp.common.rest.RestClientConfig;
 import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
-import uk.gov.ons.ctp.integration.rhsvc.config.MessagingConfig.PublishConfig;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientApi;
 
@@ -90,46 +81,30 @@ public class RHSvcApplication {
 
   @Bean
   public EventPublisher eventPublisher(
-      final RabbitTemplate rabbitTemplate,
+      @Qualifier("pubSubTemplate") PubSubTemplate pubSubTemplate,
       final FirestoreEventPersistence eventPersistence,
       @Qualifier("eventPublisherCbFactory")
           Resilience4JCircuitBreakerFactory circuitBreakerFactory) {
 
-    EventSender sender = new SpringRabbitEventSender(rabbitTemplate);
+    EventSender sender =
+        new PubSubEventSender(pubSubTemplate, appConfig.getMessaging().getPublish().getTimeout());
     CircuitBreaker circuitBreaker = circuitBreakerFactory.create("eventSendCircuitBreaker");
     return EventPublisher.createWithEventPersistence(sender, eventPersistence, circuitBreaker);
   }
 
   @Bean
-  public RabbitTemplate rabbitTemplate(
-      final ConnectionFactory connectionFactory, RetryTemplate sendRetryTemplate) {
-    final var template = new RabbitTemplate(connectionFactory);
-    template.setMessageConverter(new Jackson2JsonMessageConverter());
-    template.setExchange("events");
-    template.setChannelTransacted(true);
-    template.setRetryTemplate(sendRetryTemplate);
-    return template;
+  public PubSubTemplate pubSubTemplate(
+      PublisherFactory publisherFactory,
+      SubscriberFactory subscriberFactory,
+      JacksonPubSubMessageConverter jacksonPubSubMessageConverter) {
+    PubSubTemplate pubSubTemplate = new PubSubTemplate(publisherFactory, subscriberFactory);
+    pubSubTemplate.setMessageConverter(jacksonPubSubMessageConverter);
+    return pubSubTemplate;
   }
 
   @Bean
-  public RetryTemplate sendRetryTemplate(RetryListener sendRetryListener) {
-    RetryTemplate template = new RetryTemplate();
-    template.registerListener(sendRetryListener);
-    PublishConfig publishConfig = appConfig.getMessaging().getPublish();
-    template.setRetryPolicy(new SimpleRetryPolicy(publishConfig.getMaxAttempts()));
-    return template;
-  }
-
-  @Bean
-  public RetryListener sendRetryListener() {
-    return new CloudRetryListener() {
-      @Override
-      public <T, E extends Throwable> boolean open(
-          RetryContext context, RetryCallback<T, E> callback) {
-        context.setAttribute(RetryContext.NAME, "publish-event");
-        return true;
-      }
-    };
+  public JacksonPubSubMessageConverter messageConverter() {
+    return new JacksonPubSubMessageConverter(customObjectMapper());
   }
 
   @Bean
@@ -183,24 +158,6 @@ public class RHSvcApplication {
       @Override
       public String get(String key) {
         return null;
-      }
-    };
-  }
-
-  @Bean
-  public MeterFilter meterFilter() {
-    return new MeterFilter() {
-      @Override
-      public MeterFilterReply accept(Meter.Id id) {
-        // RM use this to remove Rabbit clutter from the metrics as they have alternate means of
-        // monitoring it
-        // We will probable want to experiment with removing this to see what value we get from
-        // rabbit metrics
-        // a) once we have Grafana setup, and b) once we try out micrometer in a perf environment
-        if (id.getName().startsWith("rabbitmq")) {
-          return MeterFilterReply.DENY;
-        }
-        return MeterFilterReply.NEUTRAL;
       }
     };
   }

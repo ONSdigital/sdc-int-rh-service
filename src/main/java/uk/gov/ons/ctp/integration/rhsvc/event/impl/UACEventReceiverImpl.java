@@ -11,7 +11,7 @@ import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.annotation.ServiceActivator;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.model.UAC;
-import uk.gov.ons.ctp.common.event.model.UACEvent;
+import uk.gov.ons.ctp.common.event.model.UacEvent;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
 
@@ -36,7 +36,7 @@ public class UACEventReceiverImpl {
    * @throws CTPException something went wrong
    */
   @ServiceActivator(inputChannel = "acceptUACEvent")
-  public void acceptUACEvent(UACEvent uacEvent) throws CTPException {
+  public void acceptUACEvent(UacEvent uacEvent) throws CTPException {
 
     UAC uac = uacEvent.getPayload().getUac();
     String uacTransactionId = uacEvent.getEvent().getTransactionId();

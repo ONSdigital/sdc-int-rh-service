@@ -6,12 +6,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import uk.gov.ons.ctp.common.domain.Channel;
+import uk.gov.ons.ctp.common.domain.Source;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.EventPublisher;
-import uk.gov.ons.ctp.common.event.EventPublisher.Channel;
-import uk.gov.ons.ctp.common.event.EventPublisher.EventType;
-import uk.gov.ons.ctp.common.event.EventPublisher.Source;
-import uk.gov.ons.ctp.common.event.model.SurveyLaunchedResponse;
+import uk.gov.ons.ctp.common.event.EventType;
+import uk.gov.ons.ctp.common.event.model.SurveyLaunchResponse;
 import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient;
 import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient.Domain;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
@@ -40,8 +40,8 @@ public class SurveyLaunchedServiceImpl implements SurveyLaunchedService {
 
     checkRateLimit(surveyLaunchedDTO.getClientIP());
 
-    SurveyLaunchedResponse response =
-        SurveyLaunchedResponse.builder()
+    SurveyLaunchResponse response =
+        SurveyLaunchResponse.builder()
             .questionnaireId(surveyLaunchedDTO.getQuestionnaireId())
             .caseId(surveyLaunchedDTO.getCaseId())
             .agentId(surveyLaunchedDTO.getAgentId())
@@ -54,7 +54,7 @@ public class SurveyLaunchedServiceImpl implements SurveyLaunchedService {
 
     String transactionId =
         eventPublisher.sendEvent(
-            EventType.SURVEY_LAUNCHED, Source.RESPONDENT_HOME, channel, response);
+            EventType.SURVEY_LAUNCH, Source.RESPONDENT_HOME, channel, response);
 
     log.debug(
         "SurveyLaunch event published",

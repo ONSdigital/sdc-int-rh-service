@@ -16,17 +16,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.ons.ctp.common.domain.CaseType;
+import uk.gov.ons.ctp.common.domain.Channel;
+import uk.gov.ons.ctp.common.domain.Source;
 import uk.gov.ons.ctp.common.domain.UniquePropertyReferenceNumber;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.error.CTPException.Fault;
 import uk.gov.ons.ctp.common.event.EventPublisher;
-import uk.gov.ons.ctp.common.event.EventPublisher.Channel;
-import uk.gov.ons.ctp.common.event.EventPublisher.EventType;
-import uk.gov.ons.ctp.common.event.EventPublisher.Source;
-import uk.gov.ons.ctp.common.event.model.AddressCompact;
-import uk.gov.ons.ctp.common.event.model.AddressModification;
+import uk.gov.ons.ctp.common.event.EventType;
 import uk.gov.ons.ctp.common.event.model.CollectionCase;
-import uk.gov.ons.ctp.common.event.model.CollectionCaseCompact;
 import uk.gov.ons.ctp.common.event.model.Contact;
 import uk.gov.ons.ctp.common.event.model.FulfilmentRequest;
 import uk.gov.ons.ctp.integration.common.product.ProductReference;
@@ -38,9 +35,7 @@ import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient;
 import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient.Domain;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
-import uk.gov.ons.ctp.integration.rhsvc.representation.AddressChangeDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
-import uk.gov.ons.ctp.integration.rhsvc.representation.CaseRequestDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.FulfilmentRequestDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.PostalFulfilmentRequestDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.SMSFulfilmentRequestDTO;
@@ -73,119 +68,6 @@ public class CaseServiceImpl implements CaseService {
       log.warn("No cases returned for uprn", kv("uprn", uprn));
       throw new CTPException(Fault.RESOURCE_NOT_FOUND, "Failed to retrieve Case");
     }
-  }
-
-  @Override
-  public CaseDTO createNewCase(CaseRequestDTO request) throws CTPException {
-
-    Optional<CaseDTO> existingCase = getLatestNonHICaseByUPRN(request.getUprn());
-
-    CaseDTO caseToReturn;
-    if (existingCase.isPresent()) {
-      // Don't need to create a new case, as we found one with the same UPRN
-      caseToReturn = existingCase.get();
-    } else {
-      // Create a new case as not found for the UPRN in Firestore
-      CaseType caseType = ServiceUtil.determineCaseType(request);
-      CollectionCase newCase =
-          ServiceUtil.createCase(request, caseType, appConfig.getCollectionExerciseId());
-      log.debug("Created new case", kv("caseId", newCase.getId()), kv("primaryCaseType", caseType));
-
-      // Store new case in Firestore
-      dataRepo.writeCollectionCase(newCase);
-
-      // tell RM we have created a case for the selected (HH|CE|SPG) address
-      ServiceUtil.sendNewAddressEvent(eventPublisher, newCase);
-
-      caseToReturn = mapperFacade.map(newCase, CaseDTO.class);
-    }
-
-    return caseToReturn;
-  }
-
-  @Override
-  public CaseDTO modifyAddress(final AddressChangeDTO addressChanges) throws CTPException {
-
-    String caseId = addressChanges.getCaseId().toString();
-
-    Optional<CollectionCase> caseMatch = dataRepo.readCollectionCase(caseId);
-
-    if (caseMatch.isEmpty()) {
-      log.warn("Failed to retrieve Case from storage", kv("caseId", caseId));
-      throw new CTPException(
-          CTPException.Fault.RESOURCE_NOT_FOUND, "Failed to retrieve Case for caseId: {}", caseId);
-    }
-
-    CollectionCase rmCase = caseMatch.get();
-
-    CaseDTO caseData = createModifiedAddressCaseDetails(caseId, rmCase, addressChanges);
-
-    AddressCompact originalAddress = mapperFacade.map(rmCase.getAddress(), AddressCompact.class);
-    AddressCompact updatedAddress = mapperFacade.map(rmCase.getAddress(), AddressCompact.class);
-
-    mapperFacade.map(addressChanges.getAddress(), updatedAddress);
-
-    sendAddressModifiedEvent(caseId, originalAddress, updatedAddress);
-
-    return caseData;
-  }
-
-  /**
-   * Create case details with updated Address
-   *
-   * @param caseId requested caseId for which to update address
-   * @param rmCase original Case from repository
-   * @param addressChanges Changed address details from request
-   * @return CaseDTO updated case details
-   * @throws CTPException UPRN of stored address and request change do not match
-   */
-  private CaseDTO createModifiedAddressCaseDetails(
-      String caseId, CollectionCase rmCase, AddressChangeDTO addressChanges) throws CTPException {
-
-    CaseDTO caseData = mapperFacade.map(rmCase, CaseDTO.class);
-    if (!caseData.getAddress().getUprn().equals(addressChanges.getAddress().getUprn())) {
-      log.warn(
-          "The UPRN of the referenced Case and the provided Address UPRN must be matching",
-          kv("caseId", caseId),
-          kv("uprn", addressChanges.getAddress().getUprn().toString()));
-      throw new CTPException(
-          CTPException.Fault.BAD_REQUEST,
-          "The UPRN of the referenced Case and the provided Address UPRN must be matching");
-    }
-    caseData.setAddress(addressChanges.getAddress());
-    return caseData;
-  }
-
-  /**
-   * Send AddressModified event
-   *
-   * @param caseId of updated case
-   * @param originalAddress details of case
-   * @param newAddress details of case
-   */
-  private void sendAddressModifiedEvent(
-      String caseId, AddressCompact originalAddress, AddressCompact newAddress) {
-
-    log.debug(
-        "Generating AddressModified event",
-        kv("caseId", caseId),
-        kv("uprn", originalAddress.getUprn()));
-
-    AddressModification addressModification =
-        AddressModification.builder()
-            .collectionCase(new CollectionCaseCompact(UUID.fromString(caseId)))
-            .originalAddress(originalAddress)
-            .newAddress(newAddress)
-            .build();
-
-    String transactionId =
-        eventPublisher.sendEvent(
-            EventType.ADDRESS_MODIFIED, Source.RESPONDENT_HOME, Channel.RH, addressModification);
-
-    log.debug(
-        "AddressModified event published",
-        kv("caseId", caseId),
-        kv("transactionId", transactionId));
   }
 
   /**
@@ -295,8 +177,7 @@ public class CaseServiceImpl implements CaseService {
       FulfilmentRequest payload =
           createFulfilmentRequestPayload(request.getCaseId(), contact, product, caseDetails);
 
-      eventPublisher.sendEvent(
-          EventType.FULFILMENT_REQUESTED, Source.RESPONDENT_HOME, Channel.RH, payload);
+      eventPublisher.sendEvent(EventType.FULFILMENT, Source.RESPONDENT_HOME, Channel.RH, payload);
     }
   }
 
@@ -366,22 +247,5 @@ public class CaseServiceImpl implements CaseService {
           "The fulfilment is for an individual so none of the following fields can be empty: "
               + "'forename' and 'surname'");
     }
-  }
-
-  // get the latest Case , which can have a valid, or invalid address, but must not have a casetype
-  // of HI.
-  private Optional<CaseDTO> getLatestNonHICaseByUPRN(UniquePropertyReferenceNumber uprn)
-      throws CTPException {
-    Optional<CaseDTO> result = Optional.empty();
-
-    Optional<CollectionCase> caseFound =
-        dataRepo.readNonHILatestCollectionCaseByUprn(Long.toString(uprn.getValue()), false);
-    if (caseFound.isPresent()) {
-      log.debug(
-          "Existing case found by UPRN", kv("case", caseFound.get().getId()), kv("uprn", uprn));
-      result = Optional.of(mapperFacade.map(caseFound.get(), CaseDTO.class));
-    }
-
-    return result;
   }
 }

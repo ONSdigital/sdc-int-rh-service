@@ -1,8 +1,6 @@
 package uk.gov.ons.ctp.integration.rhsvc.endpoint;
 
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.startsWith;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -15,10 +13,8 @@ import static uk.gov.ons.ctp.common.MvcHelper.postJson;
 import static uk.gov.ons.ctp.common.utility.MockMvcControllerAdviceHelper.mockAdviceFor;
 import static uk.gov.ons.ctp.integration.rhsvc.RespondentHomeFixture.EXPECTED_JSON_CONTENT_TYPE;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.List;
-import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,17 +22,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.domain.UniquePropertyReferenceNumber;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.error.RestExceptionHandler;
-import uk.gov.ons.ctp.integration.rhsvc.representation.AddressChangeDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
-import uk.gov.ons.ctp.integration.rhsvc.representation.CaseRequestDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.PostalFulfilmentRequestDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.SMSFulfilmentRequestDTO;
 import uk.gov.ons.ctp.integration.rhsvc.service.CaseService;
@@ -51,18 +43,12 @@ public class CaseEndpointUnitTest {
   private static final String ERROR_MESSAGE = "Failed to retrieve UPRN";
   private static final String INVALID_CODE = "VALIDATION_FAILED";
   private static final String INVALID_MESSAGE = "Provided json is incorrect.";
-  private static final String CASEID_UPRN_INCONSISTENT =
-      "The UPRN of the referenced Case and the provided Address UPRN must be matching";
-  private static final String CASEID_INCONSISTENT =
-      "The path parameter caseId does not match the caseId in the request body";
 
   @InjectMocks private CaseEndpoint caseEndpoint;
 
   @Mock CaseService caseService;
 
   private MockMvc mockMvc;
-
-  private ObjectMapper mapper = new ObjectMapper();
 
   private List<CaseDTO> caseDTO;
 
@@ -74,77 +60,6 @@ public class CaseEndpointUnitTest {
             .setHandlerExceptionResolvers(mockAdviceFor(RestExceptionHandler.class))
             .build();
     this.caseDTO = FixtureHelper.loadClassFixtures(CaseDTO[].class);
-  }
-
-  /** Test returns JSON for new case from valid new case request */
-  @Test
-  public void postCreateCase_OK() throws Exception {
-    CaseRequestDTO newCaseRequest = FixtureHelper.loadClassFixtures(CaseRequestDTO[].class).get(0);
-
-    CaseDTO existingCase = caseDTO.get(0);
-    when(caseService.createNewCase(any())).thenReturn(existingCase);
-
-    mockMvc
-        .perform(
-            MockMvcRequestBuilders.post("/cases/create")
-                .content(mapper.writeValueAsString(newCaseRequest))
-                .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.caseId", is(existingCase.getCaseId().toString())));
-  }
-
-  @Test
-  public void postCreateCase_missingAddressLine1() throws Exception {
-    CaseRequestDTO request = FixtureHelper.loadClassFixtures(CaseRequestDTO[].class).get(0);
-
-    request.setAddressLine1(null);
-
-    submitInvalidNewCaseRequest(request);
-  }
-
-  @Test
-  public void postCreateCase_missingTownName() throws Exception {
-    CaseRequestDTO request = FixtureHelper.loadClassFixtures(CaseRequestDTO[].class).get(0);
-
-    request.setTownName(null);
-
-    submitInvalidNewCaseRequest(request);
-  }
-
-  @Test
-  public void postCreateCase_missingRegion() throws Exception {
-    CaseRequestDTO request = FixtureHelper.loadClassFixtures(CaseRequestDTO[].class).get(0);
-
-    request.setRegion(null);
-
-    submitInvalidNewCaseRequest(request);
-  }
-
-  @Test
-  public void postCreateCase_missingPostcode() throws Exception {
-    CaseRequestDTO request = FixtureHelper.loadClassFixtures(CaseRequestDTO[].class).get(0);
-
-    request.setPostcode(null);
-
-    submitInvalidNewCaseRequest(request);
-  }
-
-  @Test
-  public void postCreateCase_missingUprn() throws Exception {
-    CaseRequestDTO request = FixtureHelper.loadClassFixtures(CaseRequestDTO[].class).get(0);
-
-    request.setUprn(null);
-
-    submitInvalidNewCaseRequest(request);
-  }
-
-  @Test
-  public void postCreateCase_missingEstabType() throws Exception {
-    CaseRequestDTO request = FixtureHelper.loadClassFixtures(CaseRequestDTO[].class).get(0);
-
-    request.setEstabType(null);
-
-    submitInvalidNewCaseRequest(request);
   }
 
   /** Test returns valid JSON for valid UPRN */
@@ -193,125 +108,6 @@ public class CaseEndpointUnitTest {
         .andExpect(status().isBadRequest())
         .andExpect(jsonPath("$.error.code", is(INVALID_CODE)))
         .andExpect(jsonPath("$.error.message", is(INVALID_MESSAGE)));
-  }
-
-  /** Test returns valid JSON for valid caseId */
-  @Test
-  public void putModifyAddressByCaseIdOK() throws Exception {
-    CaseDTO rmCase = caseDTO.get(0);
-    AddressChangeDTO addressChangeDTO =
-        new AddressChangeDTO(rmCase.getCaseId(), rmCase.getAddress());
-
-    when(caseService.modifyAddress(addressChangeDTO)).thenReturn(rmCase);
-
-    mockMvc
-        .perform(
-            MockMvcRequestBuilders.put("/cases/{caseId}/address", rmCase.getCaseId().toString())
-                .content(mapper.writeValueAsString(addressChangeDTO))
-                .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk())
-        .andExpect(content().contentType(EXPECTED_JSON_CONTENT_TYPE))
-        .andExpect(jsonPath("$.caseId", is(rmCase.getCaseId().toString())))
-        .andExpect(jsonPath("$.caseRef", is(rmCase.getCaseRef())))
-        .andExpect(jsonPath("$.caseType", is(rmCase.getCaseType())))
-        .andExpect(jsonPath("$.addressType", is(rmCase.getAddressType())))
-        .andExpect(jsonPath("$.addressLevel", is(rmCase.getAddressLevel())))
-        .andExpect(jsonPath("$.addressLine1", is(rmCase.getAddress().getAddressLine1())))
-        .andExpect(jsonPath("$.addressLine2", is(rmCase.getAddress().getAddressLine2())))
-        .andExpect(jsonPath("$.addressLine3", is(rmCase.getAddress().getAddressLine3())))
-        .andExpect(jsonPath("$.townName", is(rmCase.getAddress().getTownName())))
-        .andExpect(jsonPath("$.postcode", is(rmCase.getAddress().getPostcode())));
-  }
-
-  /** Test returns bad request if caseId path parameter and body don't match */
-  @Test
-  public void putModifyAddressByCaseIdInconsistent() throws Exception {
-    CaseDTO rmCase = caseDTO.get(0);
-    AddressChangeDTO addressChangeDTO =
-        new AddressChangeDTO(UUID.fromString(rmCase.getCaseId().toString()), rmCase.getAddress());
-
-    mockMvc
-        .perform(
-            MockMvcRequestBuilders.put("/cases/{caseId}/address", INCONSISTENT_CASEID)
-                .content(mapper.writeValueAsString(addressChangeDTO))
-                .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isBadRequest())
-        .andExpect(jsonPath("$.error.code", is(CTPException.Fault.BAD_REQUEST.toString())))
-        .andExpect(jsonPath("$.error.message", is(CASEID_INCONSISTENT)));
-  }
-
-  /** Test returns bad request for missing UPRN */
-  @Test
-  public void putModifyUPRNMissing() throws Exception {
-    CaseDTO rmCase = caseDTO.get(0);
-    UUID caseId = UUID.fromString(rmCase.getCaseId().toString());
-    AddressChangeDTO addressChangeDTO = new AddressChangeDTO(caseId, rmCase.getAddress());
-    addressChangeDTO.getAddress().setUprn(null);
-
-    mockMvc
-        .perform(
-            MockMvcRequestBuilders.put("/cases/{caseId}/address", rmCase.getCaseId().toString())
-                .content(mapper.writeValueAsString(addressChangeDTO))
-                .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isBadRequest())
-        .andExpect(jsonPath("$.error.code", is(INVALID_CODE)))
-        .andExpect(jsonPath("$.error.message", containsString(INVALID_MESSAGE)));
-  }
-
-  /** Test returns bad request for missing address line 1 */
-  @Test
-  public void putModifyAddressLine1Missing() throws Exception {
-    CaseDTO rmCase = caseDTO.get(0);
-    UUID caseId = UUID.fromString(rmCase.getCaseId().toString());
-    AddressChangeDTO addressChangeDTO = new AddressChangeDTO(caseId, rmCase.getAddress());
-    addressChangeDTO.getAddress().setAddressLine1(null);
-
-    mockMvc
-        .perform(
-            MockMvcRequestBuilders.put("/cases/{caseId}/address", rmCase.getCaseId().toString())
-                .content(mapper.writeValueAsString(addressChangeDTO))
-                .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isBadRequest())
-        .andExpect(jsonPath("$.error.code", is(INVALID_CODE)))
-        .andExpect(jsonPath("$.error.message", containsString(INVALID_MESSAGE)));
-  }
-
-  /** Test returns bad request for missing postcode */
-  @Test
-  public void putModifyPostcodeMissing() throws Exception {
-    CaseDTO rmCase = caseDTO.get(0);
-    UUID caseId = UUID.fromString(rmCase.getCaseId().toString());
-    AddressChangeDTO addressChangeDTO = new AddressChangeDTO(caseId, rmCase.getAddress());
-    addressChangeDTO.getAddress().setPostcode(null);
-
-    mockMvc
-        .perform(
-            MockMvcRequestBuilders.put("/cases/{caseId}/address", rmCase.getCaseId().toString())
-                .content(mapper.writeValueAsString(addressChangeDTO))
-                .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isBadRequest())
-        .andExpect(jsonPath("$.error.code", is(INVALID_CODE)))
-        .andExpect(jsonPath("$.error.message", containsString(INVALID_MESSAGE)));
-  }
-
-  /** Test returns bad request for inconsistent caseId and UPRN */
-  @Test
-  public void putModifyCaseIdUPRNInconsistent() throws Exception {
-    CaseDTO rmCase = caseDTO.get(0);
-    AddressChangeDTO addressChangeDTO =
-        new AddressChangeDTO(rmCase.getCaseId(), rmCase.getAddress());
-
-    when(caseService.modifyAddress(addressChangeDTO))
-        .thenThrow(new CTPException(CTPException.Fault.BAD_REQUEST, CASEID_UPRN_INCONSISTENT));
-
-    mockMvc
-        .perform(
-            MockMvcRequestBuilders.put("/cases/{caseId}/address", rmCase.getCaseId().toString())
-                .content(mapper.writeValueAsString(addressChangeDTO))
-                .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isBadRequest())
-        .andExpect(jsonPath("$.error.code", is(CTPException.Fault.BAD_REQUEST.toString())))
-        .andExpect(jsonPath("$.error.message", is(CASEID_UPRN_INCONSISTENT)));
   }
 
   @Test
@@ -514,17 +310,6 @@ public class CaseEndpointUnitTest {
     String url = "/cases/3fa85f64-5717-4562-b3fc-2c963f66afa6/fulfilments/sms";
     String json = "{ \"name\": \"Fred\" }";
     verifyRejectedSmsFulfilmentRequest(json, url);
-  }
-
-  private void submitInvalidNewCaseRequest(CaseRequestDTO newCaseRequest) throws Exception {
-    mockMvc
-        .perform(
-            MockMvcRequestBuilders.post("/cases/create")
-                .content(mapper.writeValueAsString(newCaseRequest))
-                .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isBadRequest())
-        .andExpect(jsonPath("$.error.code", is(INVALID_CODE)))
-        .andExpect(jsonPath("$.error.message", startsWith(INVALID_MESSAGE)));
   }
 
   private ObjectNode getSmsFulfilmentFixture() {

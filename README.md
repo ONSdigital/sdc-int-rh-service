@@ -32,10 +32,30 @@ NB. The instructions will lead to a .json file being downloaded, which can be us
 NB. For more detailed information about setting up the Application Default Credential please see the following confluence article:
 https://collaborate2.ons.gov.uk/confluence/display/SDC/How+to+Set+Up+Google+Cloud+Platform+Locally
 
+For initial PubSub emulator setup:
+
+* Clone https://github.com/googleapis/python-pubsub
+* Install the emulator
+  
+
+    gcloud components install pubsub-emulator
+    gcloud components update
+
+* Install python dependencies, in the above repo navigate to `samples/snipets` and run:
+
+
+    pip install -r requirements.txt
+
 Finally, create an environment variable to hold the name of your Google Cloud Platform project, using the export command at the terminal (in your census-rh-service repo):
 export GOOGLE_CLOUD_PROJECT="<name of your project>" e.g. export GOOGLE_CLOUD_PROJECT="census-rh-ellacook1"
 
 ## Running
+
+To run locally, either through terminal or through an IDE, you must set your profile to local so that the `application-local.yml` is picked up.
+
+Use this flag to do this: 
+
+    -Dspring.profiles.active=local
 
 There are several ways of running this service
 
@@ -54,20 +74,62 @@ There are several ways of running this service
     ```
 This will create the JAR file in the Target directory. You can then right-click on the JAR file (in Intellij) and choose 'Run'.
 
-In order to run the Rabbitmq service, so that you can publish CaseCreated, CaseUpdated, and UACUpdated, messages for this rh-service to receive and store in Google CLoud Platform, enter the following command (from the same directory as the docker-compose.yml):
-    ```bash
-    docker-compose up -d --no-recreate
-    ```
-Messages that are published to the events exchange will be routed to either the Case.Gateway or UAC.Gateway queue (depending on their binding).
-They will then be received by sdc-int-rh-service and stored in either the case_schema or the uac_schema (as appropriate) of the relevant Google Firestore datastore.
+You will need to complete the PubSub steps below and the first step in the `## Manual Testing` section.
+Messages that are published to either the `event_case-update` or `event_uac-update` topic will be received by sdc-int-rh-service and stored in either the case_schema or the uac_schema (as appropriate) of the relevant Google Firestore datastore.
+
 The project to use is given by the Application Default Credentials (These are the credential associated with the service account that your app engine app runs as - to set these up please follow the steps given in the previous section).
 
 
-## RabbitMQ
+## PubSub
 
-When running on localhost the Rabbitmq management console should be found at the following endpoint:
+To start pubsub
 
-* http://localhost:46672/#/queues
+    gcloud beta emulators pubsub start --project=<fake_project_id>
+
+`<fake_project_id>` Can be anything as it's not a real project, however the `application.yml` and all commands below are expecting it to be `local`, so be sure to change them if you use something else.
+
+    gcloud beta emulators pubsub start --project=local
+
+Switch to a new temrinal window and run the following to set up environment variables. You will need to run this in every terminal that you wish to use to interact with the emulator.
+
+    $(gcloud beta emulators pubsub env-init)
+
+From the python pubsub project's `python-pubsub/samples/snippets` directory run the following commands to create a topic and subscription:
+
+Topic: `python publisher.py <DUMMY_PROJECT_NAME> create <TOPIC_NAME>`
+
+Subcription: `python subscriber.py <DUMMY_PROJECT_NAME> create <TOPIC_NAME> <SUBSCRIPTION_NAME>`
+
+**Note: Python3 is required for this project, if your default `python` points to python 2, use `python3` in the above commands instead**
+
+All commands below will assume that your dummy project name is `local`
+
+Create the following topics/subscriptions:
+
+      Topic                          | Subscription
+    ---------------------------------+--------------------------------
+      event_case-update              | event_case-update_rh
+      event_uac-update               | event_uac-update_rh
+      event_uac-authenticate         | N/A
+      event_survey-launch            | N/A
+      event_fulfilment               | N/A
+
+    python publisher.py local create event_case-update
+    python publisher.py local create event_uac-update
+    python publisher.py local create event_uac-authenticate
+    python publisher.py local create event_survey-launch
+    python publisher.py local create event_fulfilment
+
+    python subscriber.py local create event_case-update event_case-update_rh
+    python subscriber.py local create event_uac-update event_uac-update_rh
+
+There's a script to create the above topics and subscriptions in the scripts folder of this project called `pubsub-setup.sh`. It must be run from the `source/snipets of the python pubsub project.
+
+You can now run rhsvc locally with pubsub using the steps detailed in the `## Manual testing` section below.
+
+Further help as well as the source of all pubsub commands in this README can be found here:
+
+https://cloud.google.com/pubsub/docs/emulator
 
 ## Firestore
 
@@ -80,14 +142,10 @@ an exponential backoff. See this page for details: https://cloud.google.com/stor
 
 CR-555 added datastore backoff support to RH service. It uses Spring @Retryable annotation in RespondentDataRepositoryImpl to
 do an exponential backoff for DataStoreContentionException exceptions. If the maximum number of retries is used without
-success then the 'doRecover' method throws the failing exception, which will then use the standard Rabbit retry 
-mechanism to try again.
+success then the 'doRecover' method throws the failing exception.
 
-This combination of an explicit backoff handling followed by the RabbitMQ retries may appear to be the same as just using 
-Rabbit retries. However, the key difference is that we are expecting to get Firestore contention exceptions whereas the 
-standard Rabbit retries are set for unexpected problems.
 
-The explicit handling of contention exceptions has some advantages over increasing the level of Rabbit retries:
+The explicit handling of contention exceptions has some advantages:
 
   - Keeps log files clean when contention is happening, as an exception is only logged once both layers of retries have been exhausted.
   - Easy analysis on the quantity of contention, as a custom retry listener does a single line log entry on completion of the retries.
@@ -120,16 +178,6 @@ as a warning.
     2019-12-11 09:16:35.362  INFO  50306 --- [enerContainer-1] u.g.o.c.i.r.e.i.CaseEventReceiverImpl    : Entering acceptCaseEvent
     2019-12-11 09:18:12.336  WARN  50306 --- [enerContainer-1] u.g.o.c.i.r.r.impl.CustomRetryListener   : writeCollectionCase: Transaction failed after 30 attempts
 
-If the Rabbit retries are exhausted then the root cause exception is logged:
-
-    2019-12-11 09:21:26.277  WARN  50306 --- [enerContainer-1] o.s.a.r.r.RejectAndDontRequeueRecoverer  : Retries exhausted for message (Body:....
-    org.springframework.amqp.rabbit.listener.exception.ListenerExecutionFailedException: Listener threw exception
-    at org.springframework.amqp.rabbit.listener.AbstractMessageListenerContainer.wrapToListenerExecutionFailedExceptionIfNeeded(AbstractMessageListenerContainer.java:1603)
-	....
-	2019-12-11 09:21:26.282  WARN  50306 --- [enerContainer-1] s.a.r.l.ConditionalRejectingErrorHandler : Execution of Rabbit message listener failed.
-    org.springframework.amqp.rabbit.listener.exception.ListenerExecutionFailedException: Retry Policy Exhausted
-    at org.springframework.amqp.rabbit.retry.RejectAndDontRequeueRecoverer.recover(RejectAndDontRequeueRecoverer.java:45)
-    ....
     
 #### Contention backoff times
 
@@ -146,7 +194,7 @@ The retry of Firestore puts is controlled by the following properties:
 The default values for these properties has been set to give a very slow rate escalation. This should mean that the
 number of successful Firestore transactions is just a fraction below the actual maximum possible rate. The shallow
 escalation also means that we will try many times, and combined with a relatively high maximum wait, will mean 
-that we should hopefully never see a transaction (which is failing due to contention) going back to Rabbit. 
+that we should hopefully never see a transaction (which is failing due to contention) going back to PubSub. 
 
 Under extreme contention RH should slow down to the extent that each RH thread is only doing one Firestore add per
 minute. This should mean that RH is submitting requests 100's of times slower than Firestore can handle.
@@ -209,38 +257,34 @@ This helps show the backoff time escalation and the maximum run time for a trans
     27 11,294 67,315
     28 13,552 80,867
 
-
 ## Manual testing
 
 To manually test RH:
 
 1) **Queue setup**
- 
-In the RabbitMQ console make sure that the following queues have been created and bound:
 
-      Exchange  |  Routing key                    | Destination queue
-    ------------+---------------------------------+--------------------------------
-       events   |  event.case.update              | case.rh.case
-       events   |  event.uac.update               | case.rh.uac
-       events   |  event.response.authentication  | event.response.authentication
-       events   |  event.website.feedback         | website.feedback
-       events   |  event.case.address.update      | event.case.address.update
-       events   |  event.questionnaire.update     | event.questionnaire.update
-
-The following dead letter queues should be configured:
-
-      Exchange                      | Routing key                    | Destination queue
-    --------------------------------+--------------------------------+---------------------
-       events.deadletter.exchange   | event.case.update              | case.rh.case.dlq
-       events.deadletter.exchange   | event.uac.update               | case.rh.uac.dlq
+Ensure that the steps in the `## PubSub` section above have been completed first, and navigate to the python pubsub project's `python-pubsub/samples/snippets` directory
 
 2) **UAC Data**
 
-Submit the UAC data (see UAC.java) by sending the following to the 'events' exchange with the routing key 'event.uac.update':
+The Easiest way currently to populate the topics is to modify the `publisher.py` class in the python pubsub project.
+In the `publish_messages` method, replace the for loop with 
+    
+    data = <EVENT_JSON>
+    # Data must be a bytestring
+    data = data.encode("utf-8")
+    # When you publish a message, the client returns a future.
+    future = publisher.publish(topic_path, data)
+    print(future.result())
+
+You can then use `python publisher.py <DUMMY_PROJECT_NAME> publish <TOPIC_NAME>` to send messages to different topics
+
+
+Submit the UAC data (see UAC.java) by swapping `<EVENT_JSON>` from above to the json below (including the tripple quotes)
 
 	{
 	  "event": {
-	    "type": "UAC_UPDATED",
+	    "type": "UAC_UPDATE",
 	    "source": "CASE_SERVICE",
 	    "channel": "RM",
 	    "dateTime": "2011-08-12T20:17:46.384Z",
@@ -260,13 +304,16 @@ Submit the UAC data (see UAC.java) by sending the following to the 'events' exch
 	  }
 	}
 
+And send `python publisher.py local publish event_uac-update`
+
 3) **Case data**
 
-Submit the case (see CollectionCase.java) by sending the following to the 'events' exchange with the routing key 'event.case.update':
+Submit the case (see CollectionCase.java) by swapping `<EVENT_JSON>` from above to the json below (including the tripple quotes)
 
-	{
+	"""
+    {
 	  "event": {
-	    "type": "CASE_UPDATED",
+	    "type": "CASE_UPDATE",
 	    "source": "CASE_SERVICE",
 	    "channel": "RM",
 	    "dateTime": "2011-08-12T20:17:46.384Z",
@@ -305,8 +352,24 @@ Submit the case (see CollectionCase.java) by sending the following to the 'event
 	    }
 	  }
 	}
+    """
 
-4) **Generate respondent authenticated event**
+And send And send `python publisher.py local publish event_case-update`
+
+
+4) **Create a subscription for the `event_uac-authenticate` topic**
+
+
+    `python subscriber.py local create event_uac-authenticate fake_subscription`
+
+5) **Listen to that subscription**
+
+In a new terminal window run:
+
+    $(gcloud beta emulators pubsub env-init)
+    python3 subscriber.py local receive fake_subscription
+
+6) **Generate respondent authenticated event**
 
 If you know the case id which matches the stored UAC hash then you can supply it in the UACS get request:
   
@@ -318,17 +381,14 @@ To calculate the sha256 value for a uac:
     8a9d5db4bbee34fd16e40aa2aaae52cfbdf1842559023614c30edb480ec252b4  -
 
 
-5) **Check the get request results**
+7) **Check the get request results**
 
 Firstly confirm that the curl command, from the previous step, returned a 200 status.
 
 Also verify that it contains a line such as:
 "caseStatus": "OK",
 
-
-6) **Check the respondent authenticated event**
-
-Firstly retrieve the event data from the 'event.response.authentication' queue.
+8) **Check the respondent authenticated event in the terminal window listening to the subscription**
 
 Format the event text and make sure it looks like:
 
@@ -347,67 +407,6 @@ Format the event text and make sure it looks like:
 	    }
 	  }
 	}
-
-
-## Manual testing with EventGenerator
-
-This section does the same testing as the previous section but automates much of the work by using the EventGenerator. To run the whole test copy and paste the following in one go. Then check that, as in the privous section, that the respondent authenticated event has been published. Note that these commands require Httpie to be installed. They also assume that local RH and EventGenerator services are running.
-
-This is how the hash of the UAC was calculated:
-    $ echo -n "aaaabbbbccccdddd" | shasum -a 256
-    147eb9dcde0e090429c01dbf634fd9b69a7f141f005c387a9c00498908499dde  -
-
-This example uses a case uuid of: f868fcfc-7280-40ea-ab01-b173ac245da3
- 
-    # Create UAC payload 
-    cat > /tmp/uac_updated.json <<EOF
-    {
-        "eventType": "UAC_UPDATED",
-        "source": "SAMPLE_LOADER",
-        "channel": "RM",
-        "contexts": [
-            {
-                "uacHash": "147eb9dcde0e090429c01dbf634fd9b69a7f141f005c387a9c00498908499dde",
-                "caseId": "f868fcfc-7280-40ea-ab01-b173ac245da3"
-            }
-        ]
-    }
-    EOF
-    
-    # Create case updated payload
-    cat > /tmp/case_updated.json <<EOF 
-    {
-        "eventType": "CASE_UPDATED",
-        "source": "SAMPLE_LOADER",
-        "channel": "RM",
-        "contexts": [
-            {
-                "id": "f868fcfc-7280-40ea-ab01-b173ac245da3"
-            }
-        ]
-    }
-    EOF
-
-    #Prepare outbound queue
-    http --auth generator:hitmeup GET http://localhost:8171/rabbit/create/SURVEY_LAUNCHED
-    http --auth generator:hitmeup GET http://localhost:8171/rabbit/flush/event.response.authentication
-
-    # Use the generator to create the UAC and case objects in Firestore
-    http --auth generator:hitmeup POST "http://localhost:8171/generate" @/tmp/uac_updated.json
-    http --auth generator:hitmeup POST "http://localhost:8171/generate" @/tmp/case_updated.json
-
-    # Wait until UAC and case have been loaded into Firestore
-    http --auth generator:hitmeup  get "http://localhost:8171/firestore/wait?collection=uac&key=147eb9dcde0e090429c01dbf634fd9b69a7f141f005c387a9c00498908499dde&timeout=1s"
-    http --auth generator:hitmeup  get "http://localhost:8171/firestore/wait?collection=case&key=f868fcfc-7280-40ea-ab01-b173ac245da3&timeout=1s"
-
-    # Make the UAC authenticated request
-    http --auth serco_cks:temporary get "http://localhost:8071/uacs/147eb9dcde0e090429c01dbf634fd9b69a7f141f005c387a9c00498908499dde"
-
-    # Grab respondent authenticated event
-    http --auth generator:hitmeup GET "http://localhost:8171/rabbit/get/event.response.authentication?timeout=500ms"
-    
-    # Nicely close down rabbit connection (Probably not required)
-    http --auth generator:hitmeup GET "http://localhost:8171/rabbit/close"
     
 Modified endpoint /cases/uprn/ - method name changed from 
 getHHCaseByUPRN to

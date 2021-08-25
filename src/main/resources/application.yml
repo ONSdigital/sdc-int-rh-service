@@ -63,45 +63,21 @@ spring:
     name: ONS RespondentHomeService
   lifecycle:
     timeout-per-shutdown-phase: 30s
-  rabbitmq:
-    username: guest
-    password: guest
-    host: localhost
-    port: 35672
-    virtualhost: /
+  cloud:
+    gcp:
+      pubsub:
+        project-id: local
 
 queueconfig:
-  event-exchange: events
-  dead-letter-exchange: events.deadletter.exchange
-  case-queue: case.rh.case
-  case-queue-DLQ: case.rh.case.dlq
-  case-routing-key: event.case.update
-  uac-queue: case.rh.uac
-  uac-queue-DLQ: case.rh.uac.dlq
-  uac-routing-key: event.uac.update
-  response-authentication-routing-key: event.response.authentication
+  case-subscription: event_case-update_rh
+  case-topic: event_case-update
+  uac-subscription: event_uac-update_rh
+  uac-topic: event_uac-update
   qid-filter-prefixes:
-     - 11
-     - 12
-     - 13
-     - 14
 
 messaging:
-  mismatched-queues-fatal: true
-  recovery-backoff:
-    initial: 2000
-    multiplier: 3
-    max: 30000
-  uac-case-listener:
-    processing-backoff:
-      initial: 5000
-      multiplier: 3
-      max: 45000
-    consuming-threads: 1
-    con-max-attempts: 3
-    prefetch-count: 1
   publish:
-    max-attempts: 10
+    timeout: 4
     
 # circuit breaker configuration can be tuned by setting many other variables:
 # see CustomCircuitBreakerConfig.java . 

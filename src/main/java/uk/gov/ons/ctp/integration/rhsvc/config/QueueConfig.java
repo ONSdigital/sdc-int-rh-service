@@ -5,14 +5,9 @@ import lombok.Data;
 
 @Data
 public class QueueConfig {
-  private String eventExchange;
-  private String deadLetterExchange;
-  private String caseQueue;
-  private String caseQueueDLQ;
-  private String caseRoutingKey;
-  private String uacQueue;
-  private String uacQueueDLQ;
-  private String uacRoutingKey;
-  private String responseAuthenticationRoutingKey;
+  private String caseSubscription;
+  private String caseTopic;
+  private String uacSubscription;
+  private String uacTopic;
   private Set<String> qidFilterPrefixes;
 }

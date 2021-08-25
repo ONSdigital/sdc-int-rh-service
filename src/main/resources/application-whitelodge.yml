@@ -3,7 +3,4 @@ logging:
     uk.gov.ons.ctp: INFO
     org.springframework: WARN
   profile: CLOUD
-
-messaging:
-  consumingThreads: 10
-  prefetchCount: 10
+  
