@@ -4,4 +4,4 @@ services:
     container_name: pubsub-emulator
     image: pubsub-emulator
     ports:
-    - "8538:8538"
+    - "8085:8085"

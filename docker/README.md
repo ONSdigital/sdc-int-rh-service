@@ -4,23 +4,15 @@ If you want to locally run the RH Service without compiling from source then
 it's probably easiest to do this by running it in Docker.
 
 
-## Prerequisits
+## Prerequisites
 
-### 1. Rabbit MQ Queues created
-
-To get RHUI + RHSVC working you'll need to make sure that Rabbit has the required queues.
-These can be created in the web interface (http://localhost:46672/#/queues) after
-running 'rh-service-up.sh'.
-
-See the RH Service Readme for a list of the required queues.
-
-### 2. Docker pull permissions
+### 1. Docker pull permissions
 
 If Docker pull commands fail with a permissions error run the following and re-attempt:
 
     gcloud auth configure-docker europe-west2-docker.pkg.dev
 
-### 3. Google credentials
+### 2. Google credentials
 
 The docker compose file for RH depends on the $DOCKER_GCP_CREDENTIALS environment
 variable. This must point to a file containing your Google credentials.
@@ -40,7 +32,7 @@ seems to produce an empty response.
 
 The command to look at the rh-service logs is 'docker logs rh-service'. 
 
-### 4. GCP project 
+### 3. GCP project 
 
 The name of your GCP project must be set in an environment variable called $GOOGLE_CLOUD_PROJECT,
 eg 'sdc-rh-fredf'
@@ -52,19 +44,19 @@ As you would expect RHUI needs to be running for Cucumber tests, etc.
 
 ## Starting & Stopping RH Service
 
-To start and stop the RH Service and it's dependencies (rabbit MQ & mock-envoy) you
+To start and stop the RH Service and its dependencies (pubsub emulator and mock-envoy) you
 can run scripts within the RH/docker directory.
 
 To bring up the services run the following. Note that the script will pull down
 the required docker images if they are not already cached on your machine. 
 
-    cd docker
-    ./rh-service-up.sh
+    cd sdc-int-rh-service
+    ./docker/rh-service-up.sh
     
 To stop the services:
 
     cd docker
-    ./rh-service-stop.sh
+    ./docker/rh-service-stop.sh
 
 
 ## Confirming execution
@@ -73,8 +65,8 @@ From the command line you can confirm that all of the services are running.
 This is especially important for RHSVC as it's not always very obvious if it has
 been started successfully: 
 
-    # Rabbit
-    curl -s http://localhost:46672/#/queues | grep title
+    # pubsub emulator. It should report a 200 status if running
+    curl -s -o /dev/null -w ''%{http_code}'' 'localhost:8085'
     
     # mock-envoy
     curl -s "http://localhost:8181/info" | jq
@@ -83,7 +75,20 @@ been started successfully:
     # This gives an empty response if not started with valid Google credentials
     curl -s "http://localhost:8071/info" | jq
 
+### Pubsub emulator topics & subscriptions
 
+The RH scripts directory contains a script that lists the topics and subscriptions
+used by the pubsub emulator
+
+    export python_pubsub_root=~/sdc/source/python-pubsub
+    sdc-int-rh-service/scripts/list_pubsub_topics.sh $python_pubsub_root
+
+
+## Pubsub image
+
+The docker file used to build the pubsub image lives in: sdc-int-concourse/images/developers/pubsubemu
+
+    
 ## Running with specific releases
 
 If you want to run with a specific release or development build for mock-case or rh-service
@@ -93,7 +98,7 @@ The ordering for doing this should be:
 
 1. Run rh-service-stop.sh to stop existing services.
 
-1. Ammend the versions required in ./rh-service-up.sh
+1. Amend the versions required in ./rh-service-up.sh
 
-1. Run ./rh-service-stop.sh to bring up the new versions. The 'docker pull' command in the script
+1. Run ./rh-service-up.sh to bring up the new versions. The 'docker pull' command in the script
 will download the images if required.
