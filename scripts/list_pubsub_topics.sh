@@ -8,6 +8,10 @@
 #    export python_pubsub_root=~/sdc/source/python-pubsub
 #    sdc-int-rh-service/scripts/list_pubsub_topics.sh $python_pubsub_root 
 #
+# This script assumes that you are running python3. If this is not the case then you'll
+# need to do one off:
+#   - setup pyenv so you can switch to python3
+#   - locally edit the script to use python3
 
 set -e
 

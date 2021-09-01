@@ -12,6 +12,8 @@ If Docker pull commands fail with a permissions error run the following and re-a
 
     gcloud auth configure-docker europe-west2-docker.pkg.dev
 
+The docker
+
 ### 2. Google credentials
 
 The docker compose file for RH depends on the $DOCKER_GCP_CREDENTIALS environment
@@ -55,7 +57,7 @@ the required docker images if they are not already cached on your machine.
     
 To stop the services:
 
-    cd docker
+    cd sdc-int-rh-service
     ./docker/rh-service-stop.sh
 
 
@@ -83,6 +85,7 @@ used by the pubsub emulator
     export python_pubsub_root=~/sdc/source/python-pubsub
     sdc-int-rh-service/scripts/list_pubsub_topics.sh $python_pubsub_root
 
+If your 'python' command is not running python 3 then you can either setup pyenv so you can switch to python3, or locally edit the script to use python3.
 
 ## Pubsub image
 
