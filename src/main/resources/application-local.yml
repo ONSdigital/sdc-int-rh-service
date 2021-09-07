@@ -3,4 +3,4 @@ spring:
     gcp:
       pubsub:
         project-id: local
-        emulator-host: localhost:8085
+        emulator-host: localhost:9808

@@ -36,13 +36,11 @@ For initial PubSub emulator setup:
 
 * Clone https://github.com/googleapis/python-pubsub
 * Install the emulator
-  
 
     gcloud components install pubsub-emulator
     gcloud components update
 
 * Install python dependencies, in the above repo navigate to `samples/snipets` and run:
-
 
     pip install -r requirements.txt
 
@@ -53,7 +51,7 @@ export GOOGLE_CLOUD_PROJECT="<name of your project>" e.g. export GOOGLE_CLOUD_PR
 
 To run locally, either through terminal or through an IDE, you must set your profile to local so that the `application-local.yml` is picked up.
 
-Use this flag to do this: 
+Make sure you run RH with the VM argument: 
 
     -Dspring.profiles.active=local
 
