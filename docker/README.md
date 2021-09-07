@@ -68,7 +68,7 @@ This is especially important for RHSVC as it's not always very obvious if it has
 been started successfully: 
 
     # pubsub emulator. It should report a 200 status if running
-    curl -s -o /dev/null -w ''%{http_code}'' 'localhost:8085'
+    curl -s -o /dev/null -w ''%{http_code}'' 'localhost:9808'
     
     # mock-envoy
     curl -s "http://localhost:8181/info" | jq
@@ -103,5 +103,38 @@ The ordering for doing this should be:
 
 1. Amend the versions required in ./rh-service-up.sh
 
-1. Run ./rh-service-up.sh to bring up the new versions. The 'docker pull' command in the script
+1. Run ./rh-service-stop.sh to bring up the new versions. The 'docker pull' command in the script
 will download the images if required.
+
+
+## Running with local RH service
+
+If you want to use an in development version of RH service then your options are: 
+
+1. Hack the rh-service-up script and comment out the docker-compose for the rh-service.
+2. Bring the services up by using the rh-service-up.sh script. Then do 'docker stop rh-service' 
+and use Eclipse/IntelliJ to your current version.
+
+
+## Example commands to run everything locally
+
+If not using the RH Cucumber local profile, point at the emulator using environment variables:
+
+    export PUBSUB_EMULATOR_HOST="localhost:9808"
+    export PUBSUB_EMULATOR_USE="true"
+
+To run the services and Cucumber tests:
+
+    cd /Users/peterbochel/sdc/source
+    
+    ./sdc-int-rh-service/docker/rh-service-up.sh 
+    ./sdc-int-rh-ui/docker/rh-ui-up.sh 
+    docker ps
+    
+    cd sdc-int-rh-cucumber/
+    ./run.sh
+    cd ..
+    
+    ./sdc-int-rh-service/docker/rh-service-stop.sh 
+    ./sdc-int-rh-ui/docker/rh-ui-stop.sh 
+    docker ps

@@ -25,4 +25,4 @@ services:
     - GOOGLE_APPLICATION_CREDENTIALS=/gcp/config/google-credentials.json
     - GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT}
     - spring.profiles.active=local
-    - spring.cloud.gcp.pubsub.emulator-host=host.docker.internal:8085
+    - spring.cloud.gcp.pubsub.emulator-host=host.docker.internal:9808
