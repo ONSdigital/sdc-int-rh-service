@@ -26,6 +26,7 @@ import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.EventPublisher;
 import uk.gov.ons.ctp.common.event.EventType;
 import uk.gov.ons.ctp.common.event.model.CollectionCase;
+import uk.gov.ons.ctp.common.event.model.EventPayload;
 import uk.gov.ons.ctp.common.event.model.UAC;
 import uk.gov.ons.ctp.common.event.model.UacAuthenticateResponse;
 import uk.gov.ons.ctp.integration.rhsvc.RHSvcBeanMapper;
@@ -187,7 +188,7 @@ public class UniqueAccessCodeServiceImplTest {
 
     verify(dataRepo, times(1)).readUAC(UAC_HASH);
     verify(dataRepo, times(0)).readCollectionCase(CASE_ID);
-    verify(eventPublisher, times(0)).sendEvent(any(), any(), any(), any());
+    verify(eventPublisher, times(0)).sendEvent(any(), any(), any(), any(EventPayload.class));
 
     assertTrue(exceptionThrown);
   }
