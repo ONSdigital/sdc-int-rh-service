@@ -44,6 +44,7 @@ import uk.gov.ons.ctp.common.event.EventPublisher;
 import uk.gov.ons.ctp.common.event.EventType;
 import uk.gov.ons.ctp.common.event.model.CollectionCase;
 import uk.gov.ons.ctp.common.event.model.Contact;
+import uk.gov.ons.ctp.common.event.model.EventPayload;
 import uk.gov.ons.ctp.common.event.model.FulfilmentRequest;
 import uk.gov.ons.ctp.integration.common.product.ProductReference;
 import uk.gov.ons.ctp.integration.common.product.model.Product;
@@ -438,7 +439,7 @@ public class CaseServiceImplFulfilmentTest {
             ResponseStatusException.class, () -> caseSvc.fulfilmentRequestByPost(postalRequest));
 
     assertEquals(HttpStatus.TOO_MANY_REQUESTS, ex.getStatus());
-    verify(eventPublisher, never()).sendEvent(any(), any(), any(), any());
+    verify(eventPublisher, never()).sendEvent(any(), any(), any(), any(EventPayload.class));
     verifyRateLimiterCall(1, null, postalRequest.getClientIP(), caseDetails);
   }
 
@@ -493,7 +494,7 @@ public class CaseServiceImplFulfilmentTest {
             ResponseStatusException.class, () -> caseSvc.fulfilmentRequestBySMS(smsRequest));
 
     assertEquals(HttpStatus.TOO_MANY_REQUESTS, ex.getStatus());
-    verify(eventPublisher, never()).sendEvent(any(), any(), any(), any());
+    verify(eventPublisher, never()).sendEvent(any(), any(), any(), any(EventPayload.class));
     verifyRateLimiterCall(1, phoneNo, smsRequest.getClientIP(), caseDetails);
   }
 
