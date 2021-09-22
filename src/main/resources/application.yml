@@ -73,6 +73,10 @@ queueconfig:
   case-topic: event_case-update
   uac-subscription: event_uac-update_rh
   uac-topic: event_uac-update
+  collection-exercise-subscription: event_collection-exercise-update_rh
+  collection-exercise-topic: event_collection-exercise-update
+  survey-subscription: event_survey-update_rh
+  survey-topic: event_survey-update
   qid-filter-prefixes:
 
 messaging:
@@ -113,6 +117,8 @@ swagger-settings:
 cloud-storage:
   case-schema-name: case
   uac-schema-name: uac
+  survey-schema-name: survey
+  collection-exercise-schema-name: collection_exercise
   event-backup-schema-name: event-backup
   backoff:
     initial: 100

@@ -44,3 +44,5 @@ createTopic event_fulfilment
 echo "<<< Creating subscriptions >>>"
 createSubscription event_case-update event_case-update_rh
 createSubscription event_uac-update event_uac-update_rh
+
+#TODO Add new topics/subs

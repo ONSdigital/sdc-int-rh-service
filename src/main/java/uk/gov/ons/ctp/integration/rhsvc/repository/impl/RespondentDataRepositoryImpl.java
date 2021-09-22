@@ -17,6 +17,8 @@ import uk.gov.ons.ctp.common.cloud.RetryableCloudDataStore;
 import uk.gov.ons.ctp.common.domain.CaseType;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.model.CollectionCase;
+import uk.gov.ons.ctp.common.event.model.CollectionExercise;
+import uk.gov.ons.ctp.common.event.model.Survey;
 import uk.gov.ons.ctp.common.event.model.UAC;
 import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
 
@@ -38,8 +40,16 @@ public class RespondentDataRepositoryImpl implements RespondentDataRepository {
   @Value("${cloud-storage.uac-schema-name}")
   private String uacSchemaName;
 
+  @Value("${cloud-storage.survey-schema-name}")
+  private String surveySchemaName;
+
+  @Value("${cloud-storage.collection-exercise-schema-name}")
+  private String collectionExerciseSchemaName;
+
   String caseSchema;
   private String uacSchema;
+  private String surveySchema;
+  private String collectionExerciseSchema;
 
   private static final String[] SEARCH_BY_UPRN_PATH = new String[] {"address", "uprn"};
 
@@ -47,6 +57,8 @@ public class RespondentDataRepositoryImpl implements RespondentDataRepository {
   public void init() {
     caseSchema = gcpProject + "-" + caseSchemaName.toLowerCase();
     uacSchema = gcpProject + "-" + uacSchemaName.toLowerCase();
+    surveySchema = gcpProject + "-" + surveySchemaName.toLowerCase();
+    collectionExerciseSchema = gcpProject + "-" + collectionExerciseSchemaName.toLowerCase();
 
     // Verify that Cloud Storage is working before consuming any events
     try {
@@ -111,6 +123,57 @@ public class RespondentDataRepositoryImpl implements RespondentDataRepository {
   @Override
   public Optional<CollectionCase> readCollectionCase(final String caseId) throws CTPException {
     return retryableCloudDataStore.retrieveObject(CollectionCase.class, caseSchema, caseId);
+  }
+
+  /**
+   * Read a Survey object from cloud.
+   *
+   * @param surveyId - the unique id of the object stored
+   * @return - de-serialised version of the stored object
+   * @throws CTPException - if a cloud exception was detected.
+   */
+  @Override
+  public Optional<Survey> readSurvey(final String surveyId) throws CTPException {
+    return retryableCloudDataStore.retrieveObject(Survey.class, surveySchema, surveyId);
+  }
+
+  /**
+   * Write a Survey object into the cloud data store.
+   *
+   * @param survey - is the survey to be stored in the cloud.
+   * @throws CTPException - if a cloud exception was detected.
+   */
+  @Override
+  public void writeSurvey(final Survey survey) throws CTPException {
+    String id = survey.getId();
+    retryableCloudDataStore.storeObject(surveySchema, id, survey, id);
+  }
+
+  /**
+   * Read a CollectionExercise object from cloud.
+   *
+   * @param collectionExerciseId - the unique id of the object stored
+   * @return - de-serialised version of the stored object
+   * @throws CTPException - if a cloud exception was detected.
+   */
+  @Override
+  public Optional<CollectionExercise> readCollectionExercise(final String collectionExerciseId)
+      throws CTPException {
+    return retryableCloudDataStore.retrieveObject(
+        CollectionExercise.class, collectionExerciseSchema, collectionExerciseId);
+  }
+
+  /**
+   * Write a CollectionExercise object into the cloud data store.
+   *
+   * @param collectionExercise - is the case to be stored in the cloud.
+   * @throws CTPException - if a cloud exception was detected.
+   */
+  @Override
+  public void writeCollectionExercise(final CollectionExercise collectionExercise)
+      throws CTPException {
+    String id = collectionExercise.getId();
+    retryableCloudDataStore.storeObject(collectionExerciseSchema, id, collectionExercise, id);
   }
 
   /**
