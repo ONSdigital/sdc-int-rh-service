@@ -35,13 +35,13 @@ public class CollectionExerciseEventReceiverImpl {
       CollectionExerciseUpdateEvent collectionExerciseUpdateEvent) throws CTPException {
 
     CollectionExercise collectionExercise =
-        collectionExerciseUpdateEvent.getPayload().getCollectionExercise();
+        collectionExerciseUpdateEvent.getPayload().getCollectionExerciseUpdate();
     String collexTransactionId = collectionExerciseUpdateEvent.getEvent().getTransactionId();
 
     log.info(
         "Entering acceptCollectionExerciseUpdateEvent",
         kv("transactionId", collexTransactionId),
-        kv("collectionExerciseId", collectionExercise.getId()));
+        kv("collectionExerciseId", collectionExercise.getCollectionExerciseId()));
 
     try {
       respondentDataRepo.writeCollectionExercise(collectionExercise);

@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.annotation.ServiceActivator;
 import uk.gov.ons.ctp.common.error.CTPException;
-import uk.gov.ons.ctp.common.event.model.Survey;
+import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdateEvent;
 import uk.gov.ons.ctp.integration.rhsvc.event.SurveyEventReceiver;
 import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
@@ -33,16 +33,17 @@ public class SurveyEventReceiverImpl implements SurveyEventReceiver {
   @ServiceActivator(inputChannel = "acceptSurveyUpdateEvent")
   public void acceptSurveyUpdateEvent(SurveyUpdateEvent surveyUpdateEvent) throws CTPException {
 
-    Survey survey = surveyUpdateEvent.getPayload().getSurvey();
+    SurveyUpdate surveyUpdate = surveyUpdateEvent.getPayload().getSurveyUpdate();
+    System.out.println(surveyUpdate);
     String surveyTransactionId = surveyUpdateEvent.getEvent().getTransactionId();
 
     log.info(
         "Entering acceptSurveyUpdateEvent",
         kv("transactionId", surveyTransactionId),
-        kv("surveyId", survey.getId()));
+        kv("surveyId", surveyUpdate.getSurveyId()));
 
     try {
-      respondentDataRepo.writeSurvey(survey);
+      respondentDataRepo.writeSurvey(surveyUpdate);
     } catch (CTPException ctpEx) {
       log.error(
           "Survey Event processing failed", kv("surveyTransactionId", surveyTransactionId), ctpEx);

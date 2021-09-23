@@ -18,7 +18,7 @@ import uk.gov.ons.ctp.common.domain.CaseType;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.model.CollectionCase;
 import uk.gov.ons.ctp.common.event.model.CollectionExercise;
-import uk.gov.ons.ctp.common.event.model.Survey;
+import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 import uk.gov.ons.ctp.common.event.model.UAC;
 import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
 
@@ -133,20 +133,20 @@ public class RespondentDataRepositoryImpl implements RespondentDataRepository {
    * @throws CTPException - if a cloud exception was detected.
    */
   @Override
-  public Optional<Survey> readSurvey(final String surveyId) throws CTPException {
-    return retryableCloudDataStore.retrieveObject(Survey.class, surveySchema, surveyId);
+  public Optional<SurveyUpdate> readSurvey(final String surveyId) throws CTPException {
+    return retryableCloudDataStore.retrieveObject(SurveyUpdate.class, surveySchema, surveyId);
   }
 
   /**
    * Write a Survey object into the cloud data store.
    *
-   * @param survey - is the survey to be stored in the cloud.
+   * @param surveyUpdate - is the survey to be stored in the cloud.
    * @throws CTPException - if a cloud exception was detected.
    */
   @Override
-  public void writeSurvey(final Survey survey) throws CTPException {
-    String id = survey.getId();
-    retryableCloudDataStore.storeObject(surveySchema, id, survey, id);
+  public void writeSurvey(final SurveyUpdate surveyUpdate) throws CTPException {
+    String id = surveyUpdate.getSurveyId();
+    retryableCloudDataStore.storeObject(surveySchema, id, surveyUpdate, id);
   }
 
   /**
@@ -172,7 +172,7 @@ public class RespondentDataRepositoryImpl implements RespondentDataRepository {
   @Override
   public void writeCollectionExercise(final CollectionExercise collectionExercise)
       throws CTPException {
-    String id = collectionExercise.getId();
+    String id = collectionExercise.getCollectionExerciseId();
     retryableCloudDataStore.storeObject(collectionExerciseSchema, id, collectionExercise, id);
   }
 
