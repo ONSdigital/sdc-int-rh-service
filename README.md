@@ -278,7 +278,7 @@ In the `publish_messages` method, replace the for loop with
 You can then use `python publisher.py <DUMMY_PROJECT_NAME> publish <TOPIC_NAME>` to send messages to different topics
 
 
-Submit the UAC data (see UAC.java) by swapping `<EVENT_JSON>` from above to the json below (including the tripple quotes)
+Submit the UAC data (see UAC.java) by swapping `<EVENT_JSON>` from above to the json below (including the triple quotes)
 
 	{
 	  "event": {
@@ -306,7 +306,7 @@ And send `python publisher.py local publish event_uac-update`
 
 3) **Case data**
 
-Submit the case (see CollectionCase.java) by swapping `<EVENT_JSON>` from above to the json below (including the tripple quotes)
+Submit the case (see CollectionCase.java) by swapping `<EVENT_JSON>` from above to the json below (including the triple quotes)
 
 	"""
     {
