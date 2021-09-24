@@ -34,7 +34,6 @@ public class SurveyEventReceiverImpl implements SurveyEventReceiver {
   public void acceptSurveyUpdateEvent(SurveyUpdateEvent surveyUpdateEvent) throws CTPException {
 
     SurveyUpdate surveyUpdate = surveyUpdateEvent.getPayload().getSurveyUpdate();
-    System.out.println(surveyUpdate);
     String surveyTransactionId = surveyUpdateEvent.getEvent().getTransactionId();
 
     log.info(
