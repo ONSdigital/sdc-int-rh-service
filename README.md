@@ -79,7 +79,6 @@ The project to use is given by the Application Default Credentials (These are th
 
 
 ## PubSub
-#TODO new pubsub stuff
 To start pubsub
 
     gcloud beta emulators pubsub start --project=<fake_project_id>
@@ -104,22 +103,28 @@ All commands below will assume that your dummy project name is `local`
 
 Create the following topics/subscriptions:
 
-      Topic                          | Subscription
-    ---------------------------------+--------------------------------
-      event_case-update              | event_case-update_rh
-      event_uac-update               | event_uac-update_rh
-      event_uac-authenticate         | N/A
-      event_survey-launch            | N/A
-      event_fulfilment               | N/A
+      Topic                            | Subscription
+    -----------------------------------+--------------------------------
+      event_case-update                | event_case-update_rh
+      event_uac-update                 | event_uac-update_rh
+      event_survey-update              | event_survey-update_rh
+      event_collection-exercise-update | event_collection-exercise-update_rh
+      event_uac-authenticate           | N/A
+      event_survey-launch              | N/A
+      event_fulfilment                 | N/A
 
     python publisher.py local create event_case-update
     python publisher.py local create event_uac-update
+    python publisher.py local create event_survey-update
+    python publisher.py local create event_collection-exercise-update
     python publisher.py local create event_uac-authenticate
     python publisher.py local create event_survey-launch
     python publisher.py local create event_fulfilment
 
     python subscriber.py local create event_case-update event_case-update_rh
     python subscriber.py local create event_uac-update event_uac-update_rh
+    python subscriber.py local create event_survey-update event_survey-update_rh
+    python subscriber.py local create event_collection-exercise-update event_collection-exercise-update_rh
 
 There's a script to create the above topics and subscriptions in the scripts folder of this project called `pubsub-setup.sh`. It must be run from the `source/snipets of the python pubsub project.
 
@@ -354,20 +359,75 @@ Submit the case (see CollectionCase.java) by swapping `<EVENT_JSON>` from above 
 
 And send And send `python publisher.py local publish event_case-update`
 
+4) **Survey Update**
 
-4) **Create a subscription for the `event_uac-authenticate` topic**
+Submit the case (see SurveyUpdate.java) by swapping `<EVENT_JSON>` from above to the json below (including the tripple quotes)
+
+    """{
+        "event" : {
+          "type" : "SURVEY_UPDATE",
+          "source" : "SAMPLE_LOADER",
+          "channel" : "RH",
+          "dateTime" : "2020-06-08T07:28:45.117Z",
+          "transactionId" : "c45de4dc-3c3b-11e9-b210-d663bd873d93"
+        },
+        "payload": {
+          "surveyUpdate": {
+            "surveyId": "3883af91-0052-4497-9805-3238544fcf8a",
+            "name": "Excepteur veniam"
+          }
+        }
+      }
+    """
+
+And send And send `python publisher.py local publish event_survey-update`
+
+5) **Collection Exercise Update**
+
+Submit the case (see SurveyUpdate.java) by swapping `<EVENT_JSON>` from above to the json below (including the tripple quotes)
+
+    """{
+        "event": {
+          "type": "COLLECTION_EXERCISE_UPDATE",
+          "source": "SAMPLE_LOADER",
+          "channel": "RH",
+          "dateTime": "2020-06-08T07:28:45.117Z",
+          "transactionId": "c45de4dc-3c3b-11e9-b210-d663bd873d93"
+        },
+        "payload": {
+          "collectionExerciseUpdate": {
+            "collectionExerciseId": "3883af91-0052-4497-9805-3238544fcf8a",
+            "surveyId": "3883af91-0052-4497-9805-3238544fcf8a",
+            "name": "velit",
+            "reference": "MVP012021",
+            "startDate": "2021-09-17T23:59:59.999Z",
+            "endDate": "2021-09-27T23:59:59.999Z",
+            "metadata": {
+              "numberOfWaves": "3",
+              "waveLength": "2",
+              "cohorts": "3",
+              "cohortSchedule": "7"
+            }
+          }
+        }
+      }
+    """
+
+And send And send `python publisher.py local publish event_survey-update`
+
+6) **Create a subscription for the `event_uac-authenticate` topic**
 
 
     `python subscriber.py local create event_uac-authenticate fake_subscription`
 
-5) **Listen to that subscription**
+7) **Listen to that subscription**
 
 In a new terminal window run:
 
     $(gcloud beta emulators pubsub env-init)
     python3 subscriber.py local receive fake_subscription
 
-6) **Generate respondent authenticated event**
+8) **Generate respondent authenticated event**
 
 If you know the case id which matches the stored UAC hash then you can supply it in the UACS get request:
   
@@ -379,14 +439,14 @@ To calculate the sha256 value for a uac:
     8a9d5db4bbee34fd16e40aa2aaae52cfbdf1842559023614c30edb480ec252b4  -
 
 
-7) **Check the get request results**
+9) **Check the get request results**
 
 Firstly confirm that the curl command, from the previous step, returned a 200 status.
 
 Also verify that it contains a line such as:
 "caseStatus": "OK",
 
-8) **Check the respondent authenticated event in the terminal window listening to the subscription**
+10) **Check the respondent authenticated event in the terminal window listening to the subscription**
 
 Format the event text and make sure it looks like:
 
