@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.event.model.CaseEvent;
+import uk.gov.ons.ctp.common.event.model.Header;
 import uk.gov.ons.ctp.integration.rhsvc.event.impl.CaseEventReceiverImpl;
 import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
 
@@ -21,7 +22,10 @@ public class CaseEventReceiverImplUnit_Test {
 
   @Test
   public void test_acceptCaseEvent_success() throws Exception {
+    Header header = new Header();
+    header.setMessageId("c45de4dc-3c3b-11e9-b210-d663bd873d93");
     CaseEvent caseEvent = FixtureHelper.loadPackageFixtures(CaseEvent[].class).get(0);
+    caseEvent.setHeader(header);
     target.acceptCaseEvent(caseEvent);
     verify(mockRespondentDataRepo).writeCollectionCase(caseEvent.getPayload().getCollectionCase());
   }

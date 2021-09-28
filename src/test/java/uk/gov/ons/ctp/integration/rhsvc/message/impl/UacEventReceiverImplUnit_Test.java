@@ -53,9 +53,9 @@ public class UacEventReceiverImplUnit_Test {
     uacFixture.setQuestionnaireId(qid);
 
     Header headerFixture = new Header();
-    headerFixture.setType(type);
-    headerFixture.setTransactionId("c45de4dc-3c3b-11e9-b210-d663bd873d93");
-    UacEventFixture.setEvent(headerFixture);
+    headerFixture.setTopic(type);
+    headerFixture.setMessageId("c45de4dc-3c3b-11e9-b210-d663bd873d93");
+    UacEventFixture.setHeader(headerFixture);
 
     // execution
     target.acceptUACEvent(UacEventFixture);

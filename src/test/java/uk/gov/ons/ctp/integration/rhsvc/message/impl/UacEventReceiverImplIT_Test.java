@@ -110,7 +110,7 @@ public class UacEventReceiverImplIT_Test {
     UacEvent UacEvent = createUAC(RespondentHomeFixture.A_QID, EventType.UAC_UPDATE);
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.ENGLISH);
     sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-    UacEvent.getEvent().setDateTime(sdf.parse("2011-08-12T20:17:46Z"));
+    UacEvent.getHeader().setDateTime(sdf.parse("2011-08-12T20:17:46Z"));
 
     // Construct message
     Message<UacEvent> message = new GenericMessage<>(UacEvent, new HashMap<>());
@@ -120,8 +120,8 @@ public class UacEventReceiverImplIT_Test {
     // Capture and check Service Activator argument
     ArgumentCaptor<UacEvent> captur = ArgumentCaptor.forClass(UacEvent.class);
     verify(receiver).acceptUACEvent(captur.capture());
-    assertEquals(sdf.parse("2011-08-12T20:17:46Z"), captur.getValue().getEvent().getDateTime());
-    assertEquals(UacEvent.getEvent(), captur.getValue().getEvent());
+    assertEquals(sdf.parse("2011-08-12T20:17:46Z"), captur.getValue().getHeader().getDateTime());
+    assertEquals(UacEvent.getHeader(), captur.getValue().getHeader());
     assertTrue(captur.getValue().getPayload().equals(UacEvent.getPayload()));
     verify(respondentDataRepo).writeUAC(any());
   }
@@ -136,10 +136,10 @@ public class UacEventReceiverImplIT_Test {
     uac.setQuestionnaireId(qid);
     uac.setCaseId("c45de4dc-3c3b-11e9-b210-d663bd873d93");
     Header header = new Header();
-    header.setType(type);
-    header.setTransactionId("c45de4dc-3c3b-11e9-b210-d663bd873d93");
+    header.setTopic(type);
+    header.setMessageId("c45de4dc-3c3b-11e9-b210-d663bd873d93");
     header.setDateTime(new Date());
-    UacEvent.setEvent(header);
+    UacEvent.setHeader(header);
     return UacEvent;
   }
 }
