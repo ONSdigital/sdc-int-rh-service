@@ -1,7 +1,5 @@
 # Firestore
 
-RH service uses a Firestore datastore. If running locally you'll need to create this for your GCP account. When you go into the 'Firestore' section let it create a database for you in 'Native' mode.
-
 ### Firestore contention
 
 Firestore will throw a contention exception when overloaded, with the expectation that the application will retry with
