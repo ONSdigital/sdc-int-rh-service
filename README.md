@@ -72,7 +72,7 @@ There are several ways of running this service
     ```
 This will create the JAR file in the Target directory. You can then right-click on the JAR file (in Intellij) and choose 'Run'.
 
-You will need to complete the PubSub steps below and the first step in the `## Manual Testing` section.
+You will need to complete the PubSub setup steps below and the first step in the `## Manual Testing` section.
 Messages that are published to either the `event_case-update` or `event_uac-update` topic will be received by sdc-int-rh-service and stored in either the case_schema or the uac_schema (as appropriate) of the relevant Google Firestore datastore.
 
 The project to use is given by the Application Default Credentials (These are the credential associated with the service account that your app engine app runs as - to set these up please follow the steps given in the previous section).
@@ -268,170 +268,48 @@ To manually test RH:
 
 Ensure that the steps in the `## PubSub` section above have been completed first, and navigate to the python pubsub project's `python-pubsub/samples/snippets` directory
 
-2) **UAC Data**
+2) **Receiving Messages**
 
 The Easiest way currently to populate the topics is to modify the `publisher.py` class in the python pubsub project.
-In the `publish_messages` method, replace the for loop with 
+In the `publish_messages` method, replace the for loop with the following snippet (maintaining indentation)
     
-    data = <EVENT_JSON>
-    # Data must be a bytestring
-    data = data.encode("utf-8")
-    # When you publish a message, the client returns a future.
-    future = publisher.publish(topic_path, data)
-    print(future.result())
+    with open('<EVENT_JSON_FILE>', 'r') as file:
+      data = file.read()
+      data = data.encode("utf-8")
+      future = publisher.publish(topic_path, data)
+      print(future.result())
 
-You can then use `python publisher.py <DUMMY_PROJECT_NAME> publish <TOPIC_NAME>` to send messages to different topics
+There is a `json` file in `src/test/resources/message/impl` for each event typ that RHSvc can receive, named `PackageFixture.<EVENT>.json`
+Replace `<EVENT_JSON_FILE>` in the above python snippet with the filepath of the json file for the event type you wish to test (listed below).
+You'll need the full path to the file, not just the file name.
 
+    Event Type                 |Topic                            | Example file
+    ---------------------------+---------------------------------+--------------------------------------------------
+    CASE_UPDATE                |event_case-update                | PackageFixture.CaseEvent.json
+    UAC_UPDATE                 |event_uac-update                 | PackageFixture.UacEvent.json
+    SURVEY_UPDATE              |event_survey-update              | PackageFixture.SurveyUpdateEvent.json
+    COLLECTION_EXERCISE_UPDATE |event_collection-exercise-update | PackageFixture.CollectionExerciseUpdateEvent.json
 
-Submit the UAC data (see UAC.java) by swapping `<EVENT_JSON>` from above to the json below (including the tripple quotes)
+You can then use `python publisher.py <DUMMY_PROJECT_NAME> publish <TOPIC_NAME>` using the topic names listed above to send messages to different topics.
 
-	{
-	  "event": {
-	    "type": "UAC_UPDATE",
-	    "source": "CASE_SERVICE",
-	    "channel": "RM",
-	    "dateTime": "2011-08-12T20:17:46.384Z",
-	    "transactionId": "c45de4dc-3c3b-11e9-b210-d663bd873d93"
-	  },
-	  "payload": {
-	    "uac": {
-	      "uacHash": "8a9d5db4bbee34fd16e40aa2aaae52cfbdf1842559023614c30edb480ec252b4",
-	      "active": true,
-	      "questionnaireId": "8710000009",
-	      "caseType": "HH",
-	      "region": "E",
-	      "caseId": "dc4477d1-dd3f-4c69-b181-7ff725dc9fa4",
-	      "collectionExerciseId": "a66de4dc-3c3b-11e9-b210-d663bd873d93",
-	      "formType": "H"
-	    }
-	  }
-	}
+You should see an acknowledgement in the RHSvc logs, and the message should now appear in your GCP project's firestore.
 
-And send `python publisher.py local publish event_uac-update`
+3) **Sending Messages**
 
-3) **Case data**
+Ensure that you have successfully received a `CASE_UPDATE` and matching `UAC_UPDATE` event from the above steps, and that both appear in firestore
 
-Submit the case (see CollectionCase.java) by swapping `<EVENT_JSON>` from above to the json below (including the tripple quotes)
-
-	"""
-    {
-	  "event": {
-	    "type": "CASE_UPDATE",
-	    "source": "CASE_SERVICE",
-	    "channel": "RM",
-	    "dateTime": "2011-08-12T20:17:46.384Z",
-	    "transactionId": "c45de4dc-3c3b-11e9-b210-d663bd873d93"
-	  },
-	  "payload": {
-	    "collectionCase": {
-	      "id": "dc4477d1-dd3f-4c69-b181-7ff725dc9fa4",
-	      "caseRef": "10000000010",
-	      "caseType": "HH",
-	      "survey": "CENSUS",
-	      "collectionExerciseId": "a66de4dc-3c3b-11e9-b210-d663bd873d93",
-	      "address": {
-	        "addressLine1": "1 main street",
-	        "addressLine2": "upper upperingham",
-	        "addressLine3": "",
-	        "townName": "upton",
-	        "postcode": "UP103UP",
-	        "region": "E",
-	        "latitude": "50.863849",
-	        "longitude": "-1.229710",
-	        "uprn": "123456",
-	        "arid": "XXXXX",
-	        "addressType": "HH",
-	        "estabType": "XXX"
-	      },
-	      "contact": {
-	        "title": "Ms",
-	        "forename": "jo",
-	        "surname": "smith",
-	        "email": "me@example.com",
-	        "telNo": "+447890000000"
-	      },
-	      "actionableFrom": "2011-08-12T20:17:46.384Z",
-	      "handDelivery": "false"
-	    }
-	  }
-	}
-    """
-
-And send And send `python publisher.py local publish event_case-update`
-
-4) **Survey Update**
-
-Submit the case (see SurveyUpdate.java) by swapping `<EVENT_JSON>` from above to the json below (including the tripple quotes)
-
-    """{
-        "event" : {
-          "type" : "SURVEY_UPDATE",
-          "source" : "SAMPLE_LOADER",
-          "channel" : "RH",
-          "dateTime" : "2020-06-08T07:28:45.117Z",
-          "transactionId" : "c45de4dc-3c3b-11e9-b210-d663bd873d93"
-        },
-        "payload": {
-          "surveyUpdate": {
-            "surveyId": "3883af91-0052-4497-9805-3238544fcf8a",
-            "name": "Excepteur veniam"
-          }
-        }
-      }
-    """
-
-And send And send `python publisher.py local publish event_survey-update`
-
-5) **Collection Exercise Update**
-
-Submit the case (see SurveyUpdate.java) by swapping `<EVENT_JSON>` from above to the json below (including the tripple quotes)
-
-    """{
-        "event": {
-          "type": "COLLECTION_EXERCISE_UPDATE",
-          "source": "SAMPLE_LOADER",
-          "channel": "RH",
-          "dateTime": "2020-06-08T07:28:45.117Z",
-          "transactionId": "c45de4dc-3c3b-11e9-b210-d663bd873d93"
-        },
-        "payload": {
-          "collectionExerciseUpdate": {
-            "collectionExerciseId": "3883af91-0052-4497-9805-3238544fcf8a",
-            "surveyId": "3883af91-0052-4497-9805-3238544fcf8a",
-            "name": "velit",
-            "reference": "MVP012021",
-            "startDate": "2021-09-17T23:59:59.999Z",
-            "endDate": "2021-09-27T23:59:59.999Z",
-            "metadata": {
-              "numberOfWaves": "3",
-              "waveLength": "2",
-              "cohorts": "3",
-              "cohortSchedule": "7"
-            }
-          }
-        }
-      }
-    """
-
-And send And send `python publisher.py local publish event_survey-update`
-
-6) **Create a subscription for the `event_uac-authenticate` topic**
-
+Create a subscription for the `event_uac-authenticate` topic using
 
     `python subscriber.py local create event_uac-authenticate fake_subscription`
-
-7) **Listen to that subscription**
 
 In a new terminal window run:
 
     $(gcloud beta emulators pubsub env-init)
     python3 subscriber.py local receive fake_subscription
 
-8) **Generate respondent authenticated event**
-
-If you know the case id which matches the stored UAC hash then you can supply it in the UACS get request:
+Generate respondent authenticated event using the `uacHash` from the previously sent `UAC_UPDATE` event and hitting the `uacs` endpoint
   
-       $ curl -s -H "Content-Type: application/json" "http://localhost:8071/uacs/8a9d5db4bbee34fd16e40aa2aaae52cfbdf1842559023614c30edb480ec252b4"
+       $ curl -s -H "Content-Type: application/json" "http://localhost:8071/uacs/<UAC_HASH>"
 
 To calculate the sha256 value for a uac:
 
@@ -439,14 +317,12 @@ To calculate the sha256 value for a uac:
     8a9d5db4bbee34fd16e40aa2aaae52cfbdf1842559023614c30edb480ec252b4  -
 
 
-9) **Check the get request results**
-
-Firstly confirm that the curl command, from the previous step, returned a 200 status.
+Confirm that the curl command, from the previous step, returned a 200 status.
 
 Also verify that it contains a line such as:
 "caseStatus": "OK",
 
-10) **Check the respondent authenticated event in the terminal window listening to the subscription**
+In the terminal window listening to the subscription you created, check to see if a message was received
 
 Format the event text and make sure it looks like:
 
