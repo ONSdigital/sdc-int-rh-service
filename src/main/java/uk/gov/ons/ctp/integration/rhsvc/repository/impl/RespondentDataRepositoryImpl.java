@@ -55,10 +55,10 @@ public class RespondentDataRepositoryImpl implements RespondentDataRepository {
 
   @PostConstruct
   public void init() {
-    caseSchema = gcpProject + "-" + caseSchemaName.toLowerCase();
-    uacSchema = gcpProject + "-" + uacSchemaName.toLowerCase();
-    surveySchema = gcpProject + "-" + surveySchemaName.toLowerCase();
-    collectionExerciseSchema = gcpProject + "-" + collectionExerciseSchemaName.toLowerCase();
+    caseSchema = buildSchemaName(caseSchemaName);
+    uacSchema = buildSchemaName(uacSchemaName);
+    surveySchema = buildSchemaName(surveySchemaName);
+    collectionExerciseSchema = buildSchemaName(collectionExerciseSchemaName);
 
     // Verify that Cloud Storage is working before consuming any events
     try {
@@ -71,6 +71,10 @@ public class RespondentDataRepositoryImpl implements RespondentDataRepository {
           "Failed cloud storage startup check. Unable to write to storage. Aborting service", e);
       System.exit(-1);
     }
+  }
+
+  private String buildSchemaName(String baseSchemaName) {
+    return gcpProject + "-" + baseSchemaName.toLowerCase();
   }
 
   @Autowired
@@ -93,7 +97,7 @@ public class RespondentDataRepositoryImpl implements RespondentDataRepository {
    * Read a UAC object from cloud.
    *
    * @param universalAccessCodeHash - the hash of the unique id of the object stored
-   * @return - de-serialised version of the stored object
+   * @return - deserialised version of the stored object
    * @throws CTPException - if a cloud exception was detected.
    */
   @Override
@@ -117,7 +121,7 @@ public class RespondentDataRepositoryImpl implements RespondentDataRepository {
    * Read a Case object from cloud.
    *
    * @param caseId - the unique id of the object stored
-   * @return - de-serialised version of the stored object
+   * @return - deserialised version of the stored object
    * @throws CTPException - if a cloud exception was detected.
    */
   @Override
@@ -129,7 +133,7 @@ public class RespondentDataRepositoryImpl implements RespondentDataRepository {
    * Read a Survey object from cloud.
    *
    * @param surveyId - the unique id of the object stored
-   * @return - de-serialised version of the stored object
+   * @return - deserialised version of the stored object
    * @throws CTPException - if a cloud exception was detected.
    */
   @Override
@@ -153,7 +157,7 @@ public class RespondentDataRepositoryImpl implements RespondentDataRepository {
    * Read a CollectionExercise object from cloud.
    *
    * @param collectionExerciseId - the unique id of the object stored
-   * @return - de-serialised version of the stored object
+   * @return - deserialised version of the stored object
    * @throws CTPException - if a cloud exception was detected.
    */
   @Override
@@ -182,8 +186,8 @@ public class RespondentDataRepositoryImpl implements RespondentDataRepository {
    *
    * @param uprn - is the uprn that the target case(s) must contain.
    * @param onlyValid - true if only valid cases to be returned; false if we don't care
-   * @return - Optional containing 1 de-serialised version of the stored object. If no matching
-   *     cases are found then an empty Optional is returned.
+   * @return - Optional containing 1 deserialised version of the stored object. If no matching cases
+   *     are found then an empty Optional is returned.
    * @throws CTPException - if a cloud exception was detected.
    */
   @Override

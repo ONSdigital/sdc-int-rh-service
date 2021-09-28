@@ -35,7 +35,7 @@ import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentDataRepository
 /** Spring Integration test of flow received from Response Management */
 @SpringBootTest
 @EnableConfigurationProperties
-@ContextConfiguration(classes = {AppConfig.class, SurveyEventReceiverImplIT_Config.class})
+@ContextConfiguration(classes = {AppConfig.class, MessageIT_Config.class})
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("mocked-connection-factory")
 @ResourceLock(value = ParallelTestLocks.SPRING_TEST, mode = READ_WRITE)

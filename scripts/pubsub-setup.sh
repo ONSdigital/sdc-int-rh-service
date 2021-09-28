@@ -41,11 +41,11 @@ createTopic event_uac-authenticate
 createTopic event_survey-launch
 createTopic event_fulfilment
 createTopic event_survey-update
-createTopic event_collection-exeercise-update
+createTopic event_collection-exercise-update
 
 echo "<<< Creating subscriptions >>>"
 createSubscription event_case-update event_case-update_rh
 createSubscription event_uac-update event_uac-update_rh
 createSubscription event_survey-update event_survey-update_rh
-createSubscription event_collection-exeercise-update event_collection-exeercise-update_rh
+createSubscription event_collection-exercise-update event_collection-exercise-update_rh
 
