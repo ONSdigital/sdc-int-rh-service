@@ -54,3 +54,6 @@ You can now run rhsvc locally with pubsub using the steps detailed in the `## Ma
 Further help as well as the source of all pubsub commands in this README can be found here:
 
 https://cloud.google.com/pubsub/docs/emulator
+
+## Copyright
+Copyright (C) 2021 Crown Copyright (Office for National Statistics)

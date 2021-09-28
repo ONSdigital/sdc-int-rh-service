@@ -79,3 +79,11 @@ Format the event text and make sure it looks like:
 	    }
 	  }
 	}
+
+Modified endpoint /cases/uprn/ - method name changed from
+getHHCaseByUPRN to
+getLatestValidNonHICaseByUPRN
+to reflect the fact that it will return non HI cases now with latest valid address record.
+
+## Copyright
+Copyright (C) 2021 Crown Copyright (Office for National Statistics)

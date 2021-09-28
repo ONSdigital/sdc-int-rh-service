@@ -91,11 +91,6 @@ More details about RH Firestore can be found in [FIRESTORE.md](docs/FIRESTORE.md
 
 Instructions for testing teh sending and receiving of events can befound in [MANUAL_TESTING.md](docs/MANUAL_TESTING.md)
     
-Modified endpoint /cases/uprn/ - method name changed from 
-getHHCaseByUPRN to
-getLatestValidNonHICaseByUPRN
-to reflect the fact that it will return non HI cases now with latest valid address record.
-
 ## Docker image build
 
 Is switched off by default for clean deploy. Switch on with;
