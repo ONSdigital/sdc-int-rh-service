@@ -49,7 +49,7 @@ Create the following topics/subscriptions:
 
 There's a script to create the above topics and subscriptions in the scripts folder of this project called `pubsub-setup.sh`. It must be run from the `source/snipets of the python pubsub project.
 
-You can now run rhsvc locally with pubsub using the steps detailed in the `## Manual testing` section below.
+You can now run rhsvc locally with pubsub.
 
 Further help as well as the source of all pubsub commands in this README can be found here:
 

@@ -4,7 +4,7 @@ To manually test RH:
 
 1) **Queue setup**
 
-Ensure that the steps in the `## PubSub` section above have been completed first, and navigate to the python pubsub project's `python-pubsub/samples/snippets` directory
+Ensure that the steps described in [PUBSUB.md](PUBSUB.md) have been completed first, and navigate to the python pubsub project's `python-pubsub/samples/snippets` directory
 
 2) **Receiving Messages**
 
