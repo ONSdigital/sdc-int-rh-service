@@ -80,9 +80,13 @@ The project to use is given by the Application Default Credentials (These are th
 
 ## PubSub
 
+Set an environment variable in your .bashrc to point the pubsub utilities at the pubsub port:
+
+    export PUBSUB_EMULATOR_HOST="localhost:9808"
+
 To start pubsub
 
-    gcloud beta emulators pubsub start --project=<fake_project_id>
+    gcloud beta emulators pubsub start --project=<fake_project_id> --host-port=localhost:9808
 
 `<fake_project_id>` Can be anything as it's not a real project, however the `application.yml` and all commands below are expecting it to be `local`, so be sure to change them if you use something else.
 
