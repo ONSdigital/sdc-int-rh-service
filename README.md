@@ -87,7 +87,7 @@ RH service uses a Firestore datastore. If running locally you'll need to create 
 
 More details about RH Firestore can be found in [FIRESTORE.md](docs/FIRESTORE.md)
 
-## Manual testing
+## Manual Testing
 
 Instructions for testing the sending and receiving of events can be found in [MANUAL_TESTING.md](docs/MANUAL_TESTING.md)
     
