@@ -26,10 +26,10 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.ons.ctp.common.FixtureHelper;
-import uk.gov.ons.ctp.common.event.model.CaseEvent;
+import uk.gov.ons.ctp.common.event.model.SurveyUpdateEvent;
 import uk.gov.ons.ctp.common.utility.ParallelTestLocks;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
-import uk.gov.ons.ctp.integration.rhsvc.event.impl.CaseEventReceiverImpl;
+import uk.gov.ons.ctp.integration.rhsvc.event.impl.SurveyEventReceiverImpl;
 import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentDataRepositoryImpl;
 
 /** Spring Integration test of flow received from Response Management */
@@ -39,10 +39,10 @@ import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentDataRepository
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("mocked-connection-factory")
 @ResourceLock(value = ParallelTestLocks.SPRING_TEST, mode = READ_WRITE)
-public class CaseEventReceiverImplIT_Test {
+public class SurveyUpdateEventReceiverImplIT_Test {
 
-  @Autowired private CaseEventReceiverImpl receiver;
-  @Autowired private PubSubInboundChannelAdapter caseEventInbound;
+  @Autowired private SurveyEventReceiverImpl receiver;
+  @Autowired private PubSubInboundChannelAdapter surveyEventInbound;
   @MockBean private RespondentDataRepositoryImpl respondentDataRepo;
   @MockBean private PubSubTemplate pubSubTemplate;
 
@@ -53,41 +53,43 @@ public class CaseEventReceiverImplIT_Test {
 
   /** Test the receiver flow */
   @Test
-  public void caseEventFlowTest() throws Exception {
-    CaseEvent caseEvent = FixtureHelper.loadPackageFixtures(CaseEvent[].class).get(0);
+  public void surveyEventFlowTest() throws Exception {
+    SurveyUpdateEvent surveyUpdateEvent =
+        FixtureHelper.loadPackageFixtures(SurveyUpdateEvent[].class).get(0);
 
     // Construct message
-    Message<CaseEvent> message = new GenericMessage<>(caseEvent, new HashMap<>());
+    Message<SurveyUpdateEvent> message = new GenericMessage<>(surveyUpdateEvent, new HashMap<>());
     // Send message to container
-    caseEventInbound.getOutputChannel().send(message);
+    surveyEventInbound.getOutputChannel().send(message);
 
     // Capture and check Service Activator argument
-    ArgumentCaptor<CaseEvent> captur = ArgumentCaptor.forClass(CaseEvent.class);
-    verify(receiver).acceptCaseEvent(captur.capture());
-    assertEquals(captur.getValue().getPayload(), caseEvent.getPayload());
+    ArgumentCaptor<SurveyUpdateEvent> captur = ArgumentCaptor.forClass(SurveyUpdateEvent.class);
+    verify(receiver).acceptSurveyUpdateEvent(captur.capture());
+    assertEquals(captur.getValue().getPayload(), surveyUpdateEvent.getPayload());
   }
 
   @Test
-  public void caseCaseReceivedWithoutMillisTest() throws Exception {
+  public void surveyEventReceivedWithoutMillisTest() throws Exception {
 
-    // Create a case with a timestamp. Note that the milliseconds are not specified
-    CaseEvent caseEvent = FixtureHelper.loadPackageFixtures(CaseEvent[].class).get(0);
+    // Create a Survey with a timestamp. Note that the milliseconds are not specified
+    SurveyUpdateEvent surveyUpdateEvent =
+        FixtureHelper.loadPackageFixtures(SurveyUpdateEvent[].class).get(0);
 
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.ENGLISH);
     sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-    caseEvent.getEvent().setDateTime(sdf.parse("2011-08-12T20:17:46Z"));
+    surveyUpdateEvent.getEvent().setDateTime(sdf.parse("2011-08-12T20:17:46Z"));
 
     // Construct message
-    Message<CaseEvent> message = new GenericMessage<>(caseEvent, new HashMap<>());
+    Message<SurveyUpdateEvent> message = new GenericMessage<>(surveyUpdateEvent, new HashMap<>());
 
     // Send message to container
-    caseEventInbound.getOutputChannel().send(message);
+    surveyEventInbound.getOutputChannel().send(message);
 
     // Capture and check Service Activator argument
-    ArgumentCaptor<CaseEvent> captur = ArgumentCaptor.forClass(CaseEvent.class);
-    verify(receiver).acceptCaseEvent(captur.capture());
+    ArgumentCaptor<SurveyUpdateEvent> captur = ArgumentCaptor.forClass(SurveyUpdateEvent.class);
+    verify(receiver).acceptSurveyUpdateEvent(captur.capture());
     assertEquals(sdf.parse("2011-08-12T20:17:46Z"), captur.getValue().getEvent().getDateTime());
-    assertEquals(caseEvent.getEvent(), captur.getValue().getEvent());
-    assertEquals(caseEvent.getPayload(), captur.getValue().getPayload());
+    assertEquals(surveyUpdateEvent.getEvent(), captur.getValue().getEvent());
+    assertEquals(surveyUpdateEvent.getPayload(), captur.getValue().getPayload());
   }
 }
