@@ -72,7 +72,7 @@ There are several ways of running this service
     ```
 This will create the JAR file in the Target directory. You can then right-click on the JAR file (in Intellij) and choose 'Run'.
 
-You will need to complete the PubSub setup steps detailed in [PUBSUB.md](docs/PUBSUB.md) and the first step in the [Manual Testing](##Manual Testing) section.
+You will need to complete the PubSub setup steps detailed in [PUBSUB.md](docs/PUBSUB.md) and the first step in the [Manual Testing](#manual-testing) section.
 Messages that are published to either the `event_case-update` or `event_uac-update` topic will be received by sdc-int-rh-service and stored in either the case_schema or the uac_schema (as appropriate) of the relevant Google Firestore datastore.
 
 The project to use is given by the Application Default Credentials (These are the credential associated with the service account that your app engine app runs as - to set these up please follow the steps given in the previous section).
