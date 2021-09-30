@@ -10,13 +10,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-
+import lombok.extern.slf4j.Slf4j;
+import ma.glasnost.orika.MapperFacade;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import lombok.extern.slf4j.Slf4j;
-import ma.glasnost.orika.MapperFacade;
 import uk.gov.ons.ctp.common.domain.CaseType;
 import uk.gov.ons.ctp.common.domain.Channel;
 import uk.gov.ons.ctp.common.domain.Source;
@@ -108,18 +106,15 @@ public class CaseServiceImpl implements CaseService {
 
   @Override
   public void sendNewCaseEvent(CaseRegistrationDTO caseRegistrationDTO) throws CTPException {
-    createAndSendNewCase(caseRegistrationDTO);  
+    createAndSendNewCase(caseRegistrationDTO);
   }
 
-  private void createAndSendNewCase(CaseRegistrationDTO caseRegistrationDTO)
-        throws CTPException {
-      log.debug(
-          "Entering createAndSendFulfilment");
-//PMB          kv("fulfilmentCodes", request.getFulfilmentCodes()),
- //         kv("deliveryChannel", deliveryChannel));
+  private void createAndSendNewCase(CaseRegistrationDTO caseRegistrationDTO) throws CTPException {
+    log.debug("Entering createAndSendFulfilment");
+    // PMB          kv("fulfilmentCodes", request.getFulfilmentCodes()),
+    //         kv("deliveryChannel", deliveryChannel));
 
-      NewCasePayloadContent payload =
-          createNewCaseRequestPayload(caseRegistrationDTO);
+    NewCasePayloadContent payload = createNewCaseRequestPayload(caseRegistrationDTO);
 
     eventPublisher.sendEvent(EventType.NEW_CASE, Source.RESPONDENT_HOME, Channel.RH, payload);
   }
@@ -127,8 +122,8 @@ public class CaseServiceImpl implements CaseService {
   private NewCasePayloadContent createNewCaseRequestPayload(CaseRegistrationDTO caseRegistrationDTO)
       throws CTPException {
 
-    UUID caseId = UUID.randomUUID();
-    UUID collectionExerciseId = caseRegistrationDTO.getCollectionExerciseId();
+    final UUID caseId = UUID.randomUUID();
+    final UUID collectionExerciseId = caseRegistrationDTO.getCollectionExerciseId();
 
     NewCaseSample sample = new NewCaseSample();
     sample.setSchoolId(caseRegistrationDTO.getSchoolId());
@@ -148,13 +143,14 @@ public class CaseServiceImpl implements CaseService {
     sampleSensitive.setChildEmailAddress(caseRegistrationDTO.getChildEmailAddress());
     sampleSensitive.setParentMobileNumber(caseRegistrationDTO.getParentMobileNumber());
     sampleSensitive.setParentEmailAddress(caseRegistrationDTO.getParentEmailAddress());
-    
-    NewCasePayloadContent newCasePayloadContent = new NewCasePayloadContent(caseId, collectionExerciseId, sample, sampleSensitive);;
-    
+
+    NewCasePayloadContent newCasePayloadContent =
+        new NewCasePayloadContent(caseId, collectionExerciseId, sample, sampleSensitive);
+    ;
+
     return newCasePayloadContent;
   }
 
-  
   /*
    * create a cached list of product information to use for both
    * rate-limiting and event generation.
