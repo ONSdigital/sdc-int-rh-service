@@ -10,11 +10,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import lombok.extern.slf4j.Slf4j;
-import ma.glasnost.orika.MapperFacade;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import lombok.extern.slf4j.Slf4j;
+import ma.glasnost.orika.MapperFacade;
 import uk.gov.ons.ctp.common.domain.CaseType;
 import uk.gov.ons.ctp.common.domain.Channel;
 import uk.gov.ons.ctp.common.domain.Source;
@@ -26,6 +28,9 @@ import uk.gov.ons.ctp.common.event.EventType;
 import uk.gov.ons.ctp.common.event.model.CollectionCase;
 import uk.gov.ons.ctp.common.event.model.Contact;
 import uk.gov.ons.ctp.common.event.model.FulfilmentRequest;
+import uk.gov.ons.ctp.common.event.model.NewCasePayloadContent;
+import uk.gov.ons.ctp.common.event.model.NewCaseSample;
+import uk.gov.ons.ctp.common.event.model.NewCaseSampleSensitive;
 import uk.gov.ons.ctp.integration.common.product.ProductReference;
 import uk.gov.ons.ctp.integration.common.product.model.Product;
 import uk.gov.ons.ctp.integration.common.product.model.Product.DeliveryChannel;
@@ -36,6 +41,7 @@ import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient.Domain;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.CaseRegistrationDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.FulfilmentRequestDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.PostalFulfilmentRequestDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.SMSFulfilmentRequestDTO;
@@ -100,6 +106,39 @@ public class CaseServiceImpl implements CaseService {
     createAndSendFulfilments(DeliveryChannel.POST, contact, requestBodyDTO, products, caseDetails);
   }
 
+  @Override
+  public void sendNewCaseEvent(CaseRegistrationDTO caseRegistrationDTO) throws CTPException {
+    createAndSendNewCase(caseRegistrationDTO);  
+  }
+
+  private void createAndSendNewCase(CaseRegistrationDTO caseRegistrationDTO)
+        throws CTPException {
+      log.debug(
+          "Entering createAndSendFulfilment");
+//PMB          kv("fulfilmentCodes", request.getFulfilmentCodes()),
+ //         kv("deliveryChannel", deliveryChannel));
+
+      NewCasePayloadContent payload =
+          createNewCaseRequestPayload(caseRegistrationDTO);
+
+    eventPublisher.sendEvent(EventType.NEW_CASE, Source.RESPONDENT_HOME, Channel.RH, payload);
+  }
+
+  private NewCasePayloadContent createNewCaseRequestPayload(CaseRegistrationDTO caseRegistrationDTO)
+      throws CTPException {
+
+    UUID caseId = UUID.randomUUID();
+    UUID collectionExerciseId = caseRegistrationDTO.getCollectionExerciseId();
+
+    NewCaseSample sample = new NewCaseSample();
+    NewCaseSampleSensitive sampleSensitive = new NewCaseSampleSensitive();
+    
+    NewCasePayloadContent newCasePayloadContent = new NewCasePayloadContent(caseId, collectionExerciseId, sample, sampleSensitive);;
+    
+    return newCasePayloadContent;
+  }
+
+  
   /*
    * create a cached list of product information to use for both
    * rate-limiting and event generation.

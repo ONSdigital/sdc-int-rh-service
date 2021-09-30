@@ -19,6 +19,7 @@ import uk.gov.ons.ctp.common.domain.UniquePropertyReferenceNumber;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.error.CTPException.Fault;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.CaseRegistrationDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.PostalFulfilmentRequestDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.SMSFulfilmentRequestDTO;
 import uk.gov.ons.ctp.integration.rhsvc.service.CaseService;
@@ -112,5 +113,21 @@ public class CaseEndpoint {
     validateMatchingCaseId(caseId, requestBodyDTO.getCaseId(), methodName);
     caseService.fulfilmentRequestByPost(requestBodyDTO);
     log.debug("Exit POST {}", methodName, kv("pathParam.caseId", caseId));
+  }
+
+  @RequestMapping(value = "/registration", method = RequestMethod.POST)
+  @ResponseStatus(value = HttpStatus.OK)
+  public void newCaseRegistration(
+      @Valid @RequestBody CaseRegistrationDTO caseRegistrationDTO)
+      throws CTPException {
+    String methodName = "newCaseRegistration";
+    log.info(
+        "Entering POST {}",
+        methodName,
+        kv("requestBody", caseRegistrationDTO));
+
+     caseService.sendNewCaseEvent(caseRegistrationDTO);
+
+     log.debug("Exit POST {}", methodName);
   }
 }
