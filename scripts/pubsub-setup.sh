@@ -40,6 +40,7 @@ createTopic event_uac-update
 createTopic event_uac-authenticate
 createTopic event_survey-launch
 createTopic event_fulfilment
+createTopic event_new-case
 
 echo "<<< Creating subscriptions >>>"
 createSubscription event_case-update event_case-update_rh
