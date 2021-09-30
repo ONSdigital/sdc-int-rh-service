@@ -6,13 +6,15 @@ import static org.mockito.Mockito.verify;
 
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import lombok.SneakyThrows;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
-import uk.gov.ons.ctp.common.event.EventType;
+
+import lombok.SneakyThrows;
+import uk.gov.ons.ctp.common.event.EventTopic;
 import uk.gov.ons.ctp.common.event.model.Header;
 import uk.gov.ons.ctp.common.event.model.UAC;
 import uk.gov.ons.ctp.common.event.model.UacEvent;
@@ -45,7 +47,7 @@ public class UacEventReceiverImplUnit_Test {
   }
 
   @SneakyThrows
-  private void prepareAndAcceptEvent(String qid, EventType type) {
+  private void prepareAndAcceptEvent(String qid, EventTopic topic) {
     // Construct UacEvent
     UacEventFixture = new UacEvent();
     UacPayload uacPayloadFixture = UacEventFixture.getPayload();
@@ -53,7 +55,7 @@ public class UacEventReceiverImplUnit_Test {
     uacFixture.setQuestionnaireId(qid);
 
     Header headerFixture = new Header();
-    headerFixture.setTopic(type);
+    headerFixture.setTopic(topic);
     headerFixture.setMessageId("c45de4dc-3c3b-11e9-b210-d663bd873d93");
     UacEventFixture.setHeader(headerFixture);
 
@@ -63,18 +65,18 @@ public class UacEventReceiverImplUnit_Test {
 
   @SneakyThrows
   private void acceptUacEvent(String qid) {
-    acceptUacEvent(qid, EventType.UAC_UPDATE);
+    acceptUacEvent(qid, EventTopic.UAC_UPDATE);
   }
 
   @SneakyThrows
-  private void acceptUacEvent(String qid, EventType type) {
-    prepareAndAcceptEvent(qid, type);
+  private void acceptUacEvent(String qid, EventTopic topic) {
+    prepareAndAcceptEvent(qid, topic);
     verify(mockRespondentDataRepo).writeUAC(uacFixture);
   }
 
   @SneakyThrows
   private void filterUacEvent(String qid) {
-    prepareAndAcceptEvent(qid, EventType.UAC_UPDATE);
+    prepareAndAcceptEvent(qid, EventTopic.UAC_UPDATE);
     verify(mockRespondentDataRepo, never()).writeUAC(uacFixture);
   }
 
@@ -115,6 +117,6 @@ public class UacEventReceiverImplUnit_Test {
 
   @Test
   public void shouldAcceptUacCreatedEvent() {
-    acceptUacEvent(RespondentHomeFixture.QID_01, EventType.UAC_UPDATE);
+    acceptUacEvent(RespondentHomeFixture.QID_01, EventTopic.UAC_UPDATE);
   }
 }

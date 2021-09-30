@@ -1,7 +1,9 @@
 package uk.gov.ons.ctp.integration.rhsvc.representation;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.UUID;
+
+import javax.validation.constraints.NotNull;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,10 +15,10 @@ import lombok.NoArgsConstructor;
 public class CaseRegistrationDTO {
   
   private int surveyId;
-  private UUID collectionExerciseId;
+  @NotNull private UUID collectionExerciseId;
   
-  private String schoolId;
-  private String schoolName;
+  @NotNull private String schoolId;
+  @NotNull private String schoolName;
   
   private boolean consentGivenTest;
   private boolean consentGivenSurvey;
@@ -27,7 +29,7 @@ public class CaseRegistrationDTO {
   private String childFirstName;
   private String childMiddleName;
   private String childLastName;
-  private Date childDob;
+  private LocalDate childDob;
   
   private String additionalInfo;
   

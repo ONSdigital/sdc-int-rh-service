@@ -131,7 +131,23 @@ public class CaseServiceImpl implements CaseService {
     UUID collectionExerciseId = caseRegistrationDTO.getCollectionExerciseId();
 
     NewCaseSample sample = new NewCaseSample();
+    sample.setSchoolId(caseRegistrationDTO.getSchoolId());
+    sample.setSchoolName(caseRegistrationDTO.getSchoolName());
+    sample.setConsentGivenTest(caseRegistrationDTO.isConsentGivenTest());
+    sample.setConsentGivenSurvey(caseRegistrationDTO.isConsentGivenSurvey());
+
     NewCaseSampleSensitive sampleSensitive = new NewCaseSampleSensitive();
+    sampleSensitive.setFirstName(caseRegistrationDTO.getFirstName());
+    sampleSensitive.setLastName(caseRegistrationDTO.getLastName());
+    sampleSensitive.setChildFirstName(caseRegistrationDTO.getChildFirstName());
+    sampleSensitive.setChildMiddleNames(caseRegistrationDTO.getChildMiddleName());
+    sampleSensitive.setChildLastName(caseRegistrationDTO.getChildLastName());
+    sampleSensitive.setChildDob(caseRegistrationDTO.getChildDob());
+    sampleSensitive.setAdditionalInfo(caseRegistrationDTO.getAdditionalInfo());
+    sampleSensitive.setChildMobileNumber(caseRegistrationDTO.getChildMobileNumber());
+    sampleSensitive.setChildEmailAddress(caseRegistrationDTO.getChildEmailAddress());
+    sampleSensitive.setParentMobileNumber(caseRegistrationDTO.getParentMobileNumber());
+    sampleSensitive.setParentEmailAddress(caseRegistrationDTO.getParentEmailAddress());
     
     NewCasePayloadContent newCasePayloadContent = new NewCasePayloadContent(caseId, collectionExerciseId, sample, sampleSensitive);;
     
