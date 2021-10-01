@@ -6,14 +6,12 @@ import static org.mockito.Mockito.verify;
 
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
-
-import lombok.SneakyThrows;
 import uk.gov.ons.ctp.common.event.EventTopic;
 import uk.gov.ons.ctp.common.event.model.Header;
 import uk.gov.ons.ctp.common.event.model.UAC;

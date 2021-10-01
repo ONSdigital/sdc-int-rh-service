@@ -39,8 +39,8 @@ import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient.Domain;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
-import uk.gov.ons.ctp.integration.rhsvc.representation.NewCaseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.FulfilmentRequestDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.NewCaseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.PostalFulfilmentRequestDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.SMSFulfilmentRequestDTO;
 import uk.gov.ons.ctp.integration.rhsvc.service.CaseService;
@@ -106,14 +106,13 @@ public class CaseServiceImpl implements CaseService {
 
   @Override
   public void sendNewCaseEvent(NewCaseDTO newCaseDTO) throws CTPException {
-      log.debug(
-          "Entering createAndSendNewCase",
+    log.debug(
+        "Entering createAndSendNewCase",
         kv("collectionExerciseSid", newCaseDTO.getCollectionExerciseId()),
         kv("schoolId", newCaseDTO.getSchoolId()),
         kv("lastName", newCaseDTO.getLastName()));
 
-      NewCasePayloadContent payload =
-          createNewCaseRequestPayload(newCaseDTO);
+    NewCasePayloadContent payload = createNewCaseRequestPayload(newCaseDTO);
 
     eventPublisher.sendEvent(EventType.NEW_CASE, Source.RESPONDENT_HOME, Channel.RH, payload);
   }

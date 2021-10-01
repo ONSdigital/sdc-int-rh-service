@@ -117,19 +117,14 @@ public class CaseEndpoint {
 
   @RequestMapping(value = "/new", method = RequestMethod.POST)
   @ResponseStatus(value = HttpStatus.OK)
-  public void newCase(
-      @Valid @RequestBody NewCaseDTO caseRegistrationDTO)
-      throws CTPException {
+  public void newCase(@Valid @RequestBody NewCaseDTO caseRegistrationDTO) throws CTPException {
     String methodName = "newCaseRegistration";
-    log.info(
-        "Entering POST {}",
-        methodName,
-        kv("requestBody", caseRegistrationDTO));
+    log.info("Entering POST {}", methodName, kv("requestBody", caseRegistrationDTO));
 
     // Reject if consent not given
-    verifyConsentGiven(caseRegistrationDTO.isConsentGivenTest(), "consentGivenTest"); 
-    verifyConsentGiven(caseRegistrationDTO.isConsentGivenSurvey(), "consentGivenSurvey"); 
-    
+    verifyConsentGiven(caseRegistrationDTO.isConsentGivenTest(), "consentGivenTest");
+    verifyConsentGiven(caseRegistrationDTO.isConsentGivenSurvey(), "consentGivenSurvey");
+
     caseService.sendNewCaseEvent(caseRegistrationDTO);
 
     log.debug("Exit POST {}", methodName);

@@ -26,6 +26,6 @@ public interface CaseService {
   void fulfilmentRequestBySMS(SMSFulfilmentRequestDTO requestBodyDTO) throws CTPException;
 
   void fulfilmentRequestByPost(PostalFulfilmentRequestDTO requestBodyDTO) throws CTPException;
-  
+
   void sendNewCaseEvent(NewCaseDTO caseRegistrationDTO) throws CTPException;
 }

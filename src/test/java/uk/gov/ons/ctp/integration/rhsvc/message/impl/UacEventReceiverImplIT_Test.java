@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
-
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,8 +31,6 @@ import org.springframework.messaging.support.GenericMessage;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-
-import lombok.SneakyThrows;
 import uk.gov.ons.ctp.common.event.EventTopic;
 import uk.gov.ons.ctp.common.event.model.Header;
 import uk.gov.ons.ctp.common.event.model.UAC;
@@ -47,7 +45,7 @@ import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentDataRepository
 /** Spring Integration test of flow received from Response Management */
 @SpringBootTest
 @EnableConfigurationProperties
-@ContextConfiguration(classes = {AppConfig.class, UacEventReceiverImplIT_Config.class})
+@ContextConfiguration(classes = {AppConfig.class, MessageIT_Config.class})
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("mocked-connection-factory")
 @ResourceLock(value = ParallelTestLocks.SPRING_TEST, mode = READ_WRITE)

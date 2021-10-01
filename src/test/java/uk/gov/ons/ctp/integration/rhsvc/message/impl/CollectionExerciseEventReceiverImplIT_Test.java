@@ -26,11 +26,10 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.ons.ctp.common.FixtureHelper;
-import uk.gov.ons.ctp.common.event.model.CaseEvent;
-import uk.gov.ons.ctp.common.event.model.Header;
+import uk.gov.ons.ctp.common.event.model.CollectionExerciseUpdateEvent;
 import uk.gov.ons.ctp.common.utility.ParallelTestLocks;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
-import uk.gov.ons.ctp.integration.rhsvc.event.impl.CaseEventReceiverImpl;
+import uk.gov.ons.ctp.integration.rhsvc.event.impl.CollectionExerciseEventReceiverImpl;
 import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentDataRepositoryImpl;
 
 /** Spring Integration test of flow received from Response Management */
@@ -40,10 +39,10 @@ import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentDataRepository
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("mocked-connection-factory")
 @ResourceLock(value = ParallelTestLocks.SPRING_TEST, mode = READ_WRITE)
-public class CaseEventReceiverImplIT_Test {
+public class CollectionExerciseEventReceiverImplIT_Test {
 
-  @Autowired private CaseEventReceiverImpl receiver;
-  @Autowired private PubSubInboundChannelAdapter caseEventInbound;
+  @Autowired private CollectionExerciseEventReceiverImpl receiver;
+  @Autowired private PubSubInboundChannelAdapter collectionExerciseEventInbound;
   @MockBean private RespondentDataRepositoryImpl respondentDataRepo;
   @MockBean private PubSubTemplate pubSubTemplate;
 
@@ -54,47 +53,47 @@ public class CaseEventReceiverImplIT_Test {
 
   /** Test the receiver flow */
   @Test
-  public void caseEventFlowTest() throws Exception {
-    Header header = new Header();
-    header.setMessageId("c45de4dc-3c3b-11e9-b210-d663bd873d93");
-    CaseEvent caseEvent = FixtureHelper.loadPackageFixtures(CaseEvent[].class).get(0);
-    caseEvent.setHeader(header);
+  public void collectionExerciseEventFlowTest() throws Exception {
+    CollectionExerciseUpdateEvent collectionExerciseUpdateEvent =
+        FixtureHelper.loadPackageFixtures(CollectionExerciseUpdateEvent[].class).get(0);
 
     // Construct message
-    Message<CaseEvent> message = new GenericMessage<>(caseEvent, new HashMap<>());
+    Message<CollectionExerciseUpdateEvent> message =
+        new GenericMessage<>(collectionExerciseUpdateEvent, new HashMap<>());
     // Send message to container
-    caseEventInbound.getOutputChannel().send(message);
+    collectionExerciseEventInbound.getOutputChannel().send(message);
 
     // Capture and check Service Activator argument
-    ArgumentCaptor<CaseEvent> captur = ArgumentCaptor.forClass(CaseEvent.class);
-    verify(receiver).acceptCaseEvent(captur.capture());
-    assertEquals(captur.getValue().getPayload(), caseEvent.getPayload());
+    ArgumentCaptor<CollectionExerciseUpdateEvent> captur =
+        ArgumentCaptor.forClass(CollectionExerciseUpdateEvent.class);
+    verify(receiver).acceptCollectionExerciseUpdateEvent(captur.capture());
+    assertEquals(captur.getValue().getPayload(), collectionExerciseUpdateEvent.getPayload());
   }
 
   @Test
-  public void caseCaseReceivedWithoutMillisTest() throws Exception {
+  public void collectionExerciseEventReceivedWithoutMillisTest() throws Exception {
 
-    // Create a case with a timestamp. Note that the milliseconds are not specified
-    CaseEvent caseEvent = FixtureHelper.loadPackageFixtures(CaseEvent[].class).get(0);
+    // Create a collection exercise with a timestamp. Note that the milliseconds are not specified
+    CollectionExerciseUpdateEvent collectionExerciseUpdateEvent =
+        FixtureHelper.loadPackageFixtures(CollectionExerciseUpdateEvent[].class).get(0);
 
-    Header header = new Header();
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.ENGLISH);
     sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-    header.setDateTime(sdf.parse("2011-08-12T20:17:46Z"));
-    caseEvent.setHeader(header);
-    //    caseEvent.getHeader().setDateTime(sdf.parse("2011-08-12T20:17:46Z"));
+    collectionExerciseUpdateEvent.getHeader().setDateTime(sdf.parse("2011-08-12T20:17:46Z"));
 
     // Construct message
-    Message<CaseEvent> message = new GenericMessage<>(caseEvent, new HashMap<>());
+    Message<CollectionExerciseUpdateEvent> message =
+        new GenericMessage<>(collectionExerciseUpdateEvent, new HashMap<>());
 
     // Send message to container
-    caseEventInbound.getOutputChannel().send(message);
+    collectionExerciseEventInbound.getOutputChannel().send(message);
 
     // Capture and check Service Activator argument
-    ArgumentCaptor<CaseEvent> captur = ArgumentCaptor.forClass(CaseEvent.class);
-    verify(receiver).acceptCaseEvent(captur.capture());
+    ArgumentCaptor<CollectionExerciseUpdateEvent> captur =
+        ArgumentCaptor.forClass(CollectionExerciseUpdateEvent.class);
+    verify(receiver).acceptCollectionExerciseUpdateEvent(captur.capture());
     assertEquals(sdf.parse("2011-08-12T20:17:46Z"), captur.getValue().getHeader().getDateTime());
-    assertEquals(caseEvent.getHeader(), captur.getValue().getHeader());
-    assertEquals(caseEvent.getPayload(), captur.getValue().getPayload());
+    assertEquals(collectionExerciseUpdateEvent.getHeader(), captur.getValue().getHeader());
+    assertEquals(collectionExerciseUpdateEvent.getPayload(), captur.getValue().getPayload());
   }
 }

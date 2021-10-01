@@ -70,9 +70,9 @@ spring:
 
 queueconfig:
   case-subscription: event_case-update_rh
-  case-topic: event_case-update
   uac-subscription: event_uac-update_rh
-  uac-topic: event_uac-update
+  collection-exercise-subscription: event_collection-exercise-update_rh
+  survey-subscription: event_survey-update_rh
   qid-filter-prefixes:
 
 messaging:
@@ -113,6 +113,8 @@ swagger-settings:
 cloud-storage:
   case-schema-name: case
   uac-schema-name: uac
+  survey-schema-name: survey
+  collection-exercise-schema-name: collection_exercise
   event-backup-schema-name: event-backup
   backoff:
     initial: 100
