@@ -3,8 +3,11 @@ package uk.gov.ons.ctp.integration.rhsvc.service.impl;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -14,21 +17,28 @@ import org.apache.commons.lang3.time.DateUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.ons.ctp.common.FixtureHelper;
+import uk.gov.ons.ctp.common.domain.Channel;
+import uk.gov.ons.ctp.common.domain.Source;
 import uk.gov.ons.ctp.common.domain.UniquePropertyReferenceNumber;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.EventPublisher;
+import uk.gov.ons.ctp.common.event.EventType;
 import uk.gov.ons.ctp.common.event.model.CollectionCase;
+import uk.gov.ons.ctp.common.event.model.NewCasePayloadContent;
 import uk.gov.ons.ctp.integration.common.product.ProductReference;
 import uk.gov.ons.ctp.integration.rhsvc.RHSvcBeanMapper;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.NewCaseDTO;
 
 @ExtendWith(MockitoExtension.class)
 public class CaseServiceImplTest {
@@ -50,6 +60,8 @@ public class CaseServiceImplTest {
   @Mock private ProductReference productReference;
 
   @Spy private AppConfig appConfig = new AppConfig();
+
+  @Captor ArgumentCaptor<NewCasePayloadContent> sendEventCaptor;
 
   private List<CollectionCase> collectionCase;
 
@@ -174,5 +186,62 @@ public class CaseServiceImplTest {
         .thenReturn(Optional.empty());
 
     assertThrows(CTPException.class, () -> caseSvc.getLatestValidNonHICaseByUPRN(UPRN));
+  }
+
+  @Test
+  public void shouldCreateNewCaseRequestPayload() throws Exception {
+    callAndVerifyNewCaseCreated();
+  }
+
+  private void callAndVerifyNewCaseCreated() throws CTPException {
+
+    NewCaseDTO newCaseDTO = getNewCaseDto();
+
+    caseSvc.sendNewCaseEvent(newCaseDTO);
+
+    verify(eventPublisher)
+        .sendEvent(
+            eq(EventType.NEW_CASE),
+            eq(Source.RESPONDENT_HOME),
+            eq(Channel.RH),
+            sendEventCaptor.capture());
+    NewCasePayloadContent eventPayload = sendEventCaptor.getValue();
+
+    assertEquals(newCaseDTO.getCollectionExerciseId(), eventPayload.getCollectionExerciseId());
+    assertEquals(newCaseDTO.getSchoolId(), eventPayload.getSample().getSchoolId());
+    assertEquals(newCaseDTO.getSchoolName(), eventPayload.getSample().getSchoolName());
+    assertEquals(newCaseDTO.getFirstName(), eventPayload.getSampleSensitive().getFirstName());
+    assertEquals(newCaseDTO.getLastName(), eventPayload.getSampleSensitive().getLastName());
+    assertEquals(
+        newCaseDTO.getChildFirstName(), eventPayload.getSampleSensitive().getChildFirstName());
+    assertEquals(
+        newCaseDTO.getChildMiddleName(), eventPayload.getSampleSensitive().getChildMiddleNames());
+    assertEquals(
+        newCaseDTO.getChildLastName(), eventPayload.getSampleSensitive().getChildLastName());
+    assertEquals(newCaseDTO.getChildDob(), eventPayload.getSampleSensitive().getChildDob());
+    assertEquals(
+        newCaseDTO.getParentMobileNumber(),
+        eventPayload.getSampleSensitive().getParentMobileNumber());
+    assertEquals(
+        newCaseDTO.getParentEmailAddress(),
+        eventPayload.getSampleSensitive().getParentEmailAddress());
+  }
+
+  public NewCaseDTO getNewCaseDto() {
+    NewCaseDTO newCaseDTO = new NewCaseDTO();
+
+    newCaseDTO.setCollectionExerciseId(UUID.fromString("22684ede-7d5f-4f53-9069-2398055c61b2"));
+    newCaseDTO.setSchoolId("abc1234");
+    newCaseDTO.setSchoolName("Chesterthorps High School");
+    newCaseDTO.setFirstName("Fred");
+    newCaseDTO.setLastName("Bloggs");
+    newCaseDTO.setChildFirstName("Jo");
+    newCaseDTO.setChildMiddleName("Ross");
+    newCaseDTO.setChildLastName("Bloggs");
+    newCaseDTO.setChildDob(LocalDate.parse("2001-12-31"));
+    newCaseDTO.setParentMobileNumber("447123456999");
+    newCaseDTO.setParentEmailAddress("fred.bloggs@domain.com");
+
+    return newCaseDTO;
   }
 }

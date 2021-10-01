@@ -29,6 +29,7 @@ import uk.gov.ons.ctp.common.domain.UniquePropertyReferenceNumber;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.error.RestExceptionHandler;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.NewCaseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.PostalFulfilmentRequestDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.SMSFulfilmentRequestDTO;
 import uk.gov.ons.ctp.integration.rhsvc.service.CaseService;
@@ -312,12 +313,45 @@ public class CaseEndpointUnitTest {
     verifyRejectedSmsFulfilmentRequest(json, url);
   }
 
+  /** Test should send out a new case event (register) */
+  @Test
+  public void shouldCreateNewCase() throws Exception {
+    ObjectNode json = getNewCaseEventFixture();
+    String url = "/cases/new";
+    mockMvc.perform(postJson(url, json.toString())).andExpect(status().isOk());
+    verify(caseService).sendNewCaseEvent(any(NewCaseDTO.class));
+  }
+
+  @Test
+  public void shouldRejectNewCaseIfConsentNotGiven() throws Exception {
+    ObjectNode json = getNewCaseEventFixture();
+    json.remove("consentGivenTest");
+    json.put("consentGivenTest", "false");
+    String url = "/cases/new";
+    mockMvc.perform(postJson(url, json.toString())).andExpect(status().is4xxClientError());
+    verify(caseService, never()).sendNewCaseEvent(any(NewCaseDTO.class));
+  }
+
+  @Test
+  public void shouldRejectNewCaseIfConsentNotGivenSurvey() throws Exception {
+    ObjectNode json = getNewCaseEventFixture();
+    json.remove("consentGivenSurvey");
+    json.put("consentGivenSurvey", "false");
+    String url = "/cases/new";
+    mockMvc.perform(postJson(url, json.toString())).andExpect(status().is4xxClientError());
+    verify(caseService, never()).sendNewCaseEvent(any(NewCaseDTO.class));
+  }
+
   private ObjectNode getSmsFulfilmentFixture() {
     return FixtureHelper.loadClassObjectNode("SMSFulfilmentRequestDTO");
   }
 
   private ObjectNode getPostFulfilmentFixture() {
     return FixtureHelper.loadClassObjectNode("postal");
+  }
+
+  private ObjectNode getNewCaseEventFixture() {
+    return FixtureHelper.loadClassObjectNode("NewCaseEventDTO");
   }
 
   private void verifyRejectedSmsFulfilmentRequest(ObjectNode json, String url) throws Exception {
