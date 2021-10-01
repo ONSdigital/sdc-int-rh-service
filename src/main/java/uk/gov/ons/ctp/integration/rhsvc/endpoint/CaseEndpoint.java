@@ -19,7 +19,7 @@ import uk.gov.ons.ctp.common.domain.UniquePropertyReferenceNumber;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.error.CTPException.Fault;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
-import uk.gov.ons.ctp.integration.rhsvc.representation.CaseRegistrationDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.NewCaseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.PostalFulfilmentRequestDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.SMSFulfilmentRequestDTO;
 import uk.gov.ons.ctp.integration.rhsvc.service.CaseService;
@@ -115,10 +115,10 @@ public class CaseEndpoint {
     log.debug("Exit POST {}", methodName, kv("pathParam.caseId", caseId));
   }
 
-  @RequestMapping(value = "/registration", method = RequestMethod.POST)
+  @RequestMapping(value = "/new", method = RequestMethod.POST)
   @ResponseStatus(value = HttpStatus.OK)
-  public void newCaseRegistration(
-      @Valid @RequestBody CaseRegistrationDTO caseRegistrationDTO)
+  public void newCase(
+      @Valid @RequestBody NewCaseDTO caseRegistrationDTO)
       throws CTPException {
     String methodName = "newCaseRegistration";
     log.info(
@@ -126,8 +126,20 @@ public class CaseEndpoint {
         methodName,
         kv("requestBody", caseRegistrationDTO));
 
-     caseService.sendNewCaseEvent(caseRegistrationDTO);
+    // Reject if consent not given
+    verifyConsentGiven(caseRegistrationDTO.isConsentGivenTest(), "consentGivenTest"); 
+    verifyConsentGiven(caseRegistrationDTO.isConsentGivenSurvey(), "consentGivenSurvey"); 
+    
+    caseService.sendNewCaseEvent(caseRegistrationDTO);
 
-     log.debug("Exit POST {}", methodName);
+    log.debug("Exit POST {}", methodName);
+  }
+
+  private void verifyConsentGiven(boolean consentGiven, String fieldName) throws CTPException {
+    if (!consentGiven) {
+      String message = "The field '" + fieldName + "' must be set to true";
+      log.warn(message, kv(fieldName, consentGiven));
+      throw new CTPException(Fault.BAD_REQUEST, message);
+    }
   }
 }

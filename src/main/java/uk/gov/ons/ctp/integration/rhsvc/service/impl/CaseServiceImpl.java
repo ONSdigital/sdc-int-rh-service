@@ -41,7 +41,7 @@ import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient.Domain;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
-import uk.gov.ons.ctp.integration.rhsvc.representation.CaseRegistrationDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.NewCaseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.FulfilmentRequestDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.PostalFulfilmentRequestDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.SMSFulfilmentRequestDTO;
@@ -107,24 +107,20 @@ public class CaseServiceImpl implements CaseService {
   }
 
   @Override
-  public void sendNewCaseEvent(CaseRegistrationDTO caseRegistrationDTO) throws CTPException {
-    createAndSendNewCase(caseRegistrationDTO);  
-  }
-
-  private void createAndSendNewCase(CaseRegistrationDTO caseRegistrationDTO)
-        throws CTPException {
+  public void sendNewCaseEvent(NewCaseDTO newCaseDTO) throws CTPException {
       log.debug(
-          "Entering createAndSendFulfilment");
-//PMB          kv("fulfilmentCodes", request.getFulfilmentCodes()),
- //         kv("deliveryChannel", deliveryChannel));
+          "Entering createAndSendNewCase",
+        kv("collectionExerciseSid", newCaseDTO.getCollectionExerciseId()),
+        kv("schoolId", newCaseDTO.getSchoolId()),
+        kv("lastName", newCaseDTO.getLastName()));
 
       NewCasePayloadContent payload =
-          createNewCaseRequestPayload(caseRegistrationDTO);
+          createNewCaseRequestPayload(newCaseDTO);
 
     eventPublisher.sendEvent(EventType.NEW_CASE, Source.RESPONDENT_HOME, Channel.RH, payload);
   }
 
-  private NewCasePayloadContent createNewCaseRequestPayload(CaseRegistrationDTO caseRegistrationDTO)
+  private NewCasePayloadContent createNewCaseRequestPayload(NewCaseDTO caseRegistrationDTO)
       throws CTPException {
 
     UUID caseId = UUID.randomUUID();
