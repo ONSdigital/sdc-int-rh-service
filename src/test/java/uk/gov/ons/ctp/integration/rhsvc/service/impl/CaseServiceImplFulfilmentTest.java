@@ -41,7 +41,7 @@ import uk.gov.ons.ctp.common.domain.Source;
 import uk.gov.ons.ctp.common.domain.UniquePropertyReferenceNumber;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.EventPublisher;
-import uk.gov.ons.ctp.common.event.EventType;
+import uk.gov.ons.ctp.common.event.TopicType;
 import uk.gov.ons.ctp.common.event.model.CollectionCase;
 import uk.gov.ons.ctp.common.event.model.Contact;
 import uk.gov.ons.ctp.common.event.model.EventPayload;
@@ -598,7 +598,7 @@ public class CaseServiceImplFulfilmentTest {
 
   private List<FulfilmentRequest> getAndValidatePublishedEvent(
       CollectionCase caseDetails, Contact expectedContact, String... fulfilmentCodes) {
-    ArgumentCaptor<EventType> eventTypeCaptor = ArgumentCaptor.forClass(EventType.class);
+    ArgumentCaptor<TopicType> eventTypeCaptor = ArgumentCaptor.forClass(TopicType.class);
     ArgumentCaptor<Source> sourceCaptor = ArgumentCaptor.forClass(Source.class);
     ArgumentCaptor<Channel> channelCaptor = ArgumentCaptor.forClass(Channel.class);
     ArgumentCaptor<FulfilmentRequest> fulfilmentRequestCaptor =

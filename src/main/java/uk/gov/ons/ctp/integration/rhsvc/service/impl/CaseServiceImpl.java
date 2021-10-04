@@ -22,7 +22,7 @@ import uk.gov.ons.ctp.common.domain.UniquePropertyReferenceNumber;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.error.CTPException.Fault;
 import uk.gov.ons.ctp.common.event.EventPublisher;
-import uk.gov.ons.ctp.common.event.EventType;
+import uk.gov.ons.ctp.common.event.TopicType;
 import uk.gov.ons.ctp.common.event.model.CollectionCase;
 import uk.gov.ons.ctp.common.event.model.Contact;
 import uk.gov.ons.ctp.common.event.model.FulfilmentRequest;
@@ -114,7 +114,7 @@ public class CaseServiceImpl implements CaseService {
 
     NewCasePayloadContent payload = createNewCaseRequestPayload(newCaseDTO);
 
-    eventPublisher.sendEvent(EventType.NEW_CASE, Source.RESPONDENT_HOME, Channel.RH, payload);
+    eventPublisher.sendEvent(TopicType.NEW_CASE, Source.RESPONDENT_HOME, Channel.RH, payload);
   }
 
   private NewCasePayloadContent createNewCaseRequestPayload(NewCaseDTO caseRegistrationDTO)
@@ -226,7 +226,7 @@ public class CaseServiceImpl implements CaseService {
       FulfilmentRequest payload =
           createFulfilmentRequestPayload(request.getCaseId(), contact, product, caseDetails);
 
-      eventPublisher.sendEvent(EventType.FULFILMENT, Source.RESPONDENT_HOME, Channel.RH, payload);
+      eventPublisher.sendEvent(TopicType.FULFILMENT, Source.RESPONDENT_HOME, Channel.RH, payload);
     }
   }
 

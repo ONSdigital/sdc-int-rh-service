@@ -12,7 +12,7 @@ import uk.gov.ons.ctp.common.domain.Channel;
 import uk.gov.ons.ctp.common.domain.Source;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.EventPublisher;
-import uk.gov.ons.ctp.common.event.EventType;
+import uk.gov.ons.ctp.common.event.TopicType;
 import uk.gov.ons.ctp.common.event.model.CollectionCase;
 import uk.gov.ons.ctp.common.event.model.UAC;
 import uk.gov.ons.ctp.common.event.model.UacAuthenticateResponse;
@@ -86,7 +86,7 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
 
     String transactionId =
         eventPublisher.sendEvent(
-            EventType.UAC_AUTHENTICATE, Source.RESPONDENT_HOME, Channel.RH, response);
+            TopicType.UAC_AUTHENTICATE, Source.RESPONDENT_HOME, Channel.RH, response);
 
     log.debug(
         "UacAuthenticated event published for caseId: "
