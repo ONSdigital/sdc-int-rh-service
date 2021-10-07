@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.UUID;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -137,7 +138,7 @@ public class UacEventReceiverImplIT_Test {
     uac.setCaseId("c45de4dc-3c3b-11e9-b210-d663bd873d93");
     Header header = new Header();
     header.setTopic(topic);
-    header.setMessageId("c45de4dc-3c3b-11e9-b210-d663bd873d93");
+    header.setMessageId(UUID.fromString("c45de4dc-3c3b-11e9-b210-d663bd873d93"));
     header.setDateTime(new Date());
     UacEvent.setHeader(header);
     return UacEvent;

@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -56,7 +57,7 @@ public class CaseEventReceiverImplIT_Test {
   @Test
   public void caseEventFlowTest() throws Exception {
     Header header = new Header();
-    header.setMessageId("c45de4dc-3c3b-11e9-b210-d663bd873d93");
+    header.setMessageId(UUID.fromString("c45de4dc-3c3b-11e9-b210-d663bd873d93"));
     CaseEvent caseEvent = FixtureHelper.loadPackageFixtures(CaseEvent[].class).get(0);
     caseEvent.setHeader(header);
 
@@ -81,6 +82,7 @@ public class CaseEventReceiverImplIT_Test {
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.ENGLISH);
     sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
     header.setDateTime(sdf.parse("2011-08-12T20:17:46Z"));
+    header.setMessageId(UUID.fromString("c45de4dc-3c3b-11e9-b210-d663bd873d93"));
     caseEvent.setHeader(header);
     //    caseEvent.getHeader().setDateTime(sdf.parse("2011-08-12T20:17:46Z"));
 

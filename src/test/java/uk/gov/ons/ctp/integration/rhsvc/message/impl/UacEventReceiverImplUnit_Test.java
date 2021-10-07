@@ -4,6 +4,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.SneakyThrows;
@@ -54,7 +55,7 @@ public class UacEventReceiverImplUnit_Test {
 
     Header headerFixture = new Header();
     headerFixture.setTopic(topic);
-    headerFixture.setMessageId("c45de4dc-3c3b-11e9-b210-d663bd873d93");
+    headerFixture.setMessageId(UUID.fromString("c45de4dc-3c3b-11e9-b210-d663bd873d93"));
     UacEventFixture.setHeader(headerFixture);
 
     // execution

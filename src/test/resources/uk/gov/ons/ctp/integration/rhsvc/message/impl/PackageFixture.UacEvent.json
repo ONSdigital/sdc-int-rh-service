@@ -4,7 +4,7 @@
     "source": "CASE_SERVICE",
     "channel": "RM",
     "dateTime": "2011-08-12T20:17:46.384Z",
-    "transactionId": "c45de4dc-3c3b-11e9-b210-d663bd873d93"
+    "messageId": "c45de4dc-3c3b-11e9-b210-d663bd873d93"
   },
   "payload": {
     "uac": {
