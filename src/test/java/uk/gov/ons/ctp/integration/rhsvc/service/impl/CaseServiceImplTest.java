@@ -221,7 +221,7 @@ public class CaseServiceImplTest {
         newCaseDTO.get(0).getChildFirstName(),
         eventPayload.getSampleSensitive().getChildFirstName());
     assertEquals(
-        newCaseDTO.get(0).getChildMiddleName(),
+        newCaseDTO.get(0).getChildMiddleNames(),
         eventPayload.getSampleSensitive().getChildMiddleNames());
     assertEquals(
         newCaseDTO.get(0).getChildLastName(), eventPayload.getSampleSensitive().getChildLastName());
@@ -243,7 +243,7 @@ public class CaseServiceImplTest {
     newCaseDTO.get(0).setFirstName("Fred");
     newCaseDTO.get(0).setLastName("Bloggs");
     newCaseDTO.get(0).setChildFirstName("Jo");
-    newCaseDTO.get(0).setChildMiddleName("Ross");
+    newCaseDTO.get(0).setChildMiddleNames("Ross");
     newCaseDTO.get(0).setChildLastName("Bloggs");
     newCaseDTO.get(0).setChildDob(LocalDate.parse("2001-12-31"));
     newCaseDTO.get(0).setParentMobileNumber("447123456999");

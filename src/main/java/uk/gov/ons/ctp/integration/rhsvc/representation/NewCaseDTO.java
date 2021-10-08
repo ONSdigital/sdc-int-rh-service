@@ -40,7 +40,7 @@ public class NewCaseDTO {
 
   @LoggingScope(scope = Scope.MASK)
   @NotBlank
-  private String childMiddleName;
+  private String childMiddleNames;
 
   @LoggingScope(scope = Scope.MASK)
   @NotBlank

@@ -69,22 +69,7 @@ public class RHSvcBeanMapper extends ConfigurableMapper {
         .byDefault()
         .register();
 
-    factory
-        .classMap(NewCaseSampleSensitive.class, NewCaseDTO.class)
-        .field("firstName", "firstName")
-        .field("lastName", "lastName")
-        .field("childFirstName", "childFirstName")
-        .field("childMiddleNames", "childMiddleName")
-        .field("childLastName", "childLastName")
-        .field("childDob", "childDob")
-        .field("additionalInfo", "additionalInfo")
-        .field("childMobileNumber", "childMobileNumber")
-        .field("childEmailAddress", "childEmailAddress")
-        .field("parentMobileNumber", "parentMobileNumber")
-        .field("parentEmailAddress", "parentEmailAddress")
-        .byDefault()
-        .register();
-
+    factory.classMap(NewCaseSampleSensitive.class, NewCaseDTO.class).byDefault().register();
     factory.classMap(AddressDTO.class, AddressCompact.class).byDefault().register();
     factory.classMap(Address.class, AddressCompact.class).byDefault().register();
     factory.classMap(NewCaseSample.class, NewCaseDTO.class).byDefault().register();

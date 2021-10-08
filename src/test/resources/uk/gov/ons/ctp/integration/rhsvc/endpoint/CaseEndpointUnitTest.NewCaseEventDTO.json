@@ -8,7 +8,7 @@
   "firstName": "Fred",
   "lastName": "Bloggs",
   "childFirstName": "Jo",
-  "childMiddleName": "Rose",
+  "childMiddleNames": "Rose",
   "childLastName": "Bloggs",
   "childDob": "2001-12-31",
   "additionalInfo": "Class 2A",
