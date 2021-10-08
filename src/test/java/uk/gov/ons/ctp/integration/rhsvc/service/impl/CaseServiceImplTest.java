@@ -198,8 +198,6 @@ public class CaseServiceImplTest {
 
   private void callAndVerifyNewCaseCreated() throws CTPException {
 
-    returnNewCaseDTO();
-
     caseSvc.sendNewCaseEvent(newCaseDTO.get(0));
 
     verify(eventPublisher)
@@ -232,21 +230,5 @@ public class CaseServiceImplTest {
     assertEquals(
         newCaseDTO.get(0).getParentEmailAddress(),
         eventPayload.getSampleSensitive().getParentEmailAddress());
-  }
-
-  private void returnNewCaseDTO() {
-    newCaseDTO
-        .get(0)
-        .setCollectionExerciseId(UUID.fromString("22684ede-7d5f-4f53-9069-2398055c61b2"));
-    newCaseDTO.get(0).setSchoolId("abc1234");
-    newCaseDTO.get(0).setSchoolName("Chesterthorps High School");
-    newCaseDTO.get(0).setFirstName("Fred");
-    newCaseDTO.get(0).setLastName("Bloggs");
-    newCaseDTO.get(0).setChildFirstName("Jo");
-    newCaseDTO.get(0).setChildMiddleNames("Ross");
-    newCaseDTO.get(0).setChildLastName("Bloggs");
-    newCaseDTO.get(0).setChildDob(LocalDate.parse("2001-12-31"));
-    newCaseDTO.get(0).setParentMobileNumber("447123456999");
-    newCaseDTO.get(0).setParentEmailAddress("fred.bloggs@domain.com");
   }
 }
