@@ -4,7 +4,7 @@
     "source" : "CONTACT_CENTRE_API",
     "channel" : "CC",
     "dateTime" : "2020-06-08T07:28:45.117Z",
-    "transactionId" : "c45de4dc-3c3b-11e9-b210-d663bd873d93"
+    "messageId" : "c45de4dc-3c3b-11e9-b210-d663bd873d93"
   },
   "payload" : {
     "collectionCase" : {

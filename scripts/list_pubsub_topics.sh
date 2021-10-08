@@ -23,8 +23,8 @@ PUBSUB_DIR=$1
 
 cd $PUBSUB_DIR/samples/snippets
 
-echo "T O P I C S"
-python publisher.py local list
+echo "   T O P I C S"
+python publisher.py local list | sed 's/name: //g' | sed 's/"//g' | grep -E ".*[a-z].*" --color=never
 
-echo "S U B S C R I P T I O N S"
+echo "   S U B S C R I P T I O N S"
 python subscriber.py local list-in-project

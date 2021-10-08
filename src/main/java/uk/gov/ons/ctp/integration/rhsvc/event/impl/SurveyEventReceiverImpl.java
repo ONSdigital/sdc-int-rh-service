@@ -34,18 +34,17 @@ public class SurveyEventReceiverImpl implements SurveyEventReceiver {
   public void acceptSurveyUpdateEvent(SurveyUpdateEvent surveyUpdateEvent) throws CTPException {
 
     SurveyUpdate surveyUpdate = surveyUpdateEvent.getPayload().getSurveyUpdate();
-    String surveyTransactionId = surveyUpdateEvent.getEvent().getTransactionId();
+    String surveyMessageId = surveyUpdateEvent.getHeader().getMessageId().toString();
 
     log.info(
         "Entering acceptSurveyUpdateEvent",
-        kv("transactionId", surveyTransactionId),
+        kv("messageId", surveyMessageId),
         kv("surveyId", surveyUpdate.getSurveyId()));
 
     try {
       respondentDataRepo.writeSurvey(surveyUpdate);
     } catch (CTPException ctpEx) {
-      log.error(
-          "Survey Event processing failed", kv("surveyTransactionId", surveyTransactionId), ctpEx);
+      log.error("Survey Event processing failed", kv("surveyMessageId", surveyMessageId), ctpEx);
       throw new CTPException(ctpEx.getFault());
     }
   }

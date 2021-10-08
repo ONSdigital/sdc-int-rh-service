@@ -19,6 +19,7 @@ import uk.gov.ons.ctp.common.domain.UniquePropertyReferenceNumber;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.error.CTPException.Fault;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.NewCaseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.PostalFulfilmentRequestDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.SMSFulfilmentRequestDTO;
 import uk.gov.ons.ctp.integration.rhsvc.service.CaseService;
@@ -112,5 +113,28 @@ public class CaseEndpoint {
     validateMatchingCaseId(caseId, requestBodyDTO.getCaseId(), methodName);
     caseService.fulfilmentRequestByPost(requestBodyDTO);
     log.debug("Exit POST {}", methodName, kv("pathParam.caseId", caseId));
+  }
+
+  @RequestMapping(value = "/new", method = RequestMethod.POST)
+  @ResponseStatus(value = HttpStatus.OK)
+  public void newCase(@Valid @RequestBody NewCaseDTO caseRegistrationDTO) throws CTPException {
+    String methodName = "newCaseRegistration";
+    log.info("Entering POST {}", methodName, kv("requestBody", caseRegistrationDTO));
+
+    // Reject if consent not given
+    verifyIsTrue(caseRegistrationDTO.isConsentGivenTest(), "consentGivenTest");
+    verifyIsTrue(caseRegistrationDTO.isConsentGivenSurvey(), "consentGivenSurvey");
+
+    caseService.sendNewCaseEvent(caseRegistrationDTO);
+
+    log.debug("Exit POST {}", methodName);
+  }
+
+  private void verifyIsTrue(boolean checkBoolean, String fieldName) throws CTPException {
+    if (!checkBoolean) {
+      String message = "The field '" + fieldName + "' must be set to true";
+      log.warn(message, kv(fieldName, checkBoolean));
+      throw new CTPException(Fault.BAD_REQUEST, message);
+    }
   }
 }

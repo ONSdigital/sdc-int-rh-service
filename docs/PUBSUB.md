@@ -1,5 +1,9 @@
 # PubSub
 
+Set an environment variable in your .bashrc to point the pubsub utilities at the pubsub port:
+
+    export PUBSUB_EMULATOR_HOST="localhost:9808"
+    
 To start pubsub
 
     gcloud beta emulators pubsub start --project=<fake_project_id>
@@ -33,6 +37,7 @@ Create the following topics/subscriptions:
       event_uac-authenticate           | N/A
       event_survey-launch              | N/A
       event_fulfilment                 | N/A
+      event_new-case                   | N/A
 
     python publisher.py local create event_case-update
     python publisher.py local create event_uac-update
@@ -41,6 +46,7 @@ Create the following topics/subscriptions:
     python publisher.py local create event_uac-authenticate
     python publisher.py local create event_survey-launch
     python publisher.py local create event_fulfilment
+    python publisher.py local create event_new-case
 
     python subscriber.py local create event_case-update event_case-update_rh
     python subscriber.py local create event_uac-update event_uac-update_rh

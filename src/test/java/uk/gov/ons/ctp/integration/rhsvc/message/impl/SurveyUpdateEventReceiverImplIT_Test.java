@@ -77,7 +77,7 @@ public class SurveyUpdateEventReceiverImplIT_Test {
 
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.ENGLISH);
     sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-    surveyUpdateEvent.getEvent().setDateTime(sdf.parse("2011-08-12T20:17:46Z"));
+    surveyUpdateEvent.getHeader().setDateTime(sdf.parse("2011-08-12T20:17:46Z"));
 
     // Construct message
     Message<SurveyUpdateEvent> message = new GenericMessage<>(surveyUpdateEvent, new HashMap<>());
@@ -88,8 +88,8 @@ public class SurveyUpdateEventReceiverImplIT_Test {
     // Capture and check Service Activator argument
     ArgumentCaptor<SurveyUpdateEvent> captur = ArgumentCaptor.forClass(SurveyUpdateEvent.class);
     verify(receiver).acceptSurveyUpdateEvent(captur.capture());
-    assertEquals(sdf.parse("2011-08-12T20:17:46Z"), captur.getValue().getEvent().getDateTime());
-    assertEquals(surveyUpdateEvent.getEvent(), captur.getValue().getEvent());
+    assertEquals(sdf.parse("2011-08-12T20:17:46Z"), captur.getValue().getHeader().getDateTime());
+    assertEquals(surveyUpdateEvent.getHeader(), captur.getValue().getHeader());
     assertEquals(surveyUpdateEvent.getPayload(), captur.getValue().getPayload());
   }
 }

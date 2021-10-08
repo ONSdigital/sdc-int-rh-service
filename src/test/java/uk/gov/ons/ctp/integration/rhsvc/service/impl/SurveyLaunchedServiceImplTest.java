@@ -19,7 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.ons.ctp.common.domain.Channel;
 import uk.gov.ons.ctp.common.domain.Source;
 import uk.gov.ons.ctp.common.event.EventPublisher;
-import uk.gov.ons.ctp.common.event.EventType;
+import uk.gov.ons.ctp.common.event.TopicType;
 import uk.gov.ons.ctp.common.event.model.SurveyLaunchResponse;
 import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient;
 import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient.Domain;
@@ -83,7 +83,7 @@ public class SurveyLaunchedServiceImplTest {
     // Get hold of the event pay load that surveyLaunchedService created
     verify(publisher)
         .sendEvent(
-            eq(EventType.SURVEY_LAUNCH),
+            eq(TopicType.SURVEY_LAUNCH),
             eq(Source.RESPONDENT_HOME),
             eq(expectedChannel),
             sendEventCaptor.capture());

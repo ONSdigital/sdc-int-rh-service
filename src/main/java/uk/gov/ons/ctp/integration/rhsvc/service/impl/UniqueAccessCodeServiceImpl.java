@@ -3,6 +3,7 @@ package uk.gov.ons.ctp.integration.rhsvc.service.impl;
 import static uk.gov.ons.ctp.common.log.ScopedStructuredArguments.kv;
 
 import java.util.Optional;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import ma.glasnost.orika.MapperFacade;
 import org.apache.commons.lang3.StringUtils;
@@ -12,7 +13,7 @@ import uk.gov.ons.ctp.common.domain.Channel;
 import uk.gov.ons.ctp.common.domain.Source;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.EventPublisher;
-import uk.gov.ons.ctp.common.event.EventType;
+import uk.gov.ons.ctp.common.event.TopicType;
 import uk.gov.ons.ctp.common.event.model.CollectionCase;
 import uk.gov.ons.ctp.common.event.model.UAC;
 import uk.gov.ons.ctp.common.event.model.UacAuthenticateResponse;
@@ -84,15 +85,15 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
             .caseId(data.getCaseId())
             .build();
 
-    String transactionId =
+    UUID messageId =
         eventPublisher.sendEvent(
-            EventType.UAC_AUTHENTICATE, Source.RESPONDENT_HOME, Channel.RH, response);
+            TopicType.UAC_AUTHENTICATE, Source.RESPONDENT_HOME, Channel.RH, response);
 
     log.debug(
         "UacAuthenticated event published for caseId: "
             + response.getCaseId()
-            + ", transactionId: "
-            + transactionId);
+            + ", messageId: "
+            + messageId);
   }
 
   private UniqueAccessCodeDTO createUniqueAccessCodeDTO(

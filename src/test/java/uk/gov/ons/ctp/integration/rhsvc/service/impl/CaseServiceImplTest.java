@@ -3,6 +3,8 @@ package uk.gov.ons.ctp.integration.rhsvc.service.impl;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Date;
@@ -14,21 +16,28 @@ import org.apache.commons.lang3.time.DateUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.ons.ctp.common.FixtureHelper;
+import uk.gov.ons.ctp.common.domain.Channel;
+import uk.gov.ons.ctp.common.domain.Source;
 import uk.gov.ons.ctp.common.domain.UniquePropertyReferenceNumber;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.EventPublisher;
+import uk.gov.ons.ctp.common.event.TopicType;
 import uk.gov.ons.ctp.common.event.model.CollectionCase;
+import uk.gov.ons.ctp.common.event.model.NewCasePayloadContent;
 import uk.gov.ons.ctp.integration.common.product.ProductReference;
 import uk.gov.ons.ctp.integration.rhsvc.RHSvcBeanMapper;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.NewCaseDTO;
 
 @ExtendWith(MockitoExtension.class)
 public class CaseServiceImplTest {
@@ -51,12 +60,17 @@ public class CaseServiceImplTest {
 
   @Spy private AppConfig appConfig = new AppConfig();
 
+  @Captor ArgumentCaptor<NewCasePayloadContent> sendEventCaptor;
+
   private List<CollectionCase> collectionCase;
+
+  private List<NewCaseDTO> newCaseDTO;
 
   /** Setup tests */
   @BeforeEach
   public void setUp() {
     this.collectionCase = FixtureHelper.loadClassFixtures(CollectionCase[].class);
+    this.newCaseDTO = FixtureHelper.loadClassFixtures(NewCaseDTO[].class);
 
     appConfig.setCollectionExerciseId(COLLECTION_EXERCISE_ID);
     ReflectionTestUtils.setField(caseSvc, "appConfig", appConfig);
@@ -174,5 +188,46 @@ public class CaseServiceImplTest {
         .thenReturn(Optional.empty());
 
     assertThrows(CTPException.class, () -> caseSvc.getLatestValidNonHICaseByUPRN(UPRN));
+  }
+
+  @Test
+  public void shouldCreateNewCaseRequestPayload() throws Exception {
+    callAndVerifyNewCaseCreated();
+  }
+
+  private void callAndVerifyNewCaseCreated() throws CTPException {
+
+    caseSvc.sendNewCaseEvent(newCaseDTO.get(0));
+
+    verify(eventPublisher)
+        .sendEvent(
+            eq(TopicType.NEW_CASE),
+            eq(Source.RESPONDENT_HOME),
+            eq(Channel.RH),
+            sendEventCaptor.capture());
+    NewCasePayloadContent eventPayload = sendEventCaptor.getValue();
+
+    assertEquals(
+        newCaseDTO.get(0).getCollectionExerciseId(), eventPayload.getCollectionExerciseId());
+    assertEquals(newCaseDTO.get(0).getSchoolId(), eventPayload.getSample().getSchoolId());
+    assertEquals(newCaseDTO.get(0).getSchoolName(), eventPayload.getSample().getSchoolName());
+    assertEquals(
+        newCaseDTO.get(0).getFirstName(), eventPayload.getSampleSensitive().getFirstName());
+    assertEquals(newCaseDTO.get(0).getLastName(), eventPayload.getSampleSensitive().getLastName());
+    assertEquals(
+        newCaseDTO.get(0).getChildFirstName(),
+        eventPayload.getSampleSensitive().getChildFirstName());
+    assertEquals(
+        newCaseDTO.get(0).getChildMiddleNames(),
+        eventPayload.getSampleSensitive().getChildMiddleNames());
+    assertEquals(
+        newCaseDTO.get(0).getChildLastName(), eventPayload.getSampleSensitive().getChildLastName());
+    assertEquals(newCaseDTO.get(0).getChildDob(), eventPayload.getSampleSensitive().getChildDob());
+    assertEquals(
+        newCaseDTO.get(0).getParentMobileNumber(),
+        eventPayload.getSampleSensitive().getParentMobileNumber());
+    assertEquals(
+        newCaseDTO.get(0).getParentEmailAddress(),
+        eventPayload.getSampleSensitive().getParentEmailAddress());
   }
 }

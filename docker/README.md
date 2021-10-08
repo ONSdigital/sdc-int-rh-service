@@ -125,7 +125,7 @@ If not using the RH Cucumber local profile, point at the emulator using environm
 
 To run the services and Cucumber tests:
 
-    cd /Users/peterbochel/sdc/source
+    cd ~/sdc/source
     
     ./sdc-int-rh-service/docker/rh-service-up.sh 
     ./sdc-int-rh-ui/docker/rh-ui-up.sh 
