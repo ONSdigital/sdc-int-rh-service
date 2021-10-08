@@ -36,6 +36,7 @@ import uk.gov.ons.ctp.integration.common.product.model.Product.Region;
 import uk.gov.ons.ctp.integration.common.product.model.Product.RequestChannel;
 import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient;
 import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient.Domain;
+import uk.gov.ons.ctp.integration.rhsvc.RHSvcBeanMapper;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
@@ -55,6 +56,8 @@ public class CaseServiceImpl implements CaseService {
   @Autowired private EventPublisher eventPublisher;
   @Autowired private ProductReference productReference;
   @Autowired private RateLimiterClient rateLimiterClient;
+
+  private MapperFacade mapper = new RHSvcBeanMapper();
 
   @Override
   public CaseDTO getLatestValidNonHICaseByUPRN(final UniquePropertyReferenceNumber uprn)
@@ -123,30 +126,12 @@ public class CaseServiceImpl implements CaseService {
     final UUID caseId = UUID.randomUUID();
     final UUID collectionExerciseId = caseRegistrationDTO.getCollectionExerciseId();
 
-    NewCaseSample sample = new NewCaseSample();
-    sample.setSchoolId(caseRegistrationDTO.getSchoolId());
-    sample.setSchoolName(caseRegistrationDTO.getSchoolName());
-    sample.setConsentGivenTest(caseRegistrationDTO.isConsentGivenTest());
-    sample.setConsentGivenSurvey(caseRegistrationDTO.isConsentGivenSurvey());
+    NewCaseSample newCaseSample = mapper.map(caseRegistrationDTO, NewCaseSample.class);
+    NewCaseSampleSensitive newCaseSampleSensitive =
+        mapper.map(caseRegistrationDTO, NewCaseSampleSensitive.class);
 
-    NewCaseSampleSensitive sampleSensitive = new NewCaseSampleSensitive();
-    sampleSensitive.setFirstName(caseRegistrationDTO.getFirstName());
-    sampleSensitive.setLastName(caseRegistrationDTO.getLastName());
-    sampleSensitive.setChildFirstName(caseRegistrationDTO.getChildFirstName());
-    sampleSensitive.setChildMiddleNames(caseRegistrationDTO.getChildMiddleName());
-    sampleSensitive.setChildLastName(caseRegistrationDTO.getChildLastName());
-    sampleSensitive.setChildDob(caseRegistrationDTO.getChildDob());
-    sampleSensitive.setAdditionalInfo(caseRegistrationDTO.getAdditionalInfo());
-    sampleSensitive.setChildMobileNumber(caseRegistrationDTO.getChildMobileNumber());
-    sampleSensitive.setChildEmailAddress(caseRegistrationDTO.getChildEmailAddress());
-    sampleSensitive.setParentMobileNumber(caseRegistrationDTO.getParentMobileNumber());
-    sampleSensitive.setParentEmailAddress(caseRegistrationDTO.getParentEmailAddress());
-
-    NewCasePayloadContent newCasePayloadContent =
-        new NewCasePayloadContent(caseId, collectionExerciseId, sample, sampleSensitive);
-    ;
-
-    return newCasePayloadContent;
+    return new NewCasePayloadContent(
+        caseId, collectionExerciseId, newCaseSample, newCaseSampleSensitive);
   }
 
   /*

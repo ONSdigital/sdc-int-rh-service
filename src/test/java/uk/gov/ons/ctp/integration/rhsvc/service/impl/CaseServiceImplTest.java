@@ -65,10 +65,13 @@ public class CaseServiceImplTest {
 
   private List<CollectionCase> collectionCase;
 
+  private List<NewCaseDTO> newCaseDTO;
+
   /** Setup tests */
   @BeforeEach
   public void setUp() {
     this.collectionCase = FixtureHelper.loadClassFixtures(CollectionCase[].class);
+    this.newCaseDTO = FixtureHelper.loadClassFixtures(NewCaseDTO[].class);
 
     appConfig.setCollectionExerciseId(COLLECTION_EXERCISE_ID);
     ReflectionTestUtils.setField(caseSvc, "appConfig", appConfig);
@@ -195,9 +198,9 @@ public class CaseServiceImplTest {
 
   private void callAndVerifyNewCaseCreated() throws CTPException {
 
-    NewCaseDTO newCaseDTO = getNewCaseDto();
+    returnNewCaseDTO();
 
-    caseSvc.sendNewCaseEvent(newCaseDTO);
+    caseSvc.sendNewCaseEvent(newCaseDTO.get(0));
 
     verify(eventPublisher)
         .sendEvent(
@@ -207,41 +210,43 @@ public class CaseServiceImplTest {
             sendEventCaptor.capture());
     NewCasePayloadContent eventPayload = sendEventCaptor.getValue();
 
-    assertEquals(newCaseDTO.getCollectionExerciseId(), eventPayload.getCollectionExerciseId());
-    assertEquals(newCaseDTO.getSchoolId(), eventPayload.getSample().getSchoolId());
-    assertEquals(newCaseDTO.getSchoolName(), eventPayload.getSample().getSchoolName());
-    assertEquals(newCaseDTO.getFirstName(), eventPayload.getSampleSensitive().getFirstName());
-    assertEquals(newCaseDTO.getLastName(), eventPayload.getSampleSensitive().getLastName());
     assertEquals(
-        newCaseDTO.getChildFirstName(), eventPayload.getSampleSensitive().getChildFirstName());
+        newCaseDTO.get(0).getCollectionExerciseId(), eventPayload.getCollectionExerciseId());
+    assertEquals(newCaseDTO.get(0).getSchoolId(), eventPayload.getSample().getSchoolId());
+    assertEquals(newCaseDTO.get(0).getSchoolName(), eventPayload.getSample().getSchoolName());
     assertEquals(
-        newCaseDTO.getChildMiddleName(), eventPayload.getSampleSensitive().getChildMiddleNames());
+        newCaseDTO.get(0).getFirstName(), eventPayload.getSampleSensitive().getFirstName());
+    assertEquals(newCaseDTO.get(0).getLastName(), eventPayload.getSampleSensitive().getLastName());
     assertEquals(
-        newCaseDTO.getChildLastName(), eventPayload.getSampleSensitive().getChildLastName());
-    assertEquals(newCaseDTO.getChildDob(), eventPayload.getSampleSensitive().getChildDob());
+        newCaseDTO.get(0).getChildFirstName(),
+        eventPayload.getSampleSensitive().getChildFirstName());
     assertEquals(
-        newCaseDTO.getParentMobileNumber(),
+        newCaseDTO.get(0).getChildMiddleName(),
+        eventPayload.getSampleSensitive().getChildMiddleNames());
+    assertEquals(
+        newCaseDTO.get(0).getChildLastName(), eventPayload.getSampleSensitive().getChildLastName());
+    assertEquals(newCaseDTO.get(0).getChildDob(), eventPayload.getSampleSensitive().getChildDob());
+    assertEquals(
+        newCaseDTO.get(0).getParentMobileNumber(),
         eventPayload.getSampleSensitive().getParentMobileNumber());
     assertEquals(
-        newCaseDTO.getParentEmailAddress(),
+        newCaseDTO.get(0).getParentEmailAddress(),
         eventPayload.getSampleSensitive().getParentEmailAddress());
   }
 
-  public NewCaseDTO getNewCaseDto() {
-    NewCaseDTO newCaseDTO = new NewCaseDTO();
-
-    newCaseDTO.setCollectionExerciseId(UUID.fromString("22684ede-7d5f-4f53-9069-2398055c61b2"));
-    newCaseDTO.setSchoolId("abc1234");
-    newCaseDTO.setSchoolName("Chesterthorps High School");
-    newCaseDTO.setFirstName("Fred");
-    newCaseDTO.setLastName("Bloggs");
-    newCaseDTO.setChildFirstName("Jo");
-    newCaseDTO.setChildMiddleName("Ross");
-    newCaseDTO.setChildLastName("Bloggs");
-    newCaseDTO.setChildDob(LocalDate.parse("2001-12-31"));
-    newCaseDTO.setParentMobileNumber("447123456999");
-    newCaseDTO.setParentEmailAddress("fred.bloggs@domain.com");
-
-    return newCaseDTO;
+  private void returnNewCaseDTO() {
+    newCaseDTO
+        .get(0)
+        .setCollectionExerciseId(UUID.fromString("22684ede-7d5f-4f53-9069-2398055c61b2"));
+    newCaseDTO.get(0).setSchoolId("abc1234");
+    newCaseDTO.get(0).setSchoolName("Chesterthorps High School");
+    newCaseDTO.get(0).setFirstName("Fred");
+    newCaseDTO.get(0).setLastName("Bloggs");
+    newCaseDTO.get(0).setChildFirstName("Jo");
+    newCaseDTO.get(0).setChildMiddleName("Ross");
+    newCaseDTO.get(0).setChildLastName("Bloggs");
+    newCaseDTO.get(0).setChildDob(LocalDate.parse("2001-12-31"));
+    newCaseDTO.get(0).setParentMobileNumber("447123456999");
+    newCaseDTO.get(0).setParentEmailAddress("fred.bloggs@domain.com");
   }
 }

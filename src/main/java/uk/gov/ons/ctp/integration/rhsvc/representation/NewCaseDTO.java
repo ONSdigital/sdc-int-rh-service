@@ -26,14 +26,31 @@ public class NewCaseDTO {
   private boolean consentGivenTest;
   private boolean consentGivenSurvey;
 
-  @NotBlank private String firstName;
-  @NotBlank private String lastName;
+  @LoggingScope(scope = Scope.MASK)
+  @NotBlank
+  private String firstName;
 
-  @NotBlank private String childFirstName;
-  @NotBlank private String childMiddleName;
-  @NotBlank private String childLastName;
-  @NotNull private LocalDate childDob;
+  @LoggingScope(scope = Scope.MASK)
+  @NotBlank
+  private String lastName;
 
+  @LoggingScope(scope = Scope.MASK)
+  @NotBlank
+  private String childFirstName;
+
+  @LoggingScope(scope = Scope.MASK)
+  @NotBlank
+  private String childMiddleName;
+
+  @LoggingScope(scope = Scope.MASK)
+  @NotBlank
+  private String childLastName;
+
+  @LoggingScope(scope = Scope.MASK)
+  @NotNull
+  private LocalDate childDob;
+
+  @LoggingScope(scope = Scope.MASK)
   private String additionalInfo;
 
   @LoggingScope(scope = Scope.MASK)

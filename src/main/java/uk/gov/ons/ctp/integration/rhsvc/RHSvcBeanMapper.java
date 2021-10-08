@@ -13,10 +13,13 @@ import uk.gov.ons.ctp.common.domain.EstabType;
 import uk.gov.ons.ctp.common.event.model.Address;
 import uk.gov.ons.ctp.common.event.model.AddressCompact;
 import uk.gov.ons.ctp.common.event.model.CollectionCase;
+import uk.gov.ons.ctp.common.event.model.NewCaseSample;
+import uk.gov.ons.ctp.common.event.model.NewCaseSampleSensitive;
 import uk.gov.ons.ctp.common.util.StringToUPRNConverter;
 import uk.gov.ons.ctp.common.util.StringToUUIDConverter;
 import uk.gov.ons.ctp.integration.rhsvc.representation.AddressDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.NewCaseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.UniqueAccessCodeDTO;
 
 /** The bean mapper that maps to/from DTOs and repository entity types. */
@@ -66,8 +69,25 @@ public class RHSvcBeanMapper extends ConfigurableMapper {
         .byDefault()
         .register();
 
+    factory
+        .classMap(NewCaseSampleSensitive.class, NewCaseDTO.class)
+        .field("firstName", "firstName")
+        .field("lastName", "lastName")
+        .field("childFirstName", "childFirstName")
+        .field("childMiddleNames", "childMiddleName")
+        .field("childLastName", "childLastName")
+        .field("childDob", "childDob")
+        .field("additionalInfo", "additionalInfo")
+        .field("childMobileNumber", "childMobileNumber")
+        .field("childEmailAddress", "childEmailAddress")
+        .field("parentMobileNumber", "parentMobileNumber")
+        .field("parentEmailAddress", "parentEmailAddress")
+        .byDefault()
+        .register();
+
     factory.classMap(AddressDTO.class, AddressCompact.class).byDefault().register();
     factory.classMap(Address.class, AddressCompact.class).byDefault().register();
+    factory.classMap(NewCaseSample.class, NewCaseDTO.class).byDefault().register();
   }
 
   static class EstabTypeConverter extends BidirectionalConverter<String, EstabType> {

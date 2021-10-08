@@ -342,6 +342,116 @@ public class CaseEndpointUnitTest {
     verify(caseService, never()).sendNewCaseEvent(any(NewCaseDTO.class));
   }
 
+  @Test
+  public void shouldRejectNewCaseIfCollectionExerciseIdMissing() throws Exception {
+    ObjectNode json = getNewCaseEventFixture();
+    json.remove("collectionExerciseId");
+    json.put("collectionExerciseId", "");
+    String url = "/cases/new";
+    mockMvc.perform(postJson(url, json.toString())).andExpect(status().is4xxClientError());
+    verify(caseService, never()).sendNewCaseEvent(any(NewCaseDTO.class));
+  }
+
+  @Test
+  public void shouldRejectNewCaseIfSchoolIdNotPresent() throws Exception {
+    ObjectNode json = getNewCaseEventFixture();
+    json.remove("schoolId");
+    json.put("schoolId", "");
+    String url = "/cases/new";
+    mockMvc.perform(postJson(url, json.toString())).andExpect(status().is4xxClientError());
+    verify(caseService, never()).sendNewCaseEvent(any(NewCaseDTO.class));
+  }
+
+  @Test
+  public void shouldRejectNewCaseIfSchoolNameNotPresent() throws Exception {
+    ObjectNode json = getNewCaseEventFixture();
+    json.remove("schoolName");
+    json.put("schoolName", "");
+    String url = "/cases/new";
+    mockMvc.perform(postJson(url, json.toString())).andExpect(status().is4xxClientError());
+    verify(caseService, never()).sendNewCaseEvent(any(NewCaseDTO.class));
+  }
+
+  @Test
+  public void shouldRejectNewCaseIfParentFirstNameNotPresent() throws Exception {
+    ObjectNode json = getNewCaseEventFixture();
+    json.remove("firstName");
+    json.put("firstName", "");
+    String url = "/cases/new";
+    mockMvc.perform(postJson(url, json.toString())).andExpect(status().is4xxClientError());
+    verify(caseService, never()).sendNewCaseEvent(any(NewCaseDTO.class));
+  }
+
+  @Test
+  public void shouldRejectNewCaseIfParentLastNameNotPresent() throws Exception {
+    ObjectNode json = getNewCaseEventFixture();
+    json.remove("lastName");
+    json.put("lastName", "");
+    String url = "/cases/new";
+    mockMvc.perform(postJson(url, json.toString())).andExpect(status().is4xxClientError());
+    verify(caseService, never()).sendNewCaseEvent(any(NewCaseDTO.class));
+  }
+
+  @Test
+  public void shouldRejectNewCaseIfChildFirstNameNotPresent() throws Exception {
+    ObjectNode json = getNewCaseEventFixture();
+    json.remove("childFirstName");
+    json.put("childFirstName", "");
+    String url = "/cases/new";
+    mockMvc.perform(postJson(url, json.toString())).andExpect(status().is4xxClientError());
+    verify(caseService, never()).sendNewCaseEvent(any(NewCaseDTO.class));
+  }
+
+  @Test
+  public void shouldRejectNewCaseIfChildMiddleNameNotPresent() throws Exception {
+    ObjectNode json = getNewCaseEventFixture();
+    json.remove("childFirstName");
+    json.put("childFirstName", "");
+    String url = "/cases/new";
+    mockMvc.perform(postJson(url, json.toString())).andExpect(status().is4xxClientError());
+    verify(caseService, never()).sendNewCaseEvent(any(NewCaseDTO.class));
+  }
+
+  @Test
+  public void shouldRejectNewCaseIfChildLastNameNotPresent() throws Exception {
+    ObjectNode json = getNewCaseEventFixture();
+    json.remove("childLastName");
+    json.put("childLastName", "");
+    String url = "/cases/new";
+    mockMvc.perform(postJson(url, json.toString())).andExpect(status().is4xxClientError());
+    verify(caseService, never()).sendNewCaseEvent(any(NewCaseDTO.class));
+  }
+
+  @Test
+  public void shouldRejectNewCaseIfChildDobNotPresent() throws Exception {
+    ObjectNode json = getNewCaseEventFixture();
+    json.remove("childDob");
+    json.put("childDob", "");
+    String url = "/cases/new";
+    mockMvc.perform(postJson(url, json.toString())).andExpect(status().is4xxClientError());
+    verify(caseService, never()).sendNewCaseEvent(any(NewCaseDTO.class));
+  }
+
+  @Test
+  public void shouldRejectNewCaseIfParentMobileNumberNotPresent() throws Exception {
+    ObjectNode json = getNewCaseEventFixture();
+    json.remove("parentMobileNumber");
+    json.put("parentMobileNumber", "");
+    String url = "/cases/new";
+    mockMvc.perform(postJson(url, json.toString())).andExpect(status().is4xxClientError());
+    verify(caseService, never()).sendNewCaseEvent(any(NewCaseDTO.class));
+  }
+
+  @Test
+  public void shouldRejectNewCaseIfParentEmailNotPresent() throws Exception {
+    ObjectNode json = getNewCaseEventFixture();
+    json.remove("parentEmailAddress");
+    json.put("parentEmailAddress", "");
+    String url = "/cases/new";
+    mockMvc.perform(postJson(url, json.toString())).andExpect(status().is4xxClientError());
+    verify(caseService, never()).sendNewCaseEvent(any(NewCaseDTO.class));
+  }
+
   private ObjectNode getSmsFulfilmentFixture() {
     return FixtureHelper.loadClassObjectNode("SMSFulfilmentRequestDTO");
   }

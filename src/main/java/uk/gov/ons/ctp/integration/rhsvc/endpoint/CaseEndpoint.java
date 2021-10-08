@@ -122,18 +122,18 @@ public class CaseEndpoint {
     log.info("Entering POST {}", methodName, kv("requestBody", caseRegistrationDTO));
 
     // Reject if consent not given
-    verifyConsentGiven(caseRegistrationDTO.isConsentGivenTest(), "consentGivenTest");
-    verifyConsentGiven(caseRegistrationDTO.isConsentGivenSurvey(), "consentGivenSurvey");
+    verifyBoolean(caseRegistrationDTO.isConsentGivenTest(), "consentGivenTest");
+    verifyBoolean(caseRegistrationDTO.isConsentGivenSurvey(), "consentGivenSurvey");
 
     caseService.sendNewCaseEvent(caseRegistrationDTO);
 
     log.debug("Exit POST {}", methodName);
   }
 
-  private void verifyConsentGiven(boolean consentGiven, String fieldName) throws CTPException {
-    if (!consentGiven) {
+  private void verifyBoolean(boolean checkBoolean, String fieldName) throws CTPException {
+    if (!checkBoolean) {
       String message = "The field '" + fieldName + "' must be set to true";
-      log.warn(message, kv(fieldName, consentGiven));
+      log.warn(message, kv(fieldName, checkBoolean));
       throw new CTPException(Fault.BAD_REQUEST, message);
     }
   }

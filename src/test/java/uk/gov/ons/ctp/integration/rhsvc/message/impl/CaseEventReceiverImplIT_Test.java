@@ -84,7 +84,6 @@ public class CaseEventReceiverImplIT_Test {
     header.setDateTime(sdf.parse("2011-08-12T20:17:46Z"));
     header.setMessageId(UUID.fromString("c45de4dc-3c3b-11e9-b210-d663bd873d93"));
     caseEvent.setHeader(header);
-    //    caseEvent.getHeader().setDateTime(sdf.parse("2011-08-12T20:17:46Z"));
 
     // Construct message
     Message<CaseEvent> message = new GenericMessage<>(caseEvent, new HashMap<>());
