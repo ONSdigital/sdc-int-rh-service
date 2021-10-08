@@ -42,6 +42,7 @@ createTopic event_survey-launch
 createTopic event_fulfilment
 createTopic event_survey-update
 createTopic event_collection-exercise-update
+createTopic event_new-case
 
 echo "<<< Creating subscriptions >>>"
 createSubscription event_case-update event_case-update_rh

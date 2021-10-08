@@ -25,6 +25,9 @@ import uk.gov.ons.ctp.common.event.TopicType;
 import uk.gov.ons.ctp.common.event.model.CaseUpdate;
 import uk.gov.ons.ctp.common.event.model.Contact;
 import uk.gov.ons.ctp.common.event.model.FulfilmentRequest;
+import uk.gov.ons.ctp.common.event.model.NewCasePayloadContent;
+import uk.gov.ons.ctp.common.event.model.NewCaseSample;
+import uk.gov.ons.ctp.common.event.model.NewCaseSampleSensitive;
 import uk.gov.ons.ctp.integration.common.product.ProductReference;
 import uk.gov.ons.ctp.integration.common.product.model.Product;
 import uk.gov.ons.ctp.integration.common.product.model.Product.DeliveryChannel;
@@ -32,10 +35,12 @@ import uk.gov.ons.ctp.integration.common.product.model.Product.Region;
 import uk.gov.ons.ctp.integration.common.product.model.Product.RequestChannel;
 import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient;
 import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient.Domain;
+import uk.gov.ons.ctp.integration.rhsvc.RHSvcBeanMapper;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.FulfilmentRequestDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.NewCaseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.PostalFulfilmentRequestDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.SMSFulfilmentRequestDTO;
 import uk.gov.ons.ctp.integration.rhsvc.service.CaseService;
@@ -50,6 +55,8 @@ public class CaseServiceImpl implements CaseService {
   @Autowired private EventPublisher eventPublisher;
   @Autowired private ProductReference productReference;
   @Autowired private RateLimiterClient rateLimiterClient;
+
+  private MapperFacade mapper = new RHSvcBeanMapper();
 
   @Override
   public CaseDTO getLatestValidCaseByUPRN(final UniquePropertyReferenceNumber uprn)
@@ -97,6 +104,33 @@ public class CaseServiceImpl implements CaseService {
     preValidatePostalContactDetails(products, contact);
     recordRateLimiting(contact, requestBodyDTO.getClientIP(), products, caseDetails);
     createAndSendFulfilments(DeliveryChannel.POST, contact, requestBodyDTO, products, caseDetails);
+  }
+
+  @Override
+  public void sendNewCaseEvent(NewCaseDTO newCaseDTO) throws CTPException {
+    log.debug(
+        "Entering createAndSendNewCase",
+        kv("collectionExerciseSid", newCaseDTO.getCollectionExerciseId()),
+        kv("schoolId", newCaseDTO.getSchoolId()),
+        kv("lastName", newCaseDTO.getLastName()));
+
+    NewCasePayloadContent payload = createNewCaseRequestPayload(newCaseDTO);
+
+    eventPublisher.sendEvent(TopicType.NEW_CASE, Source.RESPONDENT_HOME, Channel.RH, payload);
+  }
+
+  private NewCasePayloadContent createNewCaseRequestPayload(NewCaseDTO caseRegistrationDTO)
+      throws CTPException {
+
+    final UUID caseId = UUID.randomUUID();
+    final UUID collectionExerciseId = caseRegistrationDTO.getCollectionExerciseId();
+
+    NewCaseSample newCaseSample = mapper.map(caseRegistrationDTO, NewCaseSample.class);
+    NewCaseSampleSensitive newCaseSampleSensitive =
+        mapper.map(caseRegistrationDTO, NewCaseSampleSensitive.class);
+
+    return new NewCasePayloadContent(
+        caseId, collectionExerciseId, newCaseSample, newCaseSampleSensitive);
   }
 
   /*

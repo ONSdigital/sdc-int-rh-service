@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.TimeZone;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,6 +32,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.event.model.CaseEvent;
+import uk.gov.ons.ctp.common.event.model.Header;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 import uk.gov.ons.ctp.common.utility.ParallelTestLocks;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
@@ -59,12 +61,15 @@ public class CaseEventReceiverImplIT_Test {
   /** Test the receiver flow */
   @Test
   public void caseEventFlowTest() throws Exception {
+    Header header = new Header();
+    header.setMessageId(UUID.fromString("c45de4dc-3c3b-11e9-b210-d663bd873d93"));
     CaseEvent caseEvent = FixtureHelper.loadPackageFixtures(CaseEvent[].class).get(0);
+    caseEvent.setHeader(header);
 
     // Construct message
     Message<CaseEvent> message = new GenericMessage<>(caseEvent, new HashMap<>());
 
-    SurveyUpdate surveyUpdate = new SurveyUpdate("1", "NOTSIS");
+    SurveyUpdate surveyUpdate = new SurveyUpdate("c45de4dc-3c3b-11e9-b210-d663bd873d93", "NOTSIS");
     when(respondentDataRepo.readSurvey(any())).thenReturn(Optional.of(surveyUpdate));
 
     // Send message to container
@@ -80,12 +85,15 @@ public class CaseEventReceiverImplIT_Test {
   /** Test the receiver flow for SIS case event */
   @Test
   public void caseEventSISFlowTest() throws Exception {
+    Header header = new Header();
+    header.setMessageId(UUID.fromString("c45de4dc-3c3b-11e9-b210-d663bd873d93"));
     CaseEvent caseEvent = FixtureHelper.loadPackageFixtures(CaseEvent[].class).get(0);
+    caseEvent.setHeader(header);
 
     // Construct message
     Message<CaseEvent> message = new GenericMessage<>(caseEvent, new HashMap<>());
 
-    SurveyUpdate surveyUpdate = new SurveyUpdate("1", "SIS");
+    SurveyUpdate surveyUpdate = new SurveyUpdate("c45de4dc-3c3b-11e9-b210-d663bd873d93", "SIS");
     when(respondentDataRepo.readSurvey(any())).thenReturn(Optional.of(surveyUpdate));
 
     // Send message to container
@@ -104,9 +112,12 @@ public class CaseEventReceiverImplIT_Test {
     // Create a case with a timestamp. Note that the milliseconds are not specified
     CaseEvent caseEvent = FixtureHelper.loadPackageFixtures(CaseEvent[].class).get(0);
 
+    Header header = new Header();
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.ENGLISH);
     sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-    caseEvent.getEvent().setDateTime(sdf.parse("2011-08-12T20:17:46Z"));
+    header.setDateTime(sdf.parse("2011-08-12T20:17:46Z"));
+    header.setMessageId(UUID.fromString("c45de4dc-3c3b-11e9-b210-d663bd873d93"));
+    caseEvent.setHeader(header);
 
     // Construct message
     Message<CaseEvent> message = new GenericMessage<>(caseEvent, new HashMap<>());
@@ -120,8 +131,8 @@ public class CaseEventReceiverImplIT_Test {
     // Capture and check Service Activator argument
     ArgumentCaptor<CaseEvent> captur = ArgumentCaptor.forClass(CaseEvent.class);
     verify(receiver).acceptCaseEvent(captur.capture());
-    assertEquals(sdf.parse("2011-08-12T20:17:46Z"), captur.getValue().getEvent().getDateTime());
-    assertEquals(caseEvent.getEvent(), captur.getValue().getEvent());
+    assertEquals(sdf.parse("2011-08-12T20:17:46Z"), captur.getValue().getHeader().getDateTime());
+    assertEquals(caseEvent.getHeader(), captur.getValue().getHeader());
     assertEquals(caseEvent.getPayload(), captur.getValue().getPayload());
   }
 }

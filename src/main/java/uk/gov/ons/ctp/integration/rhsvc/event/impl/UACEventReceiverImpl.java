@@ -39,18 +39,16 @@ public class UACEventReceiverImpl {
   public void acceptUACEvent(UacEvent uacEvent) throws CTPException {
 
     UAC uac = uacEvent.getPayload().getUac();
-    String uacTransactionId = uacEvent.getEvent().getTransactionId();
+    String uacMessageId = uacEvent.getHeader().getMessageId().toString();
 
     log.info(
-        "Entering acceptUACEvent",
-        kv("transactionId", uacTransactionId),
-        kv("caseId", uac.getCaseId()));
+        "Entering acceptUACEvent", kv("messageId", uacMessageId), kv("caseId", uac.getCaseId()));
 
     String qid = uac.getQuestionnaireId();
     if (isFilteredByQid(qid)) {
       log.info(
           "Filtering UAC Event because of questionnaire ID prefix",
-          kv("transactionId", uacTransactionId),
+          kv("messageId", uacMessageId),
           kv("caseId", uac.getCaseId()),
           kv("questionnaireId", qid));
       return;
@@ -59,7 +57,7 @@ public class UACEventReceiverImpl {
     try {
       respondentDataRepo.writeUAC(uac);
     } catch (CTPException ctpEx) {
-      log.error("UAC Event processing failed", kv("uacTransactionId", uacTransactionId), ctpEx);
+      log.error("UAC Event processing failed", kv("uacMessageId", uacMessageId), ctpEx);
       throw new CTPException(ctpEx.getFault());
     }
   }

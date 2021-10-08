@@ -79,7 +79,7 @@ public class CollectionExerciseEventReceiverImplIT_Test {
 
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.ENGLISH);
     sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-    collectionExerciseUpdateEvent.getEvent().setDateTime(sdf.parse("2011-08-12T20:17:46Z"));
+    collectionExerciseUpdateEvent.getHeader().setDateTime(sdf.parse("2011-08-12T20:17:46Z"));
 
     // Construct message
     Message<CollectionExerciseUpdateEvent> message =
@@ -92,8 +92,8 @@ public class CollectionExerciseEventReceiverImplIT_Test {
     ArgumentCaptor<CollectionExerciseUpdateEvent> captur =
         ArgumentCaptor.forClass(CollectionExerciseUpdateEvent.class);
     verify(receiver).acceptCollectionExerciseUpdateEvent(captur.capture());
-    assertEquals(sdf.parse("2011-08-12T20:17:46Z"), captur.getValue().getEvent().getDateTime());
-    assertEquals(collectionExerciseUpdateEvent.getEvent(), captur.getValue().getEvent());
+    assertEquals(sdf.parse("2011-08-12T20:17:46Z"), captur.getValue().getHeader().getDateTime());
+    assertEquals(collectionExerciseUpdateEvent.getHeader(), captur.getValue().getHeader());
     assertEquals(collectionExerciseUpdateEvent.getPayload(), captur.getValue().getPayload());
   }
 }

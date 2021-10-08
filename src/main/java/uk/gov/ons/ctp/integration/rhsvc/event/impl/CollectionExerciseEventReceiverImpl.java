@@ -36,11 +36,11 @@ public class CollectionExerciseEventReceiverImpl {
 
     CollectionExercise collectionExercise =
         collectionExerciseUpdateEvent.getPayload().getCollectionExerciseUpdate();
-    String collexTransactionId = collectionExerciseUpdateEvent.getEvent().getTransactionId();
+    String collexMessageId = collectionExerciseUpdateEvent.getHeader().getMessageId().toString();
 
     log.info(
         "Entering acceptCollectionExerciseUpdateEvent",
-        kv("transactionId", collexTransactionId),
+        kv("messageId", collexMessageId),
         kv("collectionExerciseId", collectionExercise.getCollectionExerciseId()));
 
     try {
@@ -48,7 +48,7 @@ public class CollectionExerciseEventReceiverImpl {
     } catch (CTPException ctpEx) {
       log.error(
           "Collection Exercise Event processing failed",
-          kv("collectionExerciseTransactionId", collexTransactionId),
+          kv("collectionExerciseMessageId", collexMessageId),
           ctpEx);
       throw new CTPException(ctpEx.getFault());
     }

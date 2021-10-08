@@ -2,6 +2,7 @@ package uk.gov.ons.ctp.integration.rhsvc.service.impl;
 
 import static uk.gov.ons.ctp.common.log.ScopedStructuredArguments.kv;
 
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +18,6 @@ import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient.Domain;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.representation.SurveyLaunchedDTO;
 import uk.gov.ons.ctp.integration.rhsvc.service.SurveyLaunchedService;
-
-import java.util.UUID;
 
 /** This is a service layer class, which performs RH business level logic for the endpoints. */
 @Slf4j
@@ -54,14 +53,14 @@ public class SurveyLaunchedServiceImpl implements SurveyLaunchedService {
       channel = Channel.AD;
     }
 
-    UUID transactionId =
+    UUID messageId =
         eventPublisher.sendEvent(
             TopicType.SURVEY_LAUNCH, Source.RESPONDENT_HOME, channel, response);
 
     log.debug(
         "SurveyLaunch event published",
         kv("caseId", response.getCaseId()),
-        kv("transactionId", transactionId.toString()));
+        kv("messageId", messageId));
   }
 
   private void checkRateLimit(String ipAddress) throws CTPException {

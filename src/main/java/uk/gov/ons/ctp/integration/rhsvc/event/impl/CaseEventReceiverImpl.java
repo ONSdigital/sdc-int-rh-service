@@ -39,29 +39,28 @@ public class CaseEventReceiverImpl implements CaseEventReceiver {
   public void acceptCaseEvent(CaseEvent caseEvent) throws CTPException {
 
     CaseUpdate caseUpdate = caseEvent.getPayload().getCaseUpdate();
-    String caseTransactionId = caseEvent.getEvent().getTransactionId();
+    String caseMessageId = caseEvent.getHeader().getMessageId().toString();
 
     log.info(
         "Entering acceptCaseEvent",
-        kv("transactionId", caseTransactionId),
+        kv("messageId", caseMessageId),
         kv("caseId", caseUpdate.getCaseId()));
 
     Optional<SurveyUpdate> surveyUpdateOpt =
-        respondentDataRepo.readSurvey(caseUpdate.getSurveyId());
+        respondentDataRepo.readSurvey(caseUpdate.getSurveyId().toString());
     if (surveyUpdateOpt.isPresent()) {
       SurveyUpdate surveyUpdate = surveyUpdateOpt.get();
       try {
         if (surveyUpdate.getName().equalsIgnoreCase("SIS")) {
           log.info(
               "Ignoring SIS case",
-              kv("transactionId", caseTransactionId),
+              kv("messageId", caseMessageId),
               kv("caseId", caseUpdate.getCaseId()));
         } else {
           respondentDataRepo.writeCaseUpdate(caseUpdate);
         }
       } catch (CTPException ctpEx) {
-        log.error(
-            "Case Event processing failed", kv("caseTransactionId", caseTransactionId), ctpEx);
+        log.error("Case Event processing failed", kv("messageId", caseMessageId), ctpEx);
         throw new CTPException(ctpEx.getFault());
       }
     } else {

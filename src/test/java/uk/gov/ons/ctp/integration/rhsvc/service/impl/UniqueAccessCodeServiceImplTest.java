@@ -24,7 +24,7 @@ import uk.gov.ons.ctp.common.domain.Channel;
 import uk.gov.ons.ctp.common.domain.Source;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.EventPublisher;
-import uk.gov.ons.ctp.common.event.EventType;
+import uk.gov.ons.ctp.common.event.TopicType;
 import uk.gov.ons.ctp.common.event.model.CaseUpdate;
 import uk.gov.ons.ctp.common.event.model.EventPayload;
 import uk.gov.ons.ctp.common.event.model.UAC;
@@ -68,7 +68,7 @@ public class UniqueAccessCodeServiceImplTest {
     verify(dataRepo, times(1)).readCaseUpdate(CASE_ID);
     verify(eventPublisher, times(1))
         .sendEvent(
-            eq(EventType.UAC_AUTHENTICATE),
+            eq(TopicType.UAC_AUTHENTICATE),
             eq(Source.RESPONDENT_HOME),
             eq(Channel.RH),
             payloadCapture.capture());
@@ -77,8 +77,7 @@ public class UniqueAccessCodeServiceImplTest {
     assertEquals(Boolean.valueOf(uacTest.getActive()), uacDTO.isActive());
     assertEquals(CaseStatus.OK, uacDTO.getCaseStatus());
     assertEquals(UUID.fromString(uacTest.getCaseId()), uacDTO.getCaseId());
-    assertEquals(
-        UUID.fromString(caseTest.getCollectionExerciseId()), uacDTO.getCollectionExerciseId());
+    assertEquals(UUID.fromString(caseTest.getCollectionExerciseId()), uacDTO.getCollectionExerciseId());
     assertEquals(uacTest.getQuestionnaireId(), uacDTO.getQuestionnaireId());
     assertEquals(caseTest.getSample().getRegion(), uacDTO.getRegion());
     assertEquals(uacTest.getFormType(), uacDTO.getFormType());
@@ -113,7 +112,7 @@ public class UniqueAccessCodeServiceImplTest {
 
     verify(eventPublisher, times(1))
         .sendEvent(
-            eq(EventType.UAC_AUTHENTICATE),
+            eq(TopicType.UAC_AUTHENTICATE),
             eq(Source.RESPONDENT_HOME),
             eq(Channel.RH),
             payloadCapture.capture());
@@ -151,7 +150,7 @@ public class UniqueAccessCodeServiceImplTest {
     verify(dataRepo, times(0)).readCaseUpdate(CASE_ID);
     verify(eventPublisher, times(1))
         .sendEvent(
-            eq(EventType.UAC_AUTHENTICATE),
+            eq(TopicType.UAC_AUTHENTICATE),
             eq(Source.RESPONDENT_HOME),
             eq(Channel.RH),
             payloadCapture.capture());

@@ -40,7 +40,7 @@ import uk.gov.ons.ctp.common.domain.Source;
 import uk.gov.ons.ctp.common.domain.UniquePropertyReferenceNumber;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.EventPublisher;
-import uk.gov.ons.ctp.common.event.EventType;
+import uk.gov.ons.ctp.common.event.TopicType;
 import uk.gov.ons.ctp.common.event.model.CaseUpdate;
 import uk.gov.ons.ctp.common.event.model.Contact;
 import uk.gov.ons.ctp.common.event.model.EventPayload;
@@ -143,8 +143,8 @@ public class CaseServiceImplFulfilmentTest {
 
   private FulfilmentRequest doFulfilmentRequestBySMS(
       Boolean individual, CaseUpdate caseDetails, Product.CaseType... caseTypes) throws Exception {
-    UUID caseId = UUID.fromString(caseDetails.getCaseId());
-    smsRequest.setCaseId(caseId);
+    String caseId = caseDetails.getCaseId();
+    smsRequest.setCaseId(UUID.fromString(caseId));
     when(dataRepo.readCaseUpdate(eq(caseId.toString()))).thenReturn(Optional.of(caseDetails));
     mockProductSearch("F1", individual, DeliveryChannel.SMS, caseTypes);
     caseSvc.fulfilmentRequestBySMS(smsRequest);
@@ -236,10 +236,10 @@ public class CaseServiceImplFulfilmentTest {
       String requestorsTitle,
       Product.CaseType... caseTypes)
       throws Exception {
-    UUID caseId = UUID.fromString(caseDetails.getCaseId());
-    postalRequest.setCaseId(caseId);
+    String caseId = caseDetails.getCaseId();
+    postalRequest.setCaseId(UUID.fromString(caseId));
     postalRequest.setTitle(requestorsTitle);
-    when(dataRepo.readCaseUpdate(eq(caseId.toString()))).thenReturn(Optional.of(caseDetails));
+    when(dataRepo.readCaseUpdate(eq(caseId))).thenReturn(Optional.of(caseDetails));
     mockProductSearch("F1", individual, DeliveryChannel.POST, caseTypes);
     caseSvc.fulfilmentRequestByPost(postalRequest);
 
@@ -255,9 +255,9 @@ public class CaseServiceImplFulfilmentTest {
 
   private void assertRejectPostalFulfilmentForIndividualWithoutContactName() throws Exception {
     CaseUpdate caseDetails = selectCaseUpdateForTest(Product.CaseType.HH, true);
-    UUID caseId = UUID.fromString(caseDetails.getCaseId());
-    postalRequest.setCaseId(caseId);
-    when(dataRepo.readCaseUpdate(eq(caseId.toString()))).thenReturn(Optional.of(caseDetails));
+    String caseId = caseDetails.getCaseId();
+    postalRequest.setCaseId(UUID.fromString(caseId));
+    when(dataRepo.readCaseUpdate(eq(caseId))).thenReturn(Optional.of(caseDetails));
     mockProductSearch("F1", true, DeliveryChannel.POST, Product.CaseType.HH);
     CTPException e =
         assertThrows(CTPException.class, () -> caseSvc.fulfilmentRequestByPost(postalRequest));
@@ -316,10 +316,10 @@ public class CaseServiceImplFulfilmentTest {
   @Test
   public void shouldFulfilRequestByPostForMultipleFulfilmentCodes() throws Exception {
     CaseUpdate caseDetails = selectCaseUpdateForTest(Product.CaseType.HH, false);
-    UUID caseId = UUID.fromString(caseDetails.getCaseId());
+    String caseId = caseDetails.getCaseId();
     when(dataRepo.readCaseUpdate(eq(caseId.toString()))).thenReturn(Optional.of(caseDetails));
 
-    postalRequest.setCaseId(caseId);
+    postalRequest.setCaseId(UUID.fromString(caseId));
     postalRequest.setTitle("Mrs");
     postalRequest.setFulfilmentCodes(Arrays.asList("F1", "F2", "F3"));
 
@@ -346,10 +346,10 @@ public class CaseServiceImplFulfilmentTest {
   @Test
   public void shouldFulfilRequestByPostForMultipleRepeatedFulfilmentCodes() throws Exception {
     CaseUpdate caseDetails = selectCaseUpdateForTest(Product.CaseType.HH, false);
-    UUID caseId = UUID.fromString(caseDetails.getCaseId());
+    String caseId = caseDetails.getCaseId();
     when(dataRepo.readCaseUpdate(eq(caseId.toString()))).thenReturn(Optional.of(caseDetails));
 
-    postalRequest.setCaseId(caseId);
+    postalRequest.setCaseId(UUID.fromString(caseId));
     postalRequest.setTitle("Mrs");
     postalRequest.setFulfilmentCodes(Arrays.asList("F1", "CLONE", "CLONE", "CLONE"));
 
@@ -375,14 +375,14 @@ public class CaseServiceImplFulfilmentTest {
   @Test
   public void shouldRejectPostalFulfilmentWhenRateLimiterRejects() throws Exception {
     CaseUpdate caseDetails = selectCaseUpdateForTest(Product.CaseType.HH, false);
-    UUID caseId = UUID.fromString(caseDetails.getCaseId());
-    when(dataRepo.readCaseUpdate(eq(caseId.toString()))).thenReturn(Optional.of(caseDetails));
+    String caseId = caseDetails.getCaseId();
+    when(dataRepo.readCaseUpdate(eq(caseId))).thenReturn(Optional.of(caseDetails));
 
     doThrow(new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS))
         .when(rateLimiterClient)
         .checkFulfilmentRateLimit(any(), any(), any(), any(), any());
 
-    postalRequest.setCaseId(caseId);
+    postalRequest.setCaseId(UUID.fromString(caseId));
     mockProductSearch("F1", false, DeliveryChannel.POST, Product.CaseType.HH);
 
     ResponseStatusException ex =
@@ -399,13 +399,13 @@ public class CaseServiceImplFulfilmentTest {
   @Test
   public void shouldFulfilRequestBySmsForMultipleFulfilmentCodes() throws Exception {
     CaseUpdate caseDetails = selectCaseUpdateForTest(Product.CaseType.HH, false);
-    UUID caseId = UUID.fromString(caseDetails.getCaseId());
-    when(dataRepo.readCaseUpdate(eq(caseId.toString()))).thenReturn(Optional.of(caseDetails));
+    String caseId = caseDetails.getCaseId();
+    when(dataRepo.readCaseUpdate(eq(caseId))).thenReturn(Optional.of(caseDetails));
 
     String phoneNo = "07714111222";
 
     smsRequest.setTelNo(phoneNo);
-    smsRequest.setCaseId(caseId);
+    smsRequest.setCaseId(UUID.fromString(caseId));
     smsRequest.setFulfilmentCodes(Arrays.asList("F1", "F2", "F3"));
 
     Product p1 = mockProductSearch("F1", false, DeliveryChannel.SMS, Product.CaseType.HH);
@@ -428,15 +428,15 @@ public class CaseServiceImplFulfilmentTest {
   @Test
   public void shouldRejectSmsFulfilmentWhenRateLimiterRejects() throws Exception {
     CaseUpdate caseDetails = selectCaseUpdateForTest(Product.CaseType.HH, false);
-    UUID caseId = UUID.fromString(caseDetails.getCaseId());
-    when(dataRepo.readCaseUpdate(eq(caseId.toString()))).thenReturn(Optional.of(caseDetails));
+    String caseId = caseDetails.getCaseId();
+    when(dataRepo.readCaseUpdate(eq(caseId))).thenReturn(Optional.of(caseDetails));
 
     doThrow(new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS))
         .when(rateLimiterClient)
         .checkFulfilmentRateLimit(any(), any(), any(), any(), any());
 
     String phoneNo = "07714111222";
-    smsRequest.setCaseId(caseId);
+    smsRequest.setCaseId(UUID.fromString(caseId));
     smsRequest.setTelNo(phoneNo);
     mockProductSearch("F1", false, DeliveryChannel.SMS, Product.CaseType.HH);
 
@@ -454,10 +454,10 @@ public class CaseServiceImplFulfilmentTest {
   @Test
   public void shouldFulfilRequestByPostWhenRateLimiterNotEnabled() throws Exception {
     CaseUpdate caseDetails = selectCaseUpdateForTest(Product.CaseType.HH, false);
-    UUID caseId = UUID.fromString(caseDetails.getCaseId());
-    when(dataRepo.readCaseUpdate(eq(caseId.toString()))).thenReturn(Optional.of(caseDetails));
+    String caseId = caseDetails.getCaseId();
+    when(dataRepo.readCaseUpdate(eq(caseId))).thenReturn(Optional.of(caseDetails));
 
-    postalRequest.setCaseId(caseId);
+    postalRequest.setCaseId(UUID.fromString(caseId));
     postalRequest.setTitle("Mrs");
     postalRequest.setFulfilmentCodes(Arrays.asList("F1"));
 
@@ -471,13 +471,13 @@ public class CaseServiceImplFulfilmentTest {
   @Test
   public void shouldFulfilRequestBySmsWhenRateLimiterNotEnabled() throws Exception {
     CaseUpdate caseDetails = selectCaseUpdateForTest(Product.CaseType.HH, false);
-    UUID caseId = UUID.fromString(caseDetails.getCaseId());
-    when(dataRepo.readCaseUpdate(eq(caseId.toString()))).thenReturn(Optional.of(caseDetails));
+    String caseId = caseDetails.getCaseId();
+    when(dataRepo.readCaseUpdate(eq(caseId))).thenReturn(Optional.of(caseDetails));
 
     String phoneNo = "07714111222";
 
     smsRequest.setTelNo(phoneNo);
-    smsRequest.setCaseId(caseId);
+    smsRequest.setCaseId(UUID.fromString(caseId));
     smsRequest.setFulfilmentCodes(Arrays.asList("F1"));
 
     mockProductSearch("F1", false, DeliveryChannel.SMS, Product.CaseType.HH);
@@ -536,7 +536,7 @@ public class CaseServiceImplFulfilmentTest {
 
   private List<FulfilmentRequest> getAndValidatePublishedEvent(
       CaseUpdate caseDetails, Contact expectedContact, String... fulfilmentCodes) {
-    ArgumentCaptor<EventType> eventTypeCaptor = ArgumentCaptor.forClass(EventType.class);
+    ArgumentCaptor<TopicType> eventTypeCaptor = ArgumentCaptor.forClass(TopicType.class);
     ArgumentCaptor<Source> sourceCaptor = ArgumentCaptor.forClass(Source.class);
     ArgumentCaptor<Channel> channelCaptor = ArgumentCaptor.forClass(Channel.class);
     ArgumentCaptor<FulfilmentRequest> fulfilmentRequestCaptor =
@@ -560,7 +560,7 @@ public class CaseServiceImplFulfilmentTest {
       // Validate content of generated event
       FulfilmentRequest eventPayload = fulfilmentRequestCaptor.getAllValues().get(i);
       assertEquals(fulfilmentCodes[i], eventPayload.getFulfilmentCode());
-      assertEquals(caseDetails.getCaseId(), eventPayload.getCaseId());
+      assertEquals(caseDetails.getCaseId().toString(), eventPayload.getCaseId());
       assertEquals(expectedContact, eventPayload.getContact());
       events.add(eventPayload);
     }

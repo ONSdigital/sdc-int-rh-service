@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.UUID;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,7 +32,7 @@ import org.springframework.messaging.support.GenericMessage;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.ons.ctp.common.event.EventType;
+import uk.gov.ons.ctp.common.event.EventTopic;
 import uk.gov.ons.ctp.common.event.model.Header;
 import uk.gov.ons.ctp.common.event.model.UAC;
 import uk.gov.ons.ctp.common.event.model.UacEvent;
@@ -63,8 +64,8 @@ public class UacEventReceiverImplIT_Test {
   }
 
   @SneakyThrows
-  private void UacEventFlow(EventType type) {
-    UacEvent UacEvent = createUAC(RespondentHomeFixture.A_QID, type);
+  private void UacEventFlow(EventTopic topic) {
+    UacEvent UacEvent = createUAC(RespondentHomeFixture.A_QID, topic);
 
     // Construct message
     Message<UacEvent> message = new GenericMessage<>(UacEvent, new HashMap<>());
@@ -81,14 +82,14 @@ public class UacEventReceiverImplIT_Test {
   /** Test the receiver flow for UAC updated */
   @Test
   public void uacUpdatedEventFlow() {
-    UacEventFlow(EventType.UAC_UPDATE);
+    UacEventFlow(EventTopic.UAC_UPDATE);
   }
 
   @Test
   public void shouldFilterUacEventWithContinuationFormQid() throws Exception {
 
     appConfig.getQueueConfig().setQidFilterPrefixes(Set.of("12"));
-    UacEvent UacEvent = createUAC(RespondentHomeFixture.QID_12, EventType.UAC_UPDATE);
+    UacEvent UacEvent = createUAC(RespondentHomeFixture.QID_12, EventTopic.UAC_UPDATE);
 
     // Construct message
     Message<UacEvent> message = new GenericMessage<>(UacEvent, new HashMap<>());
@@ -107,10 +108,10 @@ public class UacEventReceiverImplIT_Test {
   public void UacEventReceivedWithoutMillisecondsTest() throws Exception {
 
     // Create a UAC with a timestamp. Note that the milliseconds are not specified
-    UacEvent UacEvent = createUAC(RespondentHomeFixture.A_QID, EventType.UAC_UPDATE);
+    UacEvent UacEvent = createUAC(RespondentHomeFixture.A_QID, EventTopic.UAC_UPDATE);
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.ENGLISH);
     sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-    UacEvent.getEvent().setDateTime(sdf.parse("2011-08-12T20:17:46Z"));
+    UacEvent.getHeader().setDateTime(sdf.parse("2011-08-12T20:17:46Z"));
 
     // Construct message
     Message<UacEvent> message = new GenericMessage<>(UacEvent, new HashMap<>());
@@ -120,13 +121,13 @@ public class UacEventReceiverImplIT_Test {
     // Capture and check Service Activator argument
     ArgumentCaptor<UacEvent> captur = ArgumentCaptor.forClass(UacEvent.class);
     verify(receiver).acceptUACEvent(captur.capture());
-    assertEquals(sdf.parse("2011-08-12T20:17:46Z"), captur.getValue().getEvent().getDateTime());
-    assertEquals(UacEvent.getEvent(), captur.getValue().getEvent());
+    assertEquals(sdf.parse("2011-08-12T20:17:46Z"), captur.getValue().getHeader().getDateTime());
+    assertEquals(UacEvent.getHeader(), captur.getValue().getHeader());
     assertTrue(captur.getValue().getPayload().equals(UacEvent.getPayload()));
     verify(respondentDataRepo).writeUAC(any());
   }
 
-  private UacEvent createUAC(String qid, EventType type) {
+  private UacEvent createUAC(String qid, EventTopic topic) {
     // Construct UacEvent
     UacEvent UacEvent = new UacEvent();
     UacPayload uacPayload = UacEvent.getPayload();
@@ -136,10 +137,10 @@ public class UacEventReceiverImplIT_Test {
     uac.setQuestionnaireId(qid);
     uac.setCaseId("c45de4dc-3c3b-11e9-b210-d663bd873d93");
     Header header = new Header();
-    header.setType(type);
-    header.setTransactionId("c45de4dc-3c3b-11e9-b210-d663bd873d93");
+    header.setTopic(topic);
+    header.setMessageId(UUID.fromString("c45de4dc-3c3b-11e9-b210-d663bd873d93"));
     header.setDateTime(new Date());
-    UacEvent.setEvent(header);
+    UacEvent.setHeader(header);
     return UacEvent;
   }
 }

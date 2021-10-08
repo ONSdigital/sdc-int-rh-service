@@ -85,15 +85,15 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
             .caseId(data.getCaseId())
             .build();
 
-    UUID transactionId =
+    UUID messageId =
         eventPublisher.sendEvent(
             TopicType.UAC_AUTHENTICATE, Source.RESPONDENT_HOME, Channel.RH, response);
 
     log.debug(
         "UacAuthenticated event published for caseId: "
             + response.getCaseId()
-            + ", transactionId: "
-            + transactionId.toString());
+            + ", messageId: "
+            + messageId);
   }
 
   private UniqueAccessCodeDTO createUniqueAccessCodeDTO(
