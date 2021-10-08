@@ -2,11 +2,15 @@ package uk.gov.ons.ctp.integration.rhsvc.message.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.TimeZone;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,6 +31,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.event.model.CaseEvent;
+import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 import uk.gov.ons.ctp.common.utility.ParallelTestLocks;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.event.impl.CaseEventReceiverImpl;
@@ -58,6 +63,10 @@ public class CaseEventReceiverImplIT_Test {
 
     // Construct message
     Message<CaseEvent> message = new GenericMessage<>(caseEvent, new HashMap<>());
+
+    SurveyUpdate surveyUpdate = new SurveyUpdate("1", "NOTSIS");
+    when(respondentDataRepo.readSurvey(any())).thenReturn(Optional.of(surveyUpdate));
+
     // Send message to container
     caseEventInbound.getOutputChannel().send(message);
 
@@ -65,6 +74,28 @@ public class CaseEventReceiverImplIT_Test {
     ArgumentCaptor<CaseEvent> captur = ArgumentCaptor.forClass(CaseEvent.class);
     verify(receiver).acceptCaseEvent(captur.capture());
     assertEquals(captur.getValue().getPayload(), caseEvent.getPayload());
+    verify(respondentDataRepo, times(1)).writeCaseUpdate(caseEvent.getPayload().getCaseUpdate());
+  }
+
+  /** Test the receiver flow for SIS case event */
+  @Test
+  public void caseEventSISFlowTest() throws Exception {
+    CaseEvent caseEvent = FixtureHelper.loadPackageFixtures(CaseEvent[].class).get(0);
+
+    // Construct message
+    Message<CaseEvent> message = new GenericMessage<>(caseEvent, new HashMap<>());
+
+    SurveyUpdate surveyUpdate = new SurveyUpdate("1", "SIS");
+    when(respondentDataRepo.readSurvey(any())).thenReturn(Optional.of(surveyUpdate));
+
+    // Send message to container
+    caseEventInbound.getOutputChannel().send(message);
+
+    // Capture and check Service Activator argument
+    ArgumentCaptor<CaseEvent> captur = ArgumentCaptor.forClass(CaseEvent.class);
+    verify(receiver).acceptCaseEvent(captur.capture());
+    assertEquals(captur.getValue().getPayload(), caseEvent.getPayload());
+    verify(respondentDataRepo, times(0)).writeCaseUpdate(caseEvent.getPayload().getCaseUpdate());
   }
 
   @Test
@@ -79,6 +110,9 @@ public class CaseEventReceiverImplIT_Test {
 
     // Construct message
     Message<CaseEvent> message = new GenericMessage<>(caseEvent, new HashMap<>());
+
+    SurveyUpdate surveyUpdate = new SurveyUpdate("1", "NOTSIS");
+    when(respondentDataRepo.readSurvey(any())).thenReturn(Optional.of(surveyUpdate));
 
     // Send message to container
     caseEventInbound.getOutputChannel().send(message);

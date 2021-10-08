@@ -3,6 +3,7 @@ package uk.gov.ons.ctp.integration.rhsvc.service.impl;
 import static uk.gov.ons.ctp.common.log.ScopedStructuredArguments.kv;
 
 import java.util.Optional;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import ma.glasnost.orika.MapperFacade;
 import org.apache.commons.lang3.StringUtils;
@@ -12,8 +13,8 @@ import uk.gov.ons.ctp.common.domain.Channel;
 import uk.gov.ons.ctp.common.domain.Source;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.EventPublisher;
-import uk.gov.ons.ctp.common.event.EventType;
-import uk.gov.ons.ctp.common.event.model.CollectionCase;
+import uk.gov.ons.ctp.common.event.TopicType;
+import uk.gov.ons.ctp.common.event.model.CaseUpdate;
 import uk.gov.ons.ctp.common.event.model.UAC;
 import uk.gov.ons.ctp.common.event.model.UacAuthenticateResponse;
 import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
@@ -42,7 +43,7 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
       String caseId = uacMatch.get().getCaseId();
       if (!StringUtils.isEmpty(caseId)) {
         // UAC has a caseId
-        Optional<CollectionCase> caseMatch = dataRepo.readCollectionCase(caseId);
+        Optional<CaseUpdate> caseMatch = dataRepo.readCaseUpdate(caseId);
         if (caseMatch.isPresent()) {
           // Case found
           log.debug("UAC is linked", kv("uacHash", uacHash), kv("caseId", caseId));
@@ -84,19 +85,19 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
             .caseId(data.getCaseId())
             .build();
 
-    String transactionId =
+    UUID transactionId =
         eventPublisher.sendEvent(
-            EventType.UAC_AUTHENTICATE, Source.RESPONDENT_HOME, Channel.RH, response);
+            TopicType.UAC_AUTHENTICATE, Source.RESPONDENT_HOME, Channel.RH, response);
 
     log.debug(
         "UacAuthenticated event published for caseId: "
             + response.getCaseId()
             + ", transactionId: "
-            + transactionId);
+            + transactionId.toString());
   }
 
   private UniqueAccessCodeDTO createUniqueAccessCodeDTO(
-      UAC uac, Optional<CollectionCase> collectionCase, CaseStatus caseStatus) {
+      UAC uac, Optional<CaseUpdate> collectionCase, CaseStatus caseStatus) {
     UniqueAccessCodeDTO uniqueAccessCodeDTO = new UniqueAccessCodeDTO();
 
     // Copy the UAC first, then Case

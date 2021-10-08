@@ -3,7 +3,6 @@ package uk.gov.ons.ctp.integration.rhsvc.repository.impl;
 import static uk.gov.ons.ctp.common.log.ScopedStructuredArguments.kv;
 
 import java.text.SimpleDateFormat;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -14,9 +13,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.ons.ctp.common.cloud.CloudDataStore;
 import uk.gov.ons.ctp.common.cloud.RetryableCloudDataStore;
-import uk.gov.ons.ctp.common.domain.CaseType;
 import uk.gov.ons.ctp.common.error.CTPException;
-import uk.gov.ons.ctp.common.event.model.CollectionCase;
+import uk.gov.ons.ctp.common.event.model.CaseUpdate;
 import uk.gov.ons.ctp.common.event.model.CollectionExercise;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 import uk.gov.ons.ctp.common.event.model.UAC;
@@ -108,13 +106,13 @@ public class RespondentDataRepositoryImpl implements RespondentDataRepository {
   /**
    * Write a CollectionCase object into the cloud data store.
    *
-   * @param collectionCase - is the case to be stored in the cloud.
+   * @param caseUpdate - is the case to be stored in the cloud.
    * @throws CTPException - if a cloud exception was detected.
    */
   @Override
-  public void writeCollectionCase(final CollectionCase collectionCase) throws CTPException {
-    String id = collectionCase.getId();
-    retryableCloudDataStore.storeObject(caseSchema, id, collectionCase, id);
+  public void writeCaseUpdate(final CaseUpdate caseUpdate) throws CTPException {
+    String id = caseUpdate.getCaseId().toString();
+    retryableCloudDataStore.storeObject(caseSchema, id, caseUpdate, id);
   }
 
   /**
@@ -125,8 +123,8 @@ public class RespondentDataRepositoryImpl implements RespondentDataRepository {
    * @throws CTPException - if a cloud exception was detected.
    */
   @Override
-  public Optional<CollectionCase> readCollectionCase(final String caseId) throws CTPException {
-    return retryableCloudDataStore.retrieveObject(CollectionCase.class, caseSchema, caseId);
+  public Optional<CaseUpdate> readCaseUpdate(final String caseId) throws CTPException {
+    return retryableCloudDataStore.retrieveObject(CaseUpdate.class, caseSchema, caseId);
   }
 
   /**
@@ -181,8 +179,7 @@ public class RespondentDataRepositoryImpl implements RespondentDataRepository {
   }
 
   /**
-   * Read case objects from cloud based on its uprn. Filter by non HI, latest case, and optionally
-   * whether the case is valid.
+   * Read case objects from cloud based on its uprn. Filter optionally whether the case is valid.
    *
    * @param uprn - is the uprn that the target case(s) must contain.
    * @param onlyValid - true if only valid cases to be returned; false if we don't care
@@ -191,26 +188,26 @@ public class RespondentDataRepositoryImpl implements RespondentDataRepository {
    * @throws CTPException - if a cloud exception was detected.
    */
   @Override
-  public Optional<CollectionCase> readNonHILatestCollectionCaseByUprn(
-      final String uprn, boolean onlyValid) throws CTPException {
-    List<CollectionCase> searchResults =
-        retryableCloudDataStore.search(CollectionCase.class, caseSchema, SEARCH_BY_UPRN_PATH, uprn);
-    return filterLatestValidNonHiCollectionCaseSearchResults(searchResults, onlyValid);
+  public Optional<CaseUpdate> readCaseUpdateByUprn(final String uprn, boolean onlyValid)
+      throws CTPException {
+    List<CaseUpdate> searchResults =
+        retryableCloudDataStore.search(CaseUpdate.class, caseSchema, SEARCH_BY_UPRN_PATH, uprn);
+    return filterValidCaseUpdateSearchResults(searchResults, onlyValid);
   }
 
   /**
-   * Filter search results returning Latest !addressInvalid non HI case
+   * Filter search results returning valid case
    *
    * @param searchResults - Search results found in dataStore by searching by uprn
    * @param onlyValid - true if only valid cases to be returned; false if we don't care
    * @return Optional of the resulting collection case or Empty
    */
-  private Optional<CollectionCase> filterLatestValidNonHiCollectionCaseSearchResults(
-      final List<CollectionCase> searchResults, boolean onlyValid) {
-    return searchResults.stream()
-        .filter(c -> !c.getCaseType().equals(CaseType.HI.name()))
-        .filter(c -> onlyValid ? !c.isAddressInvalid() : true)
-        .max(Comparator.comparing(CollectionCase::getCreatedDateTime));
+  // TODO Used to filter on Non HI cases using CaseCreationDate to return the latest valid Non HI
+  // case,
+  // CaseCreatedDate may need to be added back if we receive duplicate cases
+  private Optional<CaseUpdate> filterValidCaseUpdateSearchResults(
+      final List<CaseUpdate> searchResults, boolean onlyValid) {
+    return searchResults.stream().filter(c -> !onlyValid || !c.isInvalid()).findFirst();
   }
 
   private void runCloudStartupCheck() throws Throwable {

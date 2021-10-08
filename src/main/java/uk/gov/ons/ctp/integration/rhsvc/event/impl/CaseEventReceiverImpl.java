@@ -2,6 +2,7 @@ package uk.gov.ons.ctp.integration.rhsvc.event.impl;
 
 import static uk.gov.ons.ctp.common.log.ScopedStructuredArguments.kv;
 
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,7 +12,8 @@ import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.annotation.ServiceActivator;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.model.CaseEvent;
-import uk.gov.ons.ctp.common.event.model.CollectionCase;
+import uk.gov.ons.ctp.common.event.model.CaseUpdate;
+import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.event.CaseEventReceiver;
 import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
 
@@ -36,19 +38,34 @@ public class CaseEventReceiverImpl implements CaseEventReceiver {
   @ServiceActivator(inputChannel = "acceptCaseEvent")
   public void acceptCaseEvent(CaseEvent caseEvent) throws CTPException {
 
-    CollectionCase collectionCase = caseEvent.getPayload().getCollectionCase();
+    CaseUpdate caseUpdate = caseEvent.getPayload().getCaseUpdate();
     String caseTransactionId = caseEvent.getEvent().getTransactionId();
 
     log.info(
         "Entering acceptCaseEvent",
         kv("transactionId", caseTransactionId),
-        kv("caseId", collectionCase.getId()));
+        kv("caseId", caseUpdate.getCaseId()));
 
-    try {
-      respondentDataRepo.writeCollectionCase(collectionCase);
-    } catch (CTPException ctpEx) {
-      log.error("Case Event processing failed", kv("caseTransactionId", caseTransactionId), ctpEx);
-      throw new CTPException(ctpEx.getFault());
+    Optional<SurveyUpdate> surveyUpdateOpt =
+        respondentDataRepo.readSurvey(caseUpdate.getSurveyId());
+    if (surveyUpdateOpt.isPresent()) {
+      SurveyUpdate surveyUpdate = surveyUpdateOpt.get();
+      try {
+        if (surveyUpdate.getName().equalsIgnoreCase("SIS")) {
+          log.info(
+              "Ignoring SIS case",
+              kv("transactionId", caseTransactionId),
+              kv("caseId", caseUpdate.getCaseId()));
+        } else {
+          respondentDataRepo.writeCaseUpdate(caseUpdate);
+        }
+      } catch (CTPException ctpEx) {
+        log.error(
+            "Case Event processing failed", kv("caseTransactionId", caseTransactionId), ctpEx);
+        throw new CTPException(ctpEx.getFault());
+      }
+    } else {
+      throw new CTPException(CTPException.Fault.RESOURCE_NOT_FOUND, "Survey not found");
     }
   }
 }

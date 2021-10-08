@@ -15,15 +15,14 @@ import ma.glasnost.orika.MapperFacade;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.gov.ons.ctp.common.domain.CaseType;
 import uk.gov.ons.ctp.common.domain.Channel;
 import uk.gov.ons.ctp.common.domain.Source;
 import uk.gov.ons.ctp.common.domain.UniquePropertyReferenceNumber;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.error.CTPException.Fault;
 import uk.gov.ons.ctp.common.event.EventPublisher;
-import uk.gov.ons.ctp.common.event.EventType;
-import uk.gov.ons.ctp.common.event.model.CollectionCase;
+import uk.gov.ons.ctp.common.event.TopicType;
+import uk.gov.ons.ctp.common.event.model.CaseUpdate;
 import uk.gov.ons.ctp.common.event.model.Contact;
 import uk.gov.ons.ctp.common.event.model.FulfilmentRequest;
 import uk.gov.ons.ctp.integration.common.product.ProductReference;
@@ -53,15 +52,15 @@ public class CaseServiceImpl implements CaseService {
   @Autowired private RateLimiterClient rateLimiterClient;
 
   @Override
-  public CaseDTO getLatestValidNonHICaseByUPRN(final UniquePropertyReferenceNumber uprn)
+  public CaseDTO getLatestValidCaseByUPRN(final UniquePropertyReferenceNumber uprn)
       throws CTPException {
 
-    Optional<CollectionCase> caseFound =
-        dataRepo.readNonHILatestCollectionCaseByUprn(Long.toString(uprn.getValue()), true);
+    Optional<CaseUpdate> caseFound =
+        dataRepo.readCaseUpdateByUprn(Long.toString(uprn.getValue()), true);
     if (caseFound.isPresent()) {
       log.debug(
           "non HI latest valid case retrieved for UPRN",
-          kv("case", caseFound.get().getId()),
+          kv("case", caseFound.get().getCaseId()),
           kv("uprn", uprn));
       return mapperFacade.map(caseFound.get(), CaseDTO.class);
     } else {
@@ -80,7 +79,7 @@ public class CaseServiceImpl implements CaseService {
   public void fulfilmentRequestBySMS(SMSFulfilmentRequestDTO requestBodyDTO) throws CTPException {
     Contact contact = new Contact();
     contact.setTelNo(requestBodyDTO.getTelNo());
-    CollectionCase caseDetails = findCaseDetails(requestBodyDTO.getCaseId());
+    CaseUpdate caseDetails = findCaseDetails(requestBodyDTO.getCaseId());
     var products = createProductList(DeliveryChannel.SMS, requestBodyDTO, caseDetails);
     recordRateLimiting(contact, requestBodyDTO.getClientIP(), products, caseDetails);
     createAndSendFulfilments(DeliveryChannel.SMS, contact, requestBodyDTO, products, caseDetails);
@@ -93,7 +92,7 @@ public class CaseServiceImpl implements CaseService {
     contact.setTitle(requestBodyDTO.getTitle());
     contact.setForename(requestBodyDTO.getForename());
     contact.setSurname(requestBodyDTO.getSurname());
-    CollectionCase caseDetails = findCaseDetails(requestBodyDTO.getCaseId());
+    CaseUpdate caseDetails = findCaseDetails(requestBodyDTO.getCaseId());
     var products = createProductList(DeliveryChannel.POST, requestBodyDTO, caseDetails);
     preValidatePostalContactDetails(products, contact);
     recordRateLimiting(contact, requestBodyDTO.getClientIP(), products, caseDetails);
@@ -107,10 +106,10 @@ public class CaseServiceImpl implements CaseService {
    * NOTE: must return list in order of fulfilmentCodes
    */
   private List<Product> createProductList(
-      DeliveryChannel deliveryChannel, FulfilmentRequestDTO request, CollectionCase caseDetails)
+      DeliveryChannel deliveryChannel, FulfilmentRequestDTO request, CaseUpdate caseDetails)
       throws CTPException {
     Map<String, Product> map = new HashMap<>();
-    Region region = Region.valueOf(caseDetails.getAddress().getRegion());
+    Region region = Region.valueOf(caseDetails.getSample().getRegion());
     for (String fulfilmentCode : new HashSet<>(request.getFulfilmentCodes())) {
       map.put(fulfilmentCode, findProduct(fulfilmentCode, deliveryChannel, region));
     }
@@ -127,15 +126,14 @@ public class CaseServiceImpl implements CaseService {
   }
 
   private void recordRateLimiting(
-      Contact contact, String ipAddress, List<Product> products, CollectionCase caseDetails)
+      Contact contact, String ipAddress, List<Product> products, CaseUpdate caseDetails)
       throws CTPException {
     if (appConfig.getRateLimiter().isEnabled()) {
       for (Product product : products) {
         log.debug("Recording rate-limiting", kv("fulfilmentCode", product.getFulfilmentCode()));
-        CaseType caseType = CaseType.valueOf(caseDetails.getCaseType());
         UniquePropertyReferenceNumber uprn =
-            UniquePropertyReferenceNumber.create(caseDetails.getAddress().getUprn());
-        recordRateLimiting(contact, product, caseType, ipAddress, uprn);
+            UniquePropertyReferenceNumber.create(caseDetails.getSample().getUprn());
+        recordRateLimiting(contact, product, ipAddress, uprn);
       }
     } else {
       log.info("Rate limiter client is disabled");
@@ -150,15 +148,11 @@ public class CaseServiceImpl implements CaseService {
    * If Rate limiter validation fails then a CTPException is thrown.
    */
   private void recordRateLimiting(
-      Contact contact,
-      Product product,
-      CaseType caseType,
-      String ipAddress,
-      UniquePropertyReferenceNumber uprn)
+      Contact contact, Product product, String ipAddress, UniquePropertyReferenceNumber uprn)
       throws CTPException {
 
     rateLimiterClient.checkFulfilmentRateLimit(
-        Domain.RH, product, caseType, ipAddress, uprn, contact.getTelNo());
+        Domain.RH, product, ipAddress, uprn, contact.getTelNo());
   }
 
   private void createAndSendFulfilments(
@@ -166,7 +160,7 @@ public class CaseServiceImpl implements CaseService {
       Contact contact,
       FulfilmentRequestDTO request,
       List<Product> products,
-      CollectionCase caseDetails)
+      CaseUpdate caseDetails)
       throws CTPException {
     log.debug(
         "Entering createAndSendFulfilment",
@@ -177,7 +171,7 @@ public class CaseServiceImpl implements CaseService {
       FulfilmentRequest payload =
           createFulfilmentRequestPayload(request.getCaseId(), contact, product, caseDetails);
 
-      eventPublisher.sendEvent(EventType.FULFILMENT, Source.RESPONDENT_HOME, Channel.RH, payload);
+      eventPublisher.sendEvent(TopicType.FULFILMENT, Source.RESPONDENT_HOME, Channel.RH, payload);
     }
   }
 
@@ -186,11 +180,10 @@ public class CaseServiceImpl implements CaseService {
   }
 
   private FulfilmentRequest createFulfilmentRequestPayload(
-      UUID caseId, Contact contact, Product product, CollectionCase caseDetails)
-      throws CTPException {
+      UUID caseId, Contact contact, Product product, CaseUpdate caseDetails) throws CTPException {
 
     String individualCaseId = null;
-    if (isIndividual(product) && CaseType.HH.name().equals(caseDetails.getCaseType())) {
+    if (isIndividual(product)) {
       individualCaseId = UUID.randomUUID().toString();
     }
 
@@ -228,9 +221,9 @@ public class CaseServiceImpl implements CaseService {
   }
 
   // Read case from firestore
-  private CollectionCase findCaseDetails(UUID caseId) throws CTPException {
+  private CaseUpdate findCaseDetails(UUID caseId) throws CTPException {
     return dataRepo
-        .readCollectionCase(caseId.toString())
+        .readCaseUpdate(caseId.toString())
         .orElseThrow(
             () -> {
               log.info("Case not found", kv("caseId", caseId));

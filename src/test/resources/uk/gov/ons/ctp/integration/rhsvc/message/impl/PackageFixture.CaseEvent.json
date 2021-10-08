@@ -6,38 +6,25 @@
     "dateTime" : "2020-06-08T07:28:45.117Z",
     "transactionId" : "c45de4dc-3c3b-11e9-b210-d663bd873d93"
   },
-  "payload" : {
-    "collectionCase" : {
-      "id" : "dc4477d1-dd3f-4c69-b181-7ff725dc9fa4",
-      "caseRef" : "10000000010",
-      "caseType" : "HH",
-      "survey" : "Census",
-      "collectionExerciseId" : "3883af91-0052-4497-9805-3238544fcf8a",
-      "address" : {
-        "addressLine1" : "1 main street",
-        "addressLine2" : "upper upperingham",
-        "addressLine3" : "",
-        "townName" : "upton",
-        "postcode" : "UP103UP",
-        "region" : "E",
-        "uprn" : "123456789",
-        "latitude" : "50.863849",
-        "longitude" : "-1.229710",
-        "estabUprn" : null,
-        "addressType" : "CE",
-        "addressLevel" : "E",
-        "estabType" : "XXX"
+  "payload": {
+    "caseUpdate": {
+      "caseId": "5883af91-0052-4497-9805-3238544fcf8a",
+      "surveyId": "3883af91-0052-4497-9805-3238544fcf8a",
+      "collectionExerciseId": "3883af91-0052-4497-9805-3238544fcf8a",
+      "invalid": true,
+      "refusalReceived": "HARD_REFUSAL",
+      "sample": {
+        "addressLine1": "Flat 987, Magical Apartments",
+        "addressLine2": "123 Fake Street",
+        "addressLine3": "Some Suburb",
+        "townName": "Fake Town",
+        "postcode": "AB1 2ZX",
+        "region": "W",
+        "uprn": "123456789"
       },
-      "contact" : {
-        "title" : "Ms",
-        "forename" : "jo",
-        "surname" : "smith",
-        "telNo" : "+447890000000"
-      },
-      "actionableFrom" : "2011-08-12T20:17:46.384Z",
-      "handDelivery" : true,
-      "addressInvalid" : false,
-      "createdDateTime" : "2020-06-08T07:28:45.113Z"
+      "sampleSensitive": {
+        "phoneNumber": "REDACTED"
+      }
     }
   }
 }

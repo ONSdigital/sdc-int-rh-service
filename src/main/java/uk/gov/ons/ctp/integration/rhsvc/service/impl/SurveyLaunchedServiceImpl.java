@@ -10,13 +10,15 @@ import uk.gov.ons.ctp.common.domain.Channel;
 import uk.gov.ons.ctp.common.domain.Source;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.EventPublisher;
-import uk.gov.ons.ctp.common.event.EventType;
+import uk.gov.ons.ctp.common.event.TopicType;
 import uk.gov.ons.ctp.common.event.model.SurveyLaunchResponse;
 import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient;
 import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient.Domain;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.representation.SurveyLaunchedDTO;
 import uk.gov.ons.ctp.integration.rhsvc.service.SurveyLaunchedService;
+
+import java.util.UUID;
 
 /** This is a service layer class, which performs RH business level logic for the endpoints. */
 @Slf4j
@@ -52,14 +54,14 @@ public class SurveyLaunchedServiceImpl implements SurveyLaunchedService {
       channel = Channel.AD;
     }
 
-    String transactionId =
+    UUID transactionId =
         eventPublisher.sendEvent(
-            EventType.SURVEY_LAUNCH, Source.RESPONDENT_HOME, channel, response);
+            TopicType.SURVEY_LAUNCH, Source.RESPONDENT_HOME, channel, response);
 
     log.debug(
         "SurveyLaunch event published",
         kv("caseId", response.getCaseId()),
-        kv("transactionId", transactionId));
+        kv("transactionId", transactionId.toString()));
   }
 
   private void checkRateLimit(String ipAddress) throws CTPException {

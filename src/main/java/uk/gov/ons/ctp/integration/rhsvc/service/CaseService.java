@@ -15,12 +15,11 @@ public interface CaseService {
   /**
    * Retrieve the data relating to non-HI latest valid Case by address UPRN
    *
-   * @param uprn of address for which latest valid non-HI case details are requested
+   * @param uprn of address for which latest valid case details are requested
    * @return Case details for address UPRN
    * @throws CTPException if anything went wrong.
    */
-  CaseDTO getLatestValidNonHICaseByUPRN(final UniquePropertyReferenceNumber uprn)
-      throws CTPException;
+  CaseDTO getLatestValidCaseByUPRN(final UniquePropertyReferenceNumber uprn) throws CTPException;
 
   void fulfilmentRequestBySMS(SMSFulfilmentRequestDTO requestBodyDTO) throws CTPException;
 

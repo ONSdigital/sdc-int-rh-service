@@ -2,9 +2,7 @@ package uk.gov.ons.ctp.integration.rhsvc.representation;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import java.util.UUID;
-import javax.validation.constraints.NotNull;
 import lombok.Data;
-import uk.gov.ons.ctp.common.domain.EstabType;
 import uk.gov.ons.ctp.common.log.LoggingScope;
 import uk.gov.ons.ctp.common.log.Scope;
 
@@ -13,19 +11,12 @@ import uk.gov.ons.ctp.common.log.Scope;
 public class CaseDTO {
 
   private UUID caseId;
+  private UUID surveyId;
+  private UUID collectionExerciseId;
+  private boolean invalid;
+  private String refusalReceived;
+  @JsonUnwrapped private SampleDTO sample;
 
-  @LoggingScope(scope = Scope.HASH)
-  private String caseRef;
-
-  private String caseType;
-
-  private String addressType;
-
-  @JsonUnwrapped private AddressDTO address;
-
-  private String region;
-
-  private String addressLevel;
-
-  @NotNull private EstabType estabType;
+  @LoggingScope(scope = Scope.MASK)
+  private SampleSensetiveDTO sampleSensitive;
 }

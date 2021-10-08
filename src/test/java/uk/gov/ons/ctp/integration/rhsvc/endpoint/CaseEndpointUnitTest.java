@@ -33,7 +33,7 @@ import uk.gov.ons.ctp.integration.rhsvc.representation.PostalFulfilmentRequestDT
 import uk.gov.ons.ctp.integration.rhsvc.representation.SMSFulfilmentRequestDTO;
 import uk.gov.ons.ctp.integration.rhsvc.service.CaseService;
 
-/** Unit Tests on endpoint for Case resources */
+// ** Unit Tests on endpoint for Case resources */
 @ExtendWith(MockitoExtension.class)
 public class CaseEndpointUnitTest {
 
@@ -67,7 +67,7 @@ public class CaseEndpointUnitTest {
   public void getCaseByUPRNFound() throws Exception {
     CaseDTO rmCase0 = caseDTO.get(0);
 
-    when(caseService.getLatestValidNonHICaseByUPRN(new UniquePropertyReferenceNumber(UPRN)))
+    when(caseService.getLatestValidCaseByUPRN(new UniquePropertyReferenceNumber(UPRN)))
         .thenReturn(caseDTO.get(0));
 
     mockMvc
@@ -76,20 +76,16 @@ public class CaseEndpointUnitTest {
         .andExpect(content().contentType(EXPECTED_JSON_CONTENT_TYPE))
         // .andExpect(jsonPath("$", hasSize(1)))
         .andExpect(jsonPath("$.caseId", is(rmCase0.getCaseId().toString())))
-        .andExpect(jsonPath("$.caseRef", is(rmCase0.getCaseRef())))
-        .andExpect(jsonPath("$.caseType", is(rmCase0.getCaseType())))
-        .andExpect(jsonPath("$.addressType", is(rmCase0.getAddressType())))
-        .andExpect(jsonPath("$.addressLevel", is(rmCase0.getAddressLevel())))
-        .andExpect(jsonPath("$.addressLine1", is(rmCase0.getAddress().getAddressLine1())))
-        .andExpect(jsonPath("$.townName", is(rmCase0.getAddress().getTownName())))
-        .andExpect(jsonPath("$.postcode", is(rmCase0.getAddress().getPostcode())));
+        .andExpect(jsonPath("$.addressLine1", is(rmCase0.getSample().getAddressLine1())))
+        .andExpect(jsonPath("$.townName", is(rmCase0.getSample().getTownName())))
+        .andExpect(jsonPath("$.postcode", is(rmCase0.getSample().getPostcode())));
   }
 
   /** Test returns resource not found for non-existent UPRN */
   @Test
   public void getCaseByUPRNNotFound() throws Exception {
 
-    when(caseService.getLatestValidNonHICaseByUPRN(new UniquePropertyReferenceNumber(UPRN)))
+    when(caseService.getLatestValidCaseByUPRN(new UniquePropertyReferenceNumber(UPRN)))
         .thenThrow(new CTPException(CTPException.Fault.RESOURCE_NOT_FOUND, ERROR_MESSAGE));
 
     mockMvc
