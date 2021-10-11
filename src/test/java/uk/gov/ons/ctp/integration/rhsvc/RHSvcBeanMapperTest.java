@@ -11,8 +11,8 @@ import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.domain.UniquePropertyReferenceNumber;
 import uk.gov.ons.ctp.common.event.model.CaseUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
-import uk.gov.ons.ctp.integration.rhsvc.representation.SampleDTO;
-import uk.gov.ons.ctp.integration.rhsvc.representation.SampleSensetiveDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.CaseSampleDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.CaseSampleSensitiveDTO;
 
 @DisplayName("RHSvc Bean Mapper Test")
 public class RHSvcBeanMapperTest {
@@ -26,8 +26,8 @@ public class RHSvcBeanMapperTest {
     caseUpdate = FixtureHelper.loadClassFixtures(CaseUpdate[].class).get(0);
   }
 
-  private SampleDTO expectedAddress() {
-    SampleDTO addr = new SampleDTO();
+  private CaseSampleDTO expectedAddress() {
+    CaseSampleDTO addr = new CaseSampleDTO();
     addr.setAddressLine1("1 main street");
     addr.setAddressLine2("upper upperingham");
     addr.setAddressLine3("");
@@ -38,10 +38,10 @@ public class RHSvcBeanMapperTest {
     return addr;
   }
 
-  private SampleSensetiveDTO expectedSampleSensetive() {
-    SampleSensetiveDTO sampleSensetiveDTO = new SampleSensetiveDTO();
-    sampleSensetiveDTO.setPhoneNumber("REDACTED");
-    return sampleSensetiveDTO;
+  private CaseSampleSensitiveDTO expectedSampleSensetive() {
+    CaseSampleSensitiveDTO caseSampleSensitiveDTO = new CaseSampleSensitiveDTO();
+    caseSampleSensitiveDTO.setPhoneNumber("REDACTED");
+    return caseSampleSensitiveDTO;
   }
 
   @Test

@@ -4,7 +4,7 @@ import lombok.Data;
 import uk.gov.ons.ctp.common.domain.UniquePropertyReferenceNumber;
 
 @Data
-public class SampleDTO {
+public class CaseSampleDTO {
 
   private String addressLine1;
   private String addressLine2;

@@ -19,9 +19,9 @@ import uk.gov.ons.ctp.common.util.StringToUPRNConverter;
 import uk.gov.ons.ctp.common.util.StringToUUIDConverter;
 import uk.gov.ons.ctp.integration.rhsvc.representation.AddressDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.CaseSampleDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.CaseSampleSensitiveDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.NewCaseDTO;
-import uk.gov.ons.ctp.integration.rhsvc.representation.SampleDTO;
-import uk.gov.ons.ctp.integration.rhsvc.representation.SampleSensetiveDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.UniqueAccessCodeDTO;
 
 /** The bean mapper that maps to/from DTOs and repository entity types. */
@@ -55,10 +55,10 @@ public class RHSvcBeanMapper extends ConfigurableMapper {
         .register();
 
     factory
-        .classMap(SampleSensetiveDTO.class, CaseUpdateSampleSensitive.class)
+        .classMap(CaseSampleSensitiveDTO.class, CaseUpdateSampleSensitive.class)
         .byDefault()
         .register();
-    factory.classMap(SampleDTO.class, CaseUpdateSample.class).byDefault().register();
+    factory.classMap(CaseSampleDTO.class, CaseUpdateSample.class).byDefault().register();
 
     factory.classMap(NewCaseSampleSensitive.class, NewCaseDTO.class).byDefault().register();
     factory.classMap(AddressDTO.class, AddressCompact.class).byDefault().register();
