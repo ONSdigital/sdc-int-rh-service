@@ -1,0 +1,19 @@
+[
+{
+	"caseId": "bfb5cdca-3119-4d2c-a807-51ae55443b33",
+	"surveyId": "34d7f3bb-91c9-45d0-bb2d-90afce4fc790",
+	"collectionExerciseId": "34d7f3bb-91c9-45d0-bb2d-90afce4fc790",
+	"sample": {
+		"addressLine1": "test Address Line 1",
+		"addressLine2": "test Address Line 2",
+		"addressLine3": "test Address Line 3",
+		"townName": "testTownName",
+		"postcode": "BY14 6AB",
+		"region": "E",
+		"uprn": "305634838282"
+	},
+	"sampleSensitive": {
+		"phoneNumber": "+447890000000"
+	}
+  }
+]
