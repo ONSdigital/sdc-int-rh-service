@@ -77,9 +77,9 @@ public class CaseEndpointUnitTest {
         .andExpect(content().contentType(EXPECTED_JSON_CONTENT_TYPE))
         // .andExpect(jsonPath("$", hasSize(1)))
         .andExpect(jsonPath("$.caseId", is(rmCase0.getCaseId().toString())))
-        .andExpect(jsonPath("$.addressLine1", is(rmCase0.getAddress().getAddressLine1())))
-        .andExpect(jsonPath("$.townName", is(rmCase0.getAddress().getTownName())))
-        .andExpect(jsonPath("$.postcode", is(rmCase0.getAddress().getPostcode())));
+        .andExpect(jsonPath("$.address.addressLine1", is(rmCase0.getAddress().getAddressLine1())))
+        .andExpect(jsonPath("$.address.townName", is(rmCase0.getAddress().getTownName())))
+        .andExpect(jsonPath("$.address.postcode", is(rmCase0.getAddress().getPostcode())));
   }
 
   /** Test returns resource not found for non-existent UPRN */

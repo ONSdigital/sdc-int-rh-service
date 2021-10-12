@@ -93,7 +93,7 @@ public class CaseServiceImplTest {
     assertEquals(caseUpdate.getSample().getAddressLine2(), rmCase.getAddress().getAddressLine2());
     assertEquals(caseUpdate.getSample().getAddressLine3(), rmCase.getAddress().getAddressLine3());
     assertEquals(caseUpdate.getSample().getTownName(), rmCase.getAddress().getTownName());
-    assertEquals(caseUpdate.getSample().getRegion(), rmCase.getRegion());
+    assertEquals(caseUpdate.getSample().getRegion(), rmCase.getAddress().getRegion().name());
     assertEquals(caseUpdate.getSample().getPostcode(), rmCase.getAddress().getPostcode());
     assertEquals(
         caseUpdate.getSample().getUprn(), Long.toString(rmCase.getAddress().getUprn().getValue()));

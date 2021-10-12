@@ -39,7 +39,7 @@ public class RHSvcBeanMapper extends ConfigurableMapper {
 
     factory
         .classMap(CaseUpdate.class, CaseDTO.class)
-        .field("sample.region", "region")
+        .field("sample.region", "address.region")
         .field("sample.uprn", "address.uprn")
         .field("sample.addressLine1", "address.addressLine1")
         .field("sample.addressLine2", "address.addressLine2")

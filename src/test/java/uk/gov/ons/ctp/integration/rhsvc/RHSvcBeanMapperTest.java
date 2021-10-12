@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import uk.gov.ons.ctp.common.FixtureHelper;
+import uk.gov.ons.ctp.common.domain.Region;
 import uk.gov.ons.ctp.common.domain.UniquePropertyReferenceNumber;
 import uk.gov.ons.ctp.common.event.model.CaseUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.representation.AddressDTO;
@@ -33,6 +34,7 @@ public class RHSvcBeanMapperTest {
     addr.setTownName("upton");
     addr.setPostcode("UP103UP");
     addr.setUprn(UniquePropertyReferenceNumber.create("123456"));
+    addr.setRegion(Region.E);
     return addr;
   }
 
@@ -46,6 +48,6 @@ public class RHSvcBeanMapperTest {
         UUID.fromString("a66de4dc-3c3b-11e9-b210-d663bd873d93"), dto.getCollectionExerciseId());
     assertEquals("HARD_REFUSAL", dto.getRefusalReceived());
     assertEquals(expectedAddress(), dto.getAddress());
-    assertEquals(caseUpdate.getSample().getRegion(), dto.getRegion());
+    assertEquals(caseUpdate.getSample().getRegion(), dto.getAddress().getRegion().toString());
   }
 }
