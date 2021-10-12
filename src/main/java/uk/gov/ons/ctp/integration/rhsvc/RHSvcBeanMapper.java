@@ -12,15 +12,12 @@ import uk.gov.ons.ctp.common.event.model.Address;
 import uk.gov.ons.ctp.common.event.model.AddressCompact;
 import uk.gov.ons.ctp.common.event.model.CaseUpdate;
 import uk.gov.ons.ctp.common.event.model.CaseUpdateSample;
-import uk.gov.ons.ctp.common.event.model.CaseUpdateSampleSensitive;
 import uk.gov.ons.ctp.common.event.model.NewCaseSample;
 import uk.gov.ons.ctp.common.event.model.NewCaseSampleSensitive;
 import uk.gov.ons.ctp.common.util.StringToUPRNConverter;
 import uk.gov.ons.ctp.common.util.StringToUUIDConverter;
 import uk.gov.ons.ctp.integration.rhsvc.representation.AddressDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
-import uk.gov.ons.ctp.integration.rhsvc.representation.CaseSampleDTO;
-import uk.gov.ons.ctp.integration.rhsvc.representation.CaseSampleSensitiveDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.NewCaseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.UniqueAccessCodeDTO;
 
@@ -40,7 +37,17 @@ public class RHSvcBeanMapper extends ConfigurableMapper {
     converterFactory.registerConverter(new StringToUPRNConverter());
     converterFactory.registerConverter(new EstabTypeConverter());
 
-    factory.classMap(CaseUpdate.class, CaseDTO.class).byDefault().register();
+    factory
+        .classMap(CaseUpdate.class, CaseDTO.class)
+        .field("sample.region", "region")
+        .field("sample.uprn", "address.uprn")
+        .field("sample.addressLine1", "address.addressLine1")
+        .field("sample.addressLine2", "address.addressLine2")
+        .field("sample.addressLine3", "address.addressLine3")
+        .field("sample.townName", "address.townName")
+        .field("sample.postcode", "address.postcode")
+        .byDefault()
+        .register();
 
     factory
         .classMap(CaseUpdate.class, UniqueAccessCodeDTO.class)
@@ -54,11 +61,7 @@ public class RHSvcBeanMapper extends ConfigurableMapper {
         .byDefault()
         .register();
 
-    factory
-        .classMap(CaseSampleSensitiveDTO.class, CaseUpdateSampleSensitive.class)
-        .byDefault()
-        .register();
-    factory.classMap(CaseSampleDTO.class, CaseUpdateSample.class).byDefault().register();
+    factory.classMap(AddressDTO.class, CaseUpdateSample.class).byDefault().register();
 
     factory.classMap(NewCaseSampleSensitive.class, NewCaseDTO.class).byDefault().register();
     factory.classMap(AddressDTO.class, AddressCompact.class).byDefault().register();

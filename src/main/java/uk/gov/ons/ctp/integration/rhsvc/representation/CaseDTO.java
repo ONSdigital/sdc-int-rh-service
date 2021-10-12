@@ -13,7 +13,6 @@ public class CaseDTO {
   private UUID collectionExerciseId;
   private boolean invalid;
   private String refusalReceived;
-  @JsonUnwrapped private CaseSampleDTO sample;
-
-  private CaseSampleSensitiveDTO sampleSensitive;
+  private String region;
+  @JsonUnwrapped private AddressDTO address;
 }
