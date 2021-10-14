@@ -1,6 +1,10 @@
 [
 	{
 		"caseId": "dc4477d1-dd3f-4c69-b181-7ff725dc9fa4",
+		"surveyId": "dc4477d1-dd3f-4c69-b182-7ff725dc9fa6",
+		"collectionExerciseId": "dc4477d1-dd3f-4c69-b182-7ff725dc9fa7",
+		"invalid": false,
+		"refusalReceived": "HARD_REFUSAL",
 		"address": {
 			"addressType": "SPG",
 			"addressLine1": "1 main street",
@@ -14,6 +18,10 @@
 	},
 	{
 		"caseId": "dc4477d1-dd3f-4c69-b182-7ff725dc9fa5",
+		"surveyId": "dc4477d1-dd3f-4c69-b182-7ff725dc9fa6",
+		"collectionExerciseId": "dc4477d1-dd3f-4c69-b182-7ff725dc9fa7",
+		"invalid": false,
+		"refusalReceived": "HARD_REFUSAL",
 		"address": {
 			"addressType": "SPG",
 			"addressLine1": "1 main street",

@@ -111,7 +111,7 @@ public class RespondentDataRepositoryImpl implements RespondentDataRepository {
    */
   @Override
   public void writeCaseUpdate(final CaseUpdate caseUpdate) throws CTPException {
-    String id = caseUpdate.getCaseId().toString();
+    String id = caseUpdate.getCaseId();
     retryableCloudDataStore.storeObject(caseSchema, id, caseUpdate, id);
   }
 
