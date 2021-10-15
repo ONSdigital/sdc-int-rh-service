@@ -30,7 +30,7 @@ public class RespondentDataRepositoryImplTest {
   @InjectMocks private RespondentDataRepositoryImpl target;
 
   private List<CaseUpdate> collectionCase;
-  private final String[] searchByUprnPath = new String[] {"address", "uprn"};
+  private final String[] searchByUprnPath = new String[] {"sample", "uprn"};
 
   /** Setup tests */
   @BeforeEach
