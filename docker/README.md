@@ -118,7 +118,7 @@ and use Eclipse/IntelliJ to your current version.
 
 ## Example commands to run everything locally
 
-If not using the RH Cucumber local profile, point at the emulator using environment variables:
+If not using the RH Cucumber local profile, point at the emulator using environment variables (which are probably best added to your ~/.bashrc file):
 
     export PUBSUB_EMULATOR_HOST="localhost:9808"
     export PUBSUB_EMULATOR_USE="true"
