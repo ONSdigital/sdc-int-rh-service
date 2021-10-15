@@ -17,7 +17,7 @@ import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.model.CaseUpdate;
 import uk.gov.ons.ctp.common.event.model.CollectionExercise;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
-import uk.gov.ons.ctp.common.event.model.UAC;
+import uk.gov.ons.ctp.common.event.model.UacUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
 
 /** A RespondentDataRepository implementation for CRUD operations on Respondent data entities */
@@ -87,7 +87,7 @@ public class RespondentDataRepositoryImpl implements RespondentDataRepository {
    * @throws CTPException - if a cloud exception was detected.
    */
   @Override
-  public void writeUAC(final UAC uac) throws CTPException {
+  public void writeUAC(final UacUpdate uac) throws CTPException {
     retryableCloudDataStore.storeObject(uacSchema, uac.getUacHash(), uac, uac.getCaseId());
   }
 
@@ -99,8 +99,9 @@ public class RespondentDataRepositoryImpl implements RespondentDataRepository {
    * @throws CTPException - if a cloud exception was detected.
    */
   @Override
-  public Optional<UAC> readUAC(final String universalAccessCodeHash) throws CTPException {
-    return retryableCloudDataStore.retrieveObject(UAC.class, uacSchema, universalAccessCodeHash);
+  public Optional<UacUpdate> readUAC(final String universalAccessCodeHash) throws CTPException {
+    return retryableCloudDataStore.retrieveObject(
+        UacUpdate.class, uacSchema, universalAccessCodeHash);
   }
 
   /**

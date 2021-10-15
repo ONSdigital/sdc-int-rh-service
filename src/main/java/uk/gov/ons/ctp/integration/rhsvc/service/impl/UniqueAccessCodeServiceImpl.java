@@ -15,8 +15,8 @@ import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.EventPublisher;
 import uk.gov.ons.ctp.common.event.TopicType;
 import uk.gov.ons.ctp.common.event.model.CaseUpdate;
-import uk.gov.ons.ctp.common.event.model.UAC;
 import uk.gov.ons.ctp.common.event.model.UacAuthenticateResponse;
+import uk.gov.ons.ctp.common.event.model.UacUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
 import uk.gov.ons.ctp.integration.rhsvc.representation.UniqueAccessCodeDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.UniqueAccessCodeDTO.CaseStatus;
@@ -37,7 +37,7 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
   public UniqueAccessCodeDTO getAndAuthenticateUAC(String uacHash) throws CTPException {
 
     UniqueAccessCodeDTO data;
-    Optional<UAC> uacMatch = dataRepo.readUAC(uacHash);
+    Optional<UacUpdate> uacMatch = dataRepo.readUAC(uacHash);
     if (uacMatch.isPresent()) {
       // we found UAC
       String caseId = uacMatch.get().getCaseId();
@@ -77,11 +77,11 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
     log.info(
         "Generating UacAuthenticated event for caseId",
         kv("caseId", data.getCaseId()),
-        kv("questionnaireId", data.getQuestionnaireId()));
+        kv("questionnaireId", data.getQid()));
 
     UacAuthenticateResponse response =
         UacAuthenticateResponse.builder()
-            .questionnaireId(data.getQuestionnaireId())
+            .questionnaireId(data.getQid())
             .caseId(data.getCaseId())
             .build();
 
@@ -97,7 +97,7 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
   }
 
   private UniqueAccessCodeDTO createUniqueAccessCodeDTO(
-      UAC uac, Optional<CaseUpdate> collectionCase, CaseStatus caseStatus) {
+      UacUpdate uac, Optional<CaseUpdate> collectionCase, CaseStatus caseStatus) {
     UniqueAccessCodeDTO uniqueAccessCodeDTO = new UniqueAccessCodeDTO();
 
     // Copy the UAC first, then Case
@@ -109,7 +109,8 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
     }
 
     uniqueAccessCodeDTO.setCaseStatus(caseStatus);
-
+    uniqueAccessCodeDTO.setWave(uac.getMetadata().getWave());
+    
     return uniqueAccessCodeDTO;
   }
 }

@@ -5,12 +5,12 @@ import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.model.CaseUpdate;
 import uk.gov.ons.ctp.common.event.model.CollectionExercise;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
-import uk.gov.ons.ctp.common.event.model.UAC;
+import uk.gov.ons.ctp.common.event.model.UacUpdate;
 
 /** Repository for Respondent Data */
 public interface RespondentDataRepository {
 
-  void writeUAC(UAC uac) throws CTPException;
+  void writeUAC(UacUpdate uac) throws CTPException;
 
   void writeCaseUpdate(CaseUpdate caseUpdate) throws CTPException;
 
@@ -18,7 +18,7 @@ public interface RespondentDataRepository {
 
   void writeCollectionExercise(CollectionExercise collectionExercise) throws CTPException;
 
-  Optional<UAC> readUAC(String universalAccessCode) throws CTPException;
+  Optional<UacUpdate> readUAC(String universalAccessCode) throws CTPException;
 
   Optional<CaseUpdate> readCaseUpdate(String caseId) throws CTPException;
 
