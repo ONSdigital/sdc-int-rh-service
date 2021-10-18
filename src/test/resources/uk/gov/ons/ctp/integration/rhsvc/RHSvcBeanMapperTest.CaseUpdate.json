@@ -1,0 +1,21 @@
+[
+  {
+    "caseId": "aa4477d1-dd3f-4c69-b181-7ff725dc9fa4",
+    "surveyId": "a66de4dc-3c3b-11e9-b210-d663bd873d93",
+    "refusalReceived": "HARD_REFUSAL",
+    "collectionExerciseId": "a66de4dc-3c3b-11e9-b210-d663bd873d93",
+    "sample": {
+      "addressLine1": "1 main street",
+      "addressLine2": "upper upperingham",
+      "addressLine3": "",
+      "townName": "upton",
+      "postcode": "UP103UP",
+      "region": "E",
+      "uprn": "123456"
+    },
+    "sampleSensitive": {
+      "phoneNumber": "REDACTED"
+    },
+    "invalid": false
+  }
+]

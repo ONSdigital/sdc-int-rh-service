@@ -25,7 +25,7 @@ import uk.gov.ons.ctp.common.domain.Source;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.EventPublisher;
 import uk.gov.ons.ctp.common.event.TopicType;
-import uk.gov.ons.ctp.common.event.model.CollectionCase;
+import uk.gov.ons.ctp.common.event.model.CaseUpdate;
 import uk.gov.ons.ctp.common.event.model.EventPayload;
 import uk.gov.ons.ctp.common.event.model.UAC;
 import uk.gov.ons.ctp.common.event.model.UacAuthenticateResponse;
@@ -34,7 +34,7 @@ import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
 import uk.gov.ons.ctp.integration.rhsvc.representation.UniqueAccessCodeDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.UniqueAccessCodeDTO.CaseStatus;
 
-/** Unit tests of the Unique Access Code Service */
+// ** Unit tests of the Unique Access Code Service */
 @ExtendWith(MockitoExtension.class)
 public class UniqueAccessCodeServiceImplTest {
 
@@ -57,15 +57,15 @@ public class UniqueAccessCodeServiceImplTest {
         ArgumentCaptor.forClass(UacAuthenticateResponse.class);
 
     UAC uacTest = getUAC("linkedHousehold");
-    CollectionCase caseTest = getCase("household");
+    CaseUpdate caseTest = getCase("household");
 
     when(dataRepo.readUAC(UAC_HASH)).thenReturn(Optional.of(uacTest));
-    when(dataRepo.readCollectionCase(CASE_ID)).thenReturn(Optional.of(caseTest));
+    when(dataRepo.readCaseUpdate(CASE_ID)).thenReturn(Optional.of(caseTest));
 
     UniqueAccessCodeDTO uacDTO = uacSvc.getAndAuthenticateUAC(UAC_HASH);
 
     verify(dataRepo, times(1)).readUAC(UAC_HASH);
-    verify(dataRepo, times(1)).readCollectionCase(CASE_ID);
+    verify(dataRepo, times(1)).readCaseUpdate(CASE_ID);
     verify(eventPublisher, times(1))
         .sendEvent(
             eq(TopicType.UAC_AUTHENTICATE),
@@ -80,18 +80,16 @@ public class UniqueAccessCodeServiceImplTest {
     assertEquals(
         UUID.fromString(caseTest.getCollectionExerciseId()), uacDTO.getCollectionExerciseId());
     assertEquals(uacTest.getQuestionnaireId(), uacDTO.getQuestionnaireId());
-    assertEquals(caseTest.getCaseType(), uacDTO.getCaseType());
-    assertEquals(caseTest.getAddress().getEstabType(), uacDTO.getEstabType());
-    assertEquals(caseTest.getAddress().getRegion(), uacDTO.getRegion());
+    assertEquals(caseTest.getSample().getRegion(), uacDTO.getRegion());
     assertEquals(uacTest.getFormType(), uacDTO.getFormType());
 
-    assertEquals(caseTest.getAddress().getAddressLine1(), uacDTO.getAddress().getAddressLine1());
-    assertEquals(caseTest.getAddress().getAddressLine2(), uacDTO.getAddress().getAddressLine2());
-    assertEquals(caseTest.getAddress().getAddressLine3(), uacDTO.getAddress().getAddressLine3());
-    assertEquals(caseTest.getAddress().getTownName(), uacDTO.getAddress().getTownName());
-    assertEquals(caseTest.getAddress().getPostcode(), uacDTO.getAddress().getPostcode());
+    assertEquals(caseTest.getSample().getAddressLine1(), uacDTO.getAddress().getAddressLine1());
+    assertEquals(caseTest.getSample().getAddressLine2(), uacDTO.getAddress().getAddressLine2());
+    assertEquals(caseTest.getSample().getAddressLine3(), uacDTO.getAddress().getAddressLine3());
+    assertEquals(caseTest.getSample().getTownName(), uacDTO.getAddress().getTownName());
+    assertEquals(caseTest.getSample().getPostcode(), uacDTO.getAddress().getPostcode());
     assertEquals(
-        caseTest.getAddress().getUprn(), Long.toString(uacDTO.getAddress().getUprn().getValue()));
+        caseTest.getSample().getUprn(), Long.toString(uacDTO.getAddress().getUprn().getValue()));
 
     UacAuthenticateResponse payload = payloadCapture.getValue();
     assertEquals(uacDTO.getCaseId(), payload.getCaseId());
@@ -111,7 +109,7 @@ public class UniqueAccessCodeServiceImplTest {
     UniqueAccessCodeDTO uacDTO = uacSvc.getAndAuthenticateUAC(UAC_HASH);
 
     verify(dataRepo, times(1)).readUAC(UAC_HASH);
-    verify(dataRepo, times(1)).readCollectionCase(CASE_ID);
+    verify(dataRepo, times(1)).readCaseUpdate(CASE_ID);
 
     verify(eventPublisher, times(1))
         .sendEvent(
@@ -150,7 +148,7 @@ public class UniqueAccessCodeServiceImplTest {
     UniqueAccessCodeDTO uacDTO = uacSvc.getAndAuthenticateUAC(UAC_HASH);
 
     verify(dataRepo, times(1)).readUAC(UAC_HASH);
-    verify(dataRepo, times(0)).readCollectionCase(CASE_ID);
+    verify(dataRepo, times(0)).readCaseUpdate(CASE_ID);
     verify(eventPublisher, times(1))
         .sendEvent(
             eq(TopicType.UAC_AUTHENTICATE),
@@ -187,7 +185,7 @@ public class UniqueAccessCodeServiceImplTest {
     }
 
     verify(dataRepo, times(1)).readUAC(UAC_HASH);
-    verify(dataRepo, times(0)).readCollectionCase(CASE_ID);
+    verify(dataRepo, times(0)).readCaseUpdate(CASE_ID);
     verify(eventPublisher, times(0)).sendEvent(any(), any(), any(), any(EventPayload.class));
 
     assertTrue(exceptionThrown);
@@ -197,7 +195,7 @@ public class UniqueAccessCodeServiceImplTest {
     return FixtureHelper.loadClassFixtures(UAC[].class, qualifier).get(0);
   }
 
-  private CollectionCase getCase(String qualifier) {
-    return FixtureHelper.loadClassFixtures(CollectionCase[].class, qualifier).get(0);
+  private CaseUpdate getCase(String qualifier) {
+    return FixtureHelper.loadClassFixtures(CaseUpdate[].class, qualifier).get(0);
   }
 }

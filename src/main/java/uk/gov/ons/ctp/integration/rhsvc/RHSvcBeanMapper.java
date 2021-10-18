@@ -1,6 +1,5 @@
 package uk.gov.ons.ctp.integration.rhsvc;
 
-import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.converter.BidirectionalConverter;
@@ -8,11 +7,11 @@ import ma.glasnost.orika.converter.ConverterFactory;
 import ma.glasnost.orika.impl.ConfigurableMapper;
 import ma.glasnost.orika.metadata.Type;
 import org.springframework.stereotype.Component;
-import uk.gov.ons.ctp.common.domain.CaseType;
 import uk.gov.ons.ctp.common.domain.EstabType;
 import uk.gov.ons.ctp.common.event.model.Address;
 import uk.gov.ons.ctp.common.event.model.AddressCompact;
-import uk.gov.ons.ctp.common.event.model.CollectionCase;
+import uk.gov.ons.ctp.common.event.model.CaseUpdate;
+import uk.gov.ons.ctp.common.event.model.CaseUpdateSample;
 import uk.gov.ons.ctp.common.event.model.NewCaseSample;
 import uk.gov.ons.ctp.common.event.model.NewCaseSampleSensitive;
 import uk.gov.ons.ctp.common.util.StringToUPRNConverter;
@@ -39,35 +38,30 @@ public class RHSvcBeanMapper extends ConfigurableMapper {
     converterFactory.registerConverter(new EstabTypeConverter());
 
     factory
-        .classMap(CollectionCase.class, CaseDTO.class)
-        .field("id", "caseId")
-        .field("address.addressType", "addressType")
-        .field("address.region", "region")
-        .field("address.addressLevel", "addressLevel")
-        .field("address.estabType", "estabType")
+        .classMap(CaseUpdate.class, CaseDTO.class)
+        .field("sample.region", "address.region")
+        .field("sample.uprn", "address.uprn")
+        .field("sample.addressLine1", "address.addressLine1")
+        .field("sample.addressLine2", "address.addressLine2")
+        .field("sample.addressLine3", "address.addressLine3")
+        .field("sample.townName", "address.townName")
+        .field("sample.postcode", "address.postcode")
         .byDefault()
-        .customize(
-            new CustomMapper<CollectionCase, CaseDTO>() {
-              @Override
-              public void mapAtoB(
-                  CollectionCase collectionCase, CaseDTO dto, MappingContext context) {
-                if (dto.getEstabType() == null) {
-                  dto.setEstabType(
-                      CaseType.HH.name().equals(dto.getCaseType())
-                          ? EstabType.HOUSEHOLD
-                          : EstabType.OTHER);
-                }
-              }
-            })
         .register();
 
     factory
-        .classMap(CollectionCase.class, UniqueAccessCodeDTO.class)
-        .field("id", "caseId")
-        .field("address.region", "region")
-        .field("address.estabType", "estabType")
+        .classMap(CaseUpdate.class, UniqueAccessCodeDTO.class)
+        .field("sample.region", "region")
+        .field("sample.uprn", "address.uprn")
+        .field("sample.addressLine1", "address.addressLine1")
+        .field("sample.addressLine2", "address.addressLine2")
+        .field("sample.addressLine3", "address.addressLine3")
+        .field("sample.townName", "address.townName")
+        .field("sample.postcode", "address.postcode")
         .byDefault()
         .register();
+
+    factory.classMap(AddressDTO.class, CaseUpdateSample.class).byDefault().register();
 
     factory.classMap(NewCaseSampleSensitive.class, NewCaseDTO.class).byDefault().register();
     factory.classMap(AddressDTO.class, AddressCompact.class).byDefault().register();

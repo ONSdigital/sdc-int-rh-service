@@ -1,10 +1,13 @@
 {
-  "event": {
-    "type": "UAC_UPDATE",
-    "source": "CASE_SERVICE",
-    "channel": "RM",
-    "dateTime": "2011-08-12T20:17:46.384Z",
-    "messageId": "c45de4dc-3c3b-11e9-b210-d663bd873d93"
+  "header": {
+    "version": "v0.3_DRAFT",
+    "topic": "event_uac-update",
+    "source": "SAMPLE_LOADER",
+    "channel": "RH",
+    "dateTime": "2020-06-08T07:28:45.117Z",
+    "messageId": "c45de4dc-3c3b-11e9-b210-d663bd873d93",
+    "correlationId": "3883af91-0052-4497-9805-3238544fcf8a",
+    "originatingUser": "TBD"
   },
   "payload": {
     "uac": {
@@ -13,7 +16,7 @@
       "questionnaireId": "8710000009",
       "caseType": "HH",
       "region": "E",
-      "caseId": "dc4477d1-dd3f-4c69-b181-7ff725dc9fa4",
+      "caseId": "5883af91-0052-4497-9805-3238544fcf8a",
       "collectionExerciseId": "a66de4dc-3c3b-11e9-b210-d663bd873d93",
       "formType": "H"
     }

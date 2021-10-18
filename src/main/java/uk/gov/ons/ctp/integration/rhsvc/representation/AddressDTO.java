@@ -3,6 +3,7 @@ package uk.gov.ons.ctp.integration.rhsvc.representation;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import javax.validation.constraints.NotNull;
 import lombok.Data;
+import uk.gov.ons.ctp.common.domain.Region;
 import uk.gov.ons.ctp.common.domain.UniquePropertyReferenceNumber;
 import uk.gov.ons.ctp.common.log.LoggingScope;
 import uk.gov.ons.ctp.common.log.Scope;
@@ -28,4 +29,6 @@ public class AddressDTO {
   private String townName;
 
   @NotNull private String postcode;
+
+  @NotNull private Region region;
 }

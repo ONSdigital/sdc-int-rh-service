@@ -14,7 +14,7 @@ import uk.gov.ons.ctp.common.domain.Source;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.EventPublisher;
 import uk.gov.ons.ctp.common.event.TopicType;
-import uk.gov.ons.ctp.common.event.model.CollectionCase;
+import uk.gov.ons.ctp.common.event.model.CaseUpdate;
 import uk.gov.ons.ctp.common.event.model.UAC;
 import uk.gov.ons.ctp.common.event.model.UacAuthenticateResponse;
 import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
@@ -43,7 +43,7 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
       String caseId = uacMatch.get().getCaseId();
       if (!StringUtils.isEmpty(caseId)) {
         // UAC has a caseId
-        Optional<CollectionCase> caseMatch = dataRepo.readCollectionCase(caseId);
+        Optional<CaseUpdate> caseMatch = dataRepo.readCaseUpdate(caseId);
         if (caseMatch.isPresent()) {
           // Case found
           log.debug("UAC is linked", kv("uacHash", uacHash), kv("caseId", caseId));
@@ -97,7 +97,7 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
   }
 
   private UniqueAccessCodeDTO createUniqueAccessCodeDTO(
-      UAC uac, Optional<CollectionCase> collectionCase, CaseStatus caseStatus) {
+      UAC uac, Optional<CaseUpdate> collectionCase, CaseStatus caseStatus) {
     UniqueAccessCodeDTO uniqueAccessCodeDTO = new UniqueAccessCodeDTO();
 
     // Copy the UAC first, then Case
