@@ -21,6 +21,7 @@ public class UniqueAccessCodeDTO {
   private UUID caseId;
   private UUID collectionExerciseId;
   private AddressDTO address;
+  private String formType;
   private boolean receiptReceived;
   private boolean eqLaunched;
   private int wave;

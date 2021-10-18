@@ -110,7 +110,7 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
 
     uniqueAccessCodeDTO.setCaseStatus(caseStatus);
     uniqueAccessCodeDTO.setWave(uac.getMetadata().getWave());
-    
+
     return uniqueAccessCodeDTO;
   }
 }
