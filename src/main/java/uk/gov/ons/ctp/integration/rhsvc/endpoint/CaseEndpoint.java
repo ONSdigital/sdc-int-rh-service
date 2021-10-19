@@ -119,7 +119,17 @@ public class CaseEndpoint {
   @ResponseStatus(value = HttpStatus.OK)
   public void newCase(@Valid @RequestBody NewCaseDTO caseRegistrationDTO) throws CTPException {
     String methodName = "newCaseRegistration";
-    log.info("Entering POST {}", methodName, kv("requestBody", caseRegistrationDTO));
+
+    // Only log non-sensitive fields, as current kv logging doesn't support data fields
+    log.info(
+        "Entering POST {}",
+        methodName,
+        kv("surveyId", caseRegistrationDTO.getSurveyId()),
+        kv("collectionExerciseId", caseRegistrationDTO.getCollectionExerciseId()),
+        kv("schoolId", caseRegistrationDTO.getSchoolId()),
+        kv("schoolName", caseRegistrationDTO.getSchoolName()),
+        kv("consentGivenTest", caseRegistrationDTO.isConsentGivenTest()),
+        kv("consentGivenSurvey", caseRegistrationDTO.isConsentGivenSurvey()));
 
     // Reject if consent not given
     verifyIsTrue(caseRegistrationDTO.isConsentGivenTest(), "consentGivenTest");
