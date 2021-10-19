@@ -1,18 +1,101 @@
 {
   "header": {
-    "version": "v0.3_DRAFT",
-    "topic" : "event_survey-update",
-    "source" : "SAMPLE_LOADER",
-    "channel" : "RH",
-    "dateTime" : "2020-06-08T07:28:45.117Z",
-    "messageId" : "c45de4dc-3c3b-11e9-b210-d663bd873d93",
+    "version": "0.4.0",
+    "topic": "event_survey-update",
+    "source": "in laboris nostrud",
+    "channel": "EQ",
+    "dateTime": "1970-01-01T00:00:00.000Z",
+    "messageId": "3883af91-0052-4497-9805-3238544fcf8a",
     "correlationId": "3883af91-0052-4497-9805-3238544fcf8a",
-    "originatingUser": "TBD"
+    "originatingUser": "foo.bar@ons.gov.uk"
   },
   "payload": {
     "surveyUpdate": {
-      "surveyId": "3883af91-0052-4497-9805-3238544fcf8a",
-      "name": "Excepteur veniam"
+      "surveyId": "5883af91-0052-4497-9805-3238544fcf8a",
+      "name": "LMS",
+      "sampleDefinition": [
+        {
+          "columnName": "addressLine1",
+          "rules": [
+            {
+              "className": "uk.gov.ons.ssdc.common.validation.MandatoryRule"
+            },
+            {
+              "className": "uk.gov.ons.ssdc.common.validation.LengthRule",
+              "maxLength": 60
+            }
+          ]
+        },
+        {
+          "columnName": "addressLine2",
+          "rules": [
+            {
+              "className": "uk.gov.ons.ssdc.common.validation.LengthRule",
+              "maxLength": 60
+            }
+          ]
+        },
+        {
+          "columnName": "addressLine3",
+          "rules": [
+            {
+              "className": "uk.gov.ons.ssdc.common.validation.LengthRule",
+              "maxLength": 60
+            }
+          ]
+        },
+        {
+          "columnName": "townName",
+          "rules": [
+            {
+              "className": "uk.gov.ons.ssdc.common.validation.MandatoryRule"
+            }
+          ]
+        },
+        {
+          "columnName": "postcode",
+          "rules": [
+            {
+              "className": "uk.gov.ons.ssdc.common.validation.MandatoryRule"
+            }
+          ]
+        },
+        {
+          "columnName": "region",
+          "rules": [
+            {
+              "className": "uk.gov.ons.ssdc.common.validation.InSetRule",
+              "set": [
+                "E",
+                "W",
+                "N"
+              ]
+            }
+          ]
+        },
+        {
+          "columnName": "uprn",
+          "rules": [
+            {
+              "className": "uk.gov.ons.ssdc.common.validation.MandatoryRule"
+            }
+          ]
+        },
+        {
+          "columnName": "phoneNumber",
+          "sensitive": true,
+          "rules": [
+            {
+              "className": "uk.gov.ons.ssdc.common.validation.RegexRule",
+              "expression": "^07[0-9]{9}$"
+            }
+          ]
+        }
+      ],
+      "metadata": {
+        "ex_e4": true
+      },
+      "sampleDefinitionUrl": "https://raw.githubusercontent.com/ONSdigital/ssdc-shared-events/main/sample/social/0.1.0-DRAFT/socsdial.json"
     }
   }
 }

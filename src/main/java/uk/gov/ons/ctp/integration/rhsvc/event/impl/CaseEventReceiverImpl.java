@@ -52,7 +52,7 @@ public class CaseEventReceiverImpl implements CaseEventReceiver {
     if (surveyUpdateOpt.isPresent()) {
       SurveyUpdate surveyUpdate = surveyUpdateOpt.get();
       try {
-        if (surveyUpdate.getName().equalsIgnoreCase("SIS")) {
+        if (!surveyUpdate.getSampleDefinitionUrl().endsWith("social.json")) {
           log.warn(
               "Survey is not a social survey - discarding case",
               kv("messageId", caseMessageId),

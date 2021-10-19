@@ -70,7 +70,9 @@ public class CaseEventReceiverImplIT_Test {
     // Construct message
     Message<CaseEvent> message = new GenericMessage<>(caseEvent, new HashMap<>());
 
-    SurveyUpdate surveyUpdate = new SurveyUpdate("c45de4dc-3c3b-11e9-b210-d663bd873d93", "NOTSIS");
+    SurveyUpdate surveyUpdate = new SurveyUpdate();
+    surveyUpdate.setSurveyId("c45de4dc-3c3b-11e9-b210-d663bd873d93");
+    surveyUpdate.setSampleDefinitionUrl("test/social.json");
     when(respondentDataRepo.readSurvey(any())).thenReturn(Optional.of(surveyUpdate));
     CollectionExercise collectionExercise = new CollectionExercise();
     when(respondentDataRepo.readCollectionExercise(any()))
@@ -97,7 +99,9 @@ public class CaseEventReceiverImplIT_Test {
     // Construct message
     Message<CaseEvent> message = new GenericMessage<>(caseEvent, new HashMap<>());
 
-    SurveyUpdate surveyUpdate = new SurveyUpdate("c45de4dc-3c3b-11e9-b210-d663bd873d93", "SIS");
+    SurveyUpdate surveyUpdate = new SurveyUpdate();
+    surveyUpdate.setSurveyId("c45de4dc-3c3b-11e9-b210-d663bd873d93");
+    surveyUpdate.setSampleDefinitionUrl("test/socialnot.json");
     when(respondentDataRepo.readSurvey(any())).thenReturn(Optional.of(surveyUpdate));
 
     // Send message to container
@@ -126,7 +130,9 @@ public class CaseEventReceiverImplIT_Test {
     // Construct message
     Message<CaseEvent> message = new GenericMessage<>(caseEvent, new HashMap<>());
 
-    SurveyUpdate surveyUpdate = new SurveyUpdate("1", "NOTSIS");
+    SurveyUpdate surveyUpdate = new SurveyUpdate();
+    surveyUpdate.setSurveyId("c45de4dc-3c3b-11e9-b210-d663bd873d93");
+    surveyUpdate.setSampleDefinitionUrl("test/social.json");
     when(respondentDataRepo.readSurvey(any())).thenReturn(Optional.of(surveyUpdate));
 
     // Send message to container
