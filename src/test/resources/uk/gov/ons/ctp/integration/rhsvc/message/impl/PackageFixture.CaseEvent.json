@@ -13,8 +13,8 @@
     "caseUpdate": {
       "caseId": "5883af91-0052-4497-9805-3238544fcf8a",
       "surveyId": "3883af91-0052-4497-9805-3238544fcf8a",
-      "collectionExerciseId": "3883af91-0052-4497-9805-3238544fcf8a",
-      "invalid": true,
+      "collectionExerciseId": "4883af91-0052-4497-9805-3238544fcf8a",
+      "invalid": false,
       "refusalReceived": "HARD_REFUSAL",
       "sample": {
         "addressLine1": "Flat 987, Magical Apartments",
