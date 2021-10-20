@@ -1,6 +1,6 @@
 {
   "header": {
-    "version": "v0.3_DRAFT",
+    "version": "0.4.0",
     "topic": "event_case-update",
     "source": "SAMPLE_LOADER",
     "channel": "RH",
