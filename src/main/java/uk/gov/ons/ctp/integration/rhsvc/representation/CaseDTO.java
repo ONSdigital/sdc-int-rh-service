@@ -1,6 +1,5 @@
 package uk.gov.ons.ctp.integration.rhsvc.representation;
 
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import java.util.UUID;
 import lombok.Data;
 
@@ -13,7 +12,5 @@ public class CaseDTO {
   private UUID collectionExerciseId;
   private boolean invalid;
   private String refusalReceived;
-  @JsonUnwrapped private CaseSampleDTO sample;
-
-  private CaseSampleSensitiveDTO sampleSensitive;
+  private AddressDTO address;
 }

@@ -66,7 +66,7 @@ public class CaseServiceImpl implements CaseService {
         dataRepo.readCaseUpdateByUprn(Long.toString(uprn.getValue()), true);
     if (caseFound.isPresent()) {
       log.debug(
-          "non HI latest valid case retrieved for UPRN",
+          "Latest valid case retrieved for UPRN",
           kv("case", caseFound.get().getCaseId()),
           kv("uprn", uprn));
       return mapperFacade.map(caseFound.get(), CaseDTO.class);
@@ -89,7 +89,7 @@ public class CaseServiceImpl implements CaseService {
     CaseUpdate caseDetails = findCaseDetails(requestBodyDTO.getCaseId());
     var products = createProductList(DeliveryChannel.SMS, requestBodyDTO, caseDetails);
     recordRateLimiting(contact, requestBodyDTO.getClientIP(), products, caseDetails);
-    createAndSendFulfilments(DeliveryChannel.SMS, contact, requestBodyDTO, products, caseDetails);
+    createAndSendFulfilments(DeliveryChannel.SMS, contact, requestBodyDTO, products);
   }
 
   @Override
@@ -103,7 +103,7 @@ public class CaseServiceImpl implements CaseService {
     var products = createProductList(DeliveryChannel.POST, requestBodyDTO, caseDetails);
     preValidatePostalContactDetails(products, contact);
     recordRateLimiting(contact, requestBodyDTO.getClientIP(), products, caseDetails);
-    createAndSendFulfilments(DeliveryChannel.POST, contact, requestBodyDTO, products, caseDetails);
+    createAndSendFulfilments(DeliveryChannel.POST, contact, requestBodyDTO, products);
   }
 
   @Override
@@ -193,8 +193,7 @@ public class CaseServiceImpl implements CaseService {
       DeliveryChannel deliveryChannel,
       Contact contact,
       FulfilmentRequestDTO request,
-      List<Product> products,
-      CaseUpdate caseDetails)
+      List<Product> products)
       throws CTPException {
     log.debug(
         "Entering createAndSendFulfilment",
@@ -203,7 +202,7 @@ public class CaseServiceImpl implements CaseService {
 
     for (Product product : products) {
       FulfilmentRequest payload =
-          createFulfilmentRequestPayload(request.getCaseId(), contact, product, caseDetails);
+          createFulfilmentRequestPayload(request.getCaseId(), contact, product);
 
       eventPublisher.sendEvent(TopicType.FULFILMENT, Source.RESPONDENT_HOME, Channel.RH, payload);
     }
@@ -214,7 +213,7 @@ public class CaseServiceImpl implements CaseService {
   }
 
   private FulfilmentRequest createFulfilmentRequestPayload(
-      UUID caseId, Contact contact, Product product, CaseUpdate caseDetails) throws CTPException {
+      UUID caseId, Contact contact, Product product) throws CTPException {
 
     String individualCaseId = null;
     if (isIndividual(product)) {

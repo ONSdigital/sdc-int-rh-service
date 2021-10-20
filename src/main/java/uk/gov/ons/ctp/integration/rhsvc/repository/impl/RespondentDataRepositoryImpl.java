@@ -49,7 +49,7 @@ public class RespondentDataRepositoryImpl implements RespondentDataRepository {
   private String surveySchema;
   private String collectionExerciseSchema;
 
-  private static final String[] SEARCH_BY_UPRN_PATH = new String[] {"address", "uprn"};
+  private static final String[] SEARCH_BY_UPRN_PATH = new String[] {"sample", "uprn"};
 
   @PostConstruct
   public void init() {
@@ -112,7 +112,7 @@ public class RespondentDataRepositoryImpl implements RespondentDataRepository {
    */
   @Override
   public void writeCaseUpdate(final CaseUpdate caseUpdate) throws CTPException {
-    String id = caseUpdate.getCaseId().toString();
+    String id = caseUpdate.getCaseId();
     retryableCloudDataStore.storeObject(caseSchema, id, caseUpdate, id);
   }
 

@@ -32,6 +32,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.event.model.CaseEvent;
+import uk.gov.ons.ctp.common.event.model.CollectionExercise;
 import uk.gov.ons.ctp.common.event.model.Header;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 import uk.gov.ons.ctp.common.utility.ParallelTestLocks;
@@ -71,6 +72,9 @@ public class CaseEventReceiverImplIT_Test {
 
     SurveyUpdate surveyUpdate = new SurveyUpdate("c45de4dc-3c3b-11e9-b210-d663bd873d93", "NOTSIS");
     when(respondentDataRepo.readSurvey(any())).thenReturn(Optional.of(surveyUpdate));
+    CollectionExercise collectionExercise = new CollectionExercise();
+    when(respondentDataRepo.readCollectionExercise(any()))
+        .thenReturn(Optional.of(collectionExercise));
 
     // Send message to container
     caseEventInbound.getOutputChannel().send(message);

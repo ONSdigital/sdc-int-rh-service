@@ -89,15 +89,14 @@ public class CaseServiceImplTest {
     assertEquals(caseUpdate.getCollectionExerciseId(), rmCase.getCollectionExerciseId().toString());
     assertEquals(caseUpdate.isInvalid(), rmCase.isInvalid());
     assertEquals(caseUpdate.getRefusalReceived(), rmCase.getRefusalReceived());
-    assertEquals(caseUpdate.getSample().getAddressLine1(), rmCase.getSample().getAddressLine1());
-    assertEquals(caseUpdate.getSample().getAddressLine2(), rmCase.getSample().getAddressLine2());
-    assertEquals(caseUpdate.getSample().getAddressLine3(), rmCase.getSample().getAddressLine3());
-    assertEquals(caseUpdate.getSample().getTownName(), rmCase.getSample().getTownName());
-    assertEquals(caseUpdate.getSample().getRegion(), rmCase.getSample().getRegion());
-    assertEquals(caseUpdate.getSample().getPostcode(), rmCase.getSample().getPostcode());
+    assertEquals(caseUpdate.getSample().getAddressLine1(), rmCase.getAddress().getAddressLine1());
+    assertEquals(caseUpdate.getSample().getAddressLine2(), rmCase.getAddress().getAddressLine2());
+    assertEquals(caseUpdate.getSample().getAddressLine3(), rmCase.getAddress().getAddressLine3());
+    assertEquals(caseUpdate.getSample().getTownName(), rmCase.getAddress().getTownName());
+    assertEquals(caseUpdate.getSample().getRegion(), rmCase.getAddress().getRegion().name());
+    assertEquals(caseUpdate.getSample().getPostcode(), rmCase.getAddress().getPostcode());
     assertEquals(
-        caseUpdate.getSample().getUprn(), Long.toString(rmCase.getSample().getUprn().getValue()));
-    assertEquals(caseUpdate.getSampleSensitive(), rmCase.getSampleSensitive());
+        caseUpdate.getSample().getUprn(), Long.toString(rmCase.getAddress().getUprn().getValue()));
   }
 
   /** Test throws a CTPException where no valid Address cases are returned from repository */

@@ -26,3 +26,4 @@ services:
     - GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT}
     - spring.profiles.active=local
     - spring.cloud.gcp.pubsub.emulator-host=host.docker.internal:9808
+    - rate-limiter.rest-client-config.host=host.docker.internal

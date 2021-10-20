@@ -8,11 +8,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import uk.gov.ons.ctp.common.FixtureHelper;
+import uk.gov.ons.ctp.common.domain.Region;
 import uk.gov.ons.ctp.common.domain.UniquePropertyReferenceNumber;
 import uk.gov.ons.ctp.common.event.model.CaseUpdate;
+import uk.gov.ons.ctp.integration.rhsvc.representation.AddressDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
-import uk.gov.ons.ctp.integration.rhsvc.representation.CaseSampleDTO;
-import uk.gov.ons.ctp.integration.rhsvc.representation.CaseSampleSensitiveDTO;
 
 @DisplayName("RHSvc Bean Mapper Test")
 public class RHSvcBeanMapperTest {
@@ -26,22 +26,16 @@ public class RHSvcBeanMapperTest {
     caseUpdate = FixtureHelper.loadClassFixtures(CaseUpdate[].class).get(0);
   }
 
-  private CaseSampleDTO expectedAddress() {
-    CaseSampleDTO addr = new CaseSampleDTO();
+  private AddressDTO expectedAddress() {
+    AddressDTO addr = new AddressDTO();
     addr.setAddressLine1("1 main street");
     addr.setAddressLine2("upper upperingham");
     addr.setAddressLine3("");
     addr.setTownName("upton");
     addr.setPostcode("UP103UP");
-    addr.setRegion("E");
     addr.setUprn(UniquePropertyReferenceNumber.create("123456"));
+    addr.setRegion(Region.E);
     return addr;
-  }
-
-  private CaseSampleSensitiveDTO expectedSampleSensetive() {
-    CaseSampleSensitiveDTO caseSampleSensitiveDTO = new CaseSampleSensitiveDTO();
-    caseSampleSensitiveDTO.setPhoneNumber("REDACTED");
-    return caseSampleSensitiveDTO;
   }
 
   @Test
@@ -53,7 +47,7 @@ public class RHSvcBeanMapperTest {
     assertEquals(
         UUID.fromString("a66de4dc-3c3b-11e9-b210-d663bd873d93"), dto.getCollectionExerciseId());
     assertEquals("HARD_REFUSAL", dto.getRefusalReceived());
-    assertEquals(expectedSampleSensetive(), dto.getSampleSensitive());
-    assertEquals(expectedAddress(), dto.getSample());
+    assertEquals(expectedAddress(), dto.getAddress());
+    assertEquals(caseUpdate.getSample().getRegion(), dto.getAddress().getRegion().toString());
   }
 }
