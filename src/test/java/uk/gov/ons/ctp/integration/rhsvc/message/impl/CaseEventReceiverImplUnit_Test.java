@@ -32,7 +32,9 @@ public class CaseEventReceiverImplUnit_Test {
     Header header = new Header();
     header.setMessageId(UUID.fromString("c45de4dc-3c3b-11e9-b210-d663bd873d93"));
     CaseEvent caseEvent = FixtureHelper.loadPackageFixtures(CaseEvent[].class).get(0);
-    SurveyUpdate surveyUpdate = new SurveyUpdate("1", "NOTSIS");
+    SurveyUpdate surveyUpdate = new SurveyUpdate();
+    surveyUpdate.setSurveyId("c45de4dc-3c3b-11e9-b210-d663bd873d93");
+    surveyUpdate.setSampleDefinitionUrl("test/social.json");
     CollectionExercise collectionExercise = new CollectionExercise();
     collectionExercise.setCollectionExerciseId(
         caseEvent.getPayload().getCaseUpdate().getCollectionExerciseId());
@@ -50,7 +52,9 @@ public class CaseEventReceiverImplUnit_Test {
     header.setMessageId(UUID.fromString("c45de4dc-3c3b-11e9-b210-d663bd873d93"));
     CaseEvent caseEvent = FixtureHelper.loadPackageFixtures(CaseEvent[].class).get(0);
     caseEvent.setHeader(header);
-    SurveyUpdate surveyUpdate = new SurveyUpdate("1", "SIS");
+    SurveyUpdate surveyUpdate = new SurveyUpdate();
+    surveyUpdate.setSurveyId("c45de4dc-3c3b-11e9-b210-d663bd873d93");
+    surveyUpdate.setSampleDefinitionUrl("test/socialnot.json");
     when(mockRespondentDataRepo.readSurvey(any())).thenReturn(Optional.of(surveyUpdate));
     target.acceptCaseEvent(caseEvent);
     verify(mockRespondentDataRepo, times(0))
@@ -62,7 +66,9 @@ public class CaseEventReceiverImplUnit_Test {
     Header header = new Header();
     header.setMessageId(UUID.fromString("c45de4dc-3c3b-11e9-b210-d663bd873d93"));
     CaseEvent caseEvent = FixtureHelper.loadPackageFixtures(CaseEvent[].class).get(0);
-    SurveyUpdate surveyUpdate = new SurveyUpdate("1", "NOTSIS");
+    SurveyUpdate surveyUpdate = new SurveyUpdate();
+    surveyUpdate.setSurveyId("c45de4dc-3c3b-11e9-b210-d663bd873d93");
+    surveyUpdate.setSampleDefinitionUrl("test/social.json");
     when(mockRespondentDataRepo.readCollectionExercise(any())).thenReturn(Optional.empty());
     when(mockRespondentDataRepo.readSurvey(any())).thenReturn(Optional.of(surveyUpdate));
     caseEvent.setHeader(header);
