@@ -101,7 +101,6 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
     UniqueAccessCodeDTO uniqueAccessCodeDTO = new UniqueAccessCodeDTO();
 
     // Copy the UAC first, then Case
-
     mapperFacade.map(uac, uniqueAccessCodeDTO);
 
     if (collectionCase.isPresent()) {
@@ -109,7 +108,6 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
     }
 
     uniqueAccessCodeDTO.setCaseStatus(caseStatus);
-    uniqueAccessCodeDTO.setWave(uac.getMetadata().getWave());
 
     return uniqueAccessCodeDTO;
   }
