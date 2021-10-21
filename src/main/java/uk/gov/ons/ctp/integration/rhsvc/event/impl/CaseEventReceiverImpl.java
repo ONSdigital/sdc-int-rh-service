@@ -52,28 +52,29 @@ public class CaseEventReceiverImpl implements CaseEventReceiver {
     if (surveyUpdateOpt.isPresent()) {
       SurveyUpdate surveyUpdate = surveyUpdateOpt.get();
       try {
-        if (surveyUpdate.getName().equalsIgnoreCase("SIS")) {
-          log.warn(
-              "Survey is not a social survey - discarding case",
-              kv("messageId", caseMessageId),
-              kv("caseId", caseUpdate.getCaseId()));
-        } else {
+        if (surveyUpdate.getSampleDefinitionUrl().endsWith("social.json")) {
           Optional<CollectionExercise> collectionExercise =
               respondentDataRepo.readCollectionExercise(caseUpdate.getCollectionExerciseId());
-          if (collectionExercise.isEmpty()) {
+          if (collectionExercise.isPresent()) {
+            respondentDataRepo.writeCaseUpdate(caseUpdate);
+
+          } else {
             // TODO - should we NAK the event/throw exception if we do not recognize the collex and
             // allow the exception manager quarantine the event or allow to go to DLQ?
             log.warn(
                 "Case CollectionExercise unknown - discarding Case",
                 kv("messageId", caseMessageId),
                 kv("caseId", caseUpdate.getCaseId()));
-          } else {
-            respondentDataRepo.writeCaseUpdate(caseUpdate);
           }
+        } else {
+          log.warn(
+              "Survey is not a social survey - discarding case",
+              kv("messageId", caseMessageId),
+              kv("caseId", caseUpdate.getCaseId()));
         }
       } catch (CTPException ctpEx) {
         log.error("Case Event processing failed", kv("messageId", caseMessageId), ctpEx);
-        throw new CTPException(ctpEx.getFault());
+        throw ctpEx;
       }
     } else {
       // TODO - should we NAK the event/throw exception if we do not recognize the survey and allow

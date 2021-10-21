@@ -1,6 +1,6 @@
 {
   "header": {
-    "version": "v0.3_DRAFT",
+    "version": "0.4.0",
     "topic": "event_uac-update",
     "source": "SAMPLE_LOADER",
     "channel": "RH",
@@ -17,7 +17,7 @@
       "caseType": "HH",
       "region": "E",
       "caseId": "5883af91-0052-4497-9805-3238544fcf8a",
-      "collectionExerciseId": "a66de4dc-3c3b-11e9-b210-d663bd873d93",
+      "collectionExerciseId": "3883af91-0052-4497-9805-3238544fcf8a",
       "formType": "H"
     }
   }

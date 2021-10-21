@@ -45,7 +45,7 @@ public class SurveyEventReceiverImpl implements SurveyEventReceiver {
       respondentDataRepo.writeSurvey(surveyUpdate);
     } catch (CTPException ctpEx) {
       log.error("Survey Event processing failed", kv("surveyMessageId", surveyMessageId), ctpEx);
-      throw new CTPException(ctpEx.getFault());
+      throw ctpEx;
     }
   }
 }
