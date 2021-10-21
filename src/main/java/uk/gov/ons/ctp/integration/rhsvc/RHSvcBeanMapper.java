@@ -14,6 +14,7 @@ import uk.gov.ons.ctp.common.event.model.CaseUpdate;
 import uk.gov.ons.ctp.common.event.model.CaseUpdateSample;
 import uk.gov.ons.ctp.common.event.model.NewCaseSample;
 import uk.gov.ons.ctp.common.event.model.NewCaseSampleSensitive;
+import uk.gov.ons.ctp.common.event.model.UacUpdate;
 import uk.gov.ons.ctp.common.util.StringToUPRNConverter;
 import uk.gov.ons.ctp.common.util.StringToUUIDConverter;
 import uk.gov.ons.ctp.integration.rhsvc.representation.AddressDTO;
@@ -58,6 +59,12 @@ public class RHSvcBeanMapper extends ConfigurableMapper {
         .field("sample.addressLine3", "address.addressLine3")
         .field("sample.townName", "address.townName")
         .field("sample.postcode", "address.postcode")
+        .byDefault()
+        .register();
+
+    factory
+        .classMap(UacUpdate.class, UniqueAccessCodeDTO.class)
+        .field("metadata.wave", "wave")
         .byDefault()
         .register();
 

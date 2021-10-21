@@ -16,13 +16,12 @@ public class UniqueAccessCodeDTO {
   private String uacHash;
   private boolean active;
   private CaseStatus caseStatus;
-  private String questionnaireId;
-  private String caseType;
+  private String qid;
   private String region;
   private UUID caseId;
   private UUID collectionExerciseId;
   private AddressDTO address;
-  private String formType;
-  private boolean handDelivery;
-  private String estabType;
+  private boolean receiptReceived;
+  private boolean eqLaunched;
+  private int wave;
 }

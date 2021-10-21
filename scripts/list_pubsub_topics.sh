@@ -23,6 +23,9 @@ PUBSUB_DIR=$1
 
 cd $PUBSUB_DIR/samples/snippets
 
+echo "   H O S T"
+echo "$PUBSUB_EMULATOR_HOST"
+
 echo "   T O P I C S"
 python publisher.py local list | sed 's/name: //g' | sed 's/"//g' | grep -E ".*[a-z].*" --color=never
 

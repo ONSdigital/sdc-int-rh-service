@@ -1,6 +1,7 @@
 package uk.gov.ons.ctp.integration.rhsvc;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.UUID;
 import ma.glasnost.orika.MapperFacade;
@@ -11,8 +12,10 @@ import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.domain.Region;
 import uk.gov.ons.ctp.common.domain.UniquePropertyReferenceNumber;
 import uk.gov.ons.ctp.common.event.model.CaseUpdate;
+import uk.gov.ons.ctp.common.event.model.UacUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.representation.AddressDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.UniqueAccessCodeDTO;
 
 @DisplayName("RHSvc Bean Mapper Test")
 public class RHSvcBeanMapperTest {
@@ -20,10 +23,12 @@ public class RHSvcBeanMapperTest {
   private MapperFacade mapper = new RHSvcBeanMapper();
 
   private CaseUpdate caseUpdate;
+  private UacUpdate uacUpdate;
 
   @BeforeEach
   public void setup() {
     caseUpdate = FixtureHelper.loadClassFixtures(CaseUpdate[].class).get(0);
+    uacUpdate = FixtureHelper.loadClassFixtures(UacUpdate[].class).get(0);
   }
 
   private AddressDTO expectedAddress() {
@@ -50,4 +55,27 @@ public class RHSvcBeanMapperTest {
     assertEquals(expectedAddress(), dto.getAddress());
     assertEquals(caseUpdate.getSample().getRegion(), dto.getAddress().getRegion().toString());
   }
+
+  @Test
+  @DisplayName("UacUpdate -> UniqueAccessCodeDTO mapping")
+  public void shouldMapUacUpdateToUniqueAccessCodeDTO() {
+    UniqueAccessCodeDTO dto = mapper.map(uacUpdate, UniqueAccessCodeDTO.class);
+
+    assertEquals(UUID.fromString("bfb5cdca-3119-4d2c-a807-51ae55443b33"), dto.getCaseId());
+    assertTrue(dto.isActive());
+    assertEquals(
+        "8a9d5db4bbee34fd16e40aa2aaae52cfbdf1842559023614c30edb480ec252b4", dto.getUacHash());
+    assertEquals("1110000009", dto.getQid());
+    assertTrue(dto.isReceiptReceived());
+    assertEquals(94, dto.getWave());
+    assertTrue(dto.isEqLaunched());
+  }
+
+  /*
+  UacUpdate uac
+  UniqueAccessCodeDTO uniqueAccessCodeDTO = new UniqueAccessCodeDTO();
+
+  uniqueAccessCodeDTO.setWave(uac.getMetadata().getWave());
+   */
+
 }

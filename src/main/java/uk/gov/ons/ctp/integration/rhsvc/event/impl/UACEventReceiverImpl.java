@@ -10,8 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.annotation.ServiceActivator;
 import uk.gov.ons.ctp.common.error.CTPException;
-import uk.gov.ons.ctp.common.event.model.UAC;
 import uk.gov.ons.ctp.common.event.model.UacEvent;
+import uk.gov.ons.ctp.common.event.model.UacUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
 
@@ -38,13 +38,13 @@ public class UACEventReceiverImpl {
   @ServiceActivator(inputChannel = "acceptUACEvent")
   public void acceptUACEvent(UacEvent uacEvent) throws CTPException {
 
-    UAC uac = uacEvent.getPayload().getUac();
+    UacUpdate uac = uacEvent.getPayload().getUacUpdate();
     String uacMessageId = uacEvent.getHeader().getMessageId().toString();
 
     log.info(
         "Entering acceptUACEvent", kv("messageId", uacMessageId), kv("caseId", uac.getCaseId()));
 
-    String qid = uac.getQuestionnaireId();
+    String qid = uac.getQid();
     if (isFilteredByQid(qid)) {
       log.info(
           "Filtering UAC Event because of questionnaire ID prefix",

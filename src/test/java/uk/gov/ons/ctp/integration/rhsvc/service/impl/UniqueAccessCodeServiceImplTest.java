@@ -27,8 +27,8 @@ import uk.gov.ons.ctp.common.event.EventPublisher;
 import uk.gov.ons.ctp.common.event.TopicType;
 import uk.gov.ons.ctp.common.event.model.CaseUpdate;
 import uk.gov.ons.ctp.common.event.model.EventPayload;
-import uk.gov.ons.ctp.common.event.model.UAC;
 import uk.gov.ons.ctp.common.event.model.UacAuthenticateResponse;
+import uk.gov.ons.ctp.common.event.model.UacUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.RHSvcBeanMapper;
 import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
 import uk.gov.ons.ctp.integration.rhsvc.representation.UniqueAccessCodeDTO;
@@ -56,7 +56,7 @@ public class UniqueAccessCodeServiceImplTest {
     ArgumentCaptor<UacAuthenticateResponse> payloadCapture =
         ArgumentCaptor.forClass(UacAuthenticateResponse.class);
 
-    UAC uacTest = getUAC("linkedHousehold");
+    UacUpdate uacTest = getUAC("linkedHousehold");
     CaseUpdate caseTest = getCase("household");
 
     when(dataRepo.readUAC(UAC_HASH)).thenReturn(Optional.of(uacTest));
@@ -79,9 +79,8 @@ public class UniqueAccessCodeServiceImplTest {
     assertEquals(UUID.fromString(uacTest.getCaseId()), uacDTO.getCaseId());
     assertEquals(
         UUID.fromString(caseTest.getCollectionExerciseId()), uacDTO.getCollectionExerciseId());
-    assertEquals(uacTest.getQuestionnaireId(), uacDTO.getQuestionnaireId());
+    assertEquals(uacTest.getQid(), uacDTO.getQid());
     assertEquals(caseTest.getSample().getRegion(), uacDTO.getRegion());
-    assertEquals(uacTest.getFormType(), uacDTO.getFormType());
 
     assertEquals(caseTest.getSample().getAddressLine1(), uacDTO.getAddress().getAddressLine1());
     assertEquals(caseTest.getSample().getAddressLine2(), uacDTO.getAddress().getAddressLine2());
@@ -91,9 +90,13 @@ public class UniqueAccessCodeServiceImplTest {
     assertEquals(
         caseTest.getSample().getUprn(), Long.toString(uacDTO.getAddress().getUprn().getValue()));
 
+    assertEquals(uacTest.isReceiptReceived(), uacDTO.isReceiptReceived());
+    assertEquals(uacTest.isEqLaunched(), uacDTO.isEqLaunched());
+    assertEquals(uacTest.getMetadata().getWave(), uacDTO.getWave());
+
     UacAuthenticateResponse payload = payloadCapture.getValue();
     assertEquals(uacDTO.getCaseId(), payload.getCaseId());
-    assertEquals(uacDTO.getQuestionnaireId(), payload.getQuestionnaireId());
+    assertEquals(uacDTO.getQid(), payload.getQuestionnaireId());
   }
 
   @Test
@@ -102,7 +105,7 @@ public class UniqueAccessCodeServiceImplTest {
     ArgumentCaptor<UacAuthenticateResponse> payloadCapture =
         ArgumentCaptor.forClass(UacAuthenticateResponse.class);
 
-    UAC uacTest = getUAC("linkedHousehold");
+    UacUpdate uacTest = getUAC("linkedHousehold");
 
     when(dataRepo.readUAC(UAC_HASH)).thenReturn(Optional.of(uacTest));
 
@@ -123,16 +126,18 @@ public class UniqueAccessCodeServiceImplTest {
     assertEquals(CaseStatus.UNLINKED, uacDTO.getCaseStatus());
     assertNull(uacDTO.getCaseId());
     assertNull(uacDTO.getCollectionExerciseId());
-    assertEquals(uacTest.getQuestionnaireId(), uacDTO.getQuestionnaireId());
-    assertNull(uacDTO.getCaseType());
+    assertEquals(uacTest.getQid(), uacDTO.getQid());
     assertNull(uacDTO.getRegion());
-    assertNull(uacDTO.getEstabType());
 
     assertNull(uacDTO.getAddress());
 
     UacAuthenticateResponse payload = payloadCapture.getValue();
     assertNull(payload.getCaseId());
-    assertEquals(uacDTO.getQuestionnaireId(), payload.getQuestionnaireId());
+    assertEquals(uacDTO.getQid(), payload.getQuestionnaireId());
+
+    assertEquals(uacTest.isReceiptReceived(), uacDTO.isReceiptReceived());
+    assertEquals(uacTest.isEqLaunched(), uacDTO.isEqLaunched());
+    assertEquals(uacTest.getMetadata().getWave(), uacDTO.getWave());
   }
 
   @Test
@@ -141,7 +146,7 @@ public class UniqueAccessCodeServiceImplTest {
     ArgumentCaptor<UacAuthenticateResponse> payloadCapture =
         ArgumentCaptor.forClass(UacAuthenticateResponse.class);
 
-    UAC uacTest = getUAC("unlinkedHousehold");
+    UacUpdate uacTest = getUAC("unlinkedHousehold");
 
     when(dataRepo.readUAC(UAC_HASH)).thenReturn(Optional.of(uacTest));
 
@@ -161,16 +166,18 @@ public class UniqueAccessCodeServiceImplTest {
     assertEquals(CaseStatus.UNLINKED, uacDTO.getCaseStatus());
     assertNull(uacDTO.getCaseId());
     assertNull(uacDTO.getCollectionExerciseId());
-    assertEquals(uacTest.getQuestionnaireId(), uacDTO.getQuestionnaireId());
-    assertNull(uacDTO.getCaseType());
+    assertEquals(uacTest.getQid(), uacDTO.getQid());
     assertNull(uacDTO.getRegion());
-    assertNull(uacDTO.getEstabType());
 
     assertNull(uacDTO.getAddress());
 
     UacAuthenticateResponse payload = payloadCapture.getValue();
     assertEquals(uacDTO.getCaseId(), payload.getCaseId());
-    assertEquals(uacDTO.getQuestionnaireId(), payload.getQuestionnaireId());
+    assertEquals(uacDTO.getQid(), payload.getQuestionnaireId());
+
+    assertEquals(uacTest.isReceiptReceived(), uacDTO.isReceiptReceived());
+    assertEquals(uacTest.isEqLaunched(), uacDTO.isEqLaunched());
+    assertEquals(uacTest.getMetadata().getWave(), uacDTO.getWave());
   }
 
   /** Test request for claim object where UAC not found */
@@ -191,8 +198,8 @@ public class UniqueAccessCodeServiceImplTest {
     assertTrue(exceptionThrown);
   }
 
-  private UAC getUAC(String qualifier) {
-    return FixtureHelper.loadClassFixtures(UAC[].class, qualifier).get(0);
+  private UacUpdate getUAC(String qualifier) {
+    return FixtureHelper.loadClassFixtures(UacUpdate[].class, qualifier).get(0);
   }
 
   private CaseUpdate getCase(String qualifier) {

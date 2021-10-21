@@ -34,9 +34,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.ons.ctp.common.event.EventTopic;
 import uk.gov.ons.ctp.common.event.model.Header;
-import uk.gov.ons.ctp.common.event.model.UAC;
 import uk.gov.ons.ctp.common.event.model.UacEvent;
 import uk.gov.ons.ctp.common.event.model.UacPayload;
+import uk.gov.ons.ctp.common.event.model.UacUpdate;
 import uk.gov.ons.ctp.common.utility.ParallelTestLocks;
 import uk.gov.ons.ctp.integration.rhsvc.RespondentHomeFixture;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
@@ -131,10 +131,10 @@ public class UacEventReceiverImplIT_Test {
     // Construct UacEvent
     UacEvent UacEvent = new UacEvent();
     UacPayload uacPayload = UacEvent.getPayload();
-    UAC uac = uacPayload.getUac();
+    UacUpdate uac = uacPayload.getUacUpdate();
     uac.setUacHash("999999999");
     uac.setActive("true");
-    uac.setQuestionnaireId(qid);
+    uac.setQid(qid);
     uac.setCaseId("c45de4dc-3c3b-11e9-b210-d663bd873d93");
     Header header = new Header();
     header.setTopic(topic);
