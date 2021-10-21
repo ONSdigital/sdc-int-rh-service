@@ -50,7 +50,7 @@ public class CollectionExerciseEventReceiverImpl {
           "Collection Exercise Event processing failed",
           kv("collectionExerciseMessageId", collexMessageId),
           ctpEx);
-      throw new CTPException(ctpEx.getFault());
+      throw ctpEx;
     }
   }
 }
