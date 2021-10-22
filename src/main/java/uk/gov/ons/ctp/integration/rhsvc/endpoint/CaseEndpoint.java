@@ -125,7 +125,6 @@ public class CaseEndpoint {
         "Entering POST {}",
         methodName,
         kv("surveyId", caseRegistrationDTO.getSurveyId()),
-        kv("collectionExerciseId", caseRegistrationDTO.getCollectionExerciseId()),
         kv("schoolId", caseRegistrationDTO.getSchoolId()),
         kv("schoolName", caseRegistrationDTO.getSchoolName()),
         kv("consentGivenTest", caseRegistrationDTO.isConsentGivenTest()),

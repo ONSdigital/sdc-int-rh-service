@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import ma.glasnost.orika.MapperFacade;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -134,8 +135,8 @@ public class CaseServiceImplTest {
             sendEventCaptor.capture());
     NewCasePayloadContent eventPayload = sendEventCaptor.getValue();
 
-    assertEquals(
-        newCaseDTO.get(0).getCollectionExerciseId(), eventPayload.getCollectionExerciseId());
+    UUID expectedCollectionExerciseId = UUID.fromString(COLLECTION_EXERCISE_ID);
+    assertEquals(expectedCollectionExerciseId, eventPayload.getCollectionExerciseId());
     assertEquals(newCaseDTO.get(0).getSchoolId(), eventPayload.getSample().getSchoolId());
     assertEquals(newCaseDTO.get(0).getSchoolName(), eventPayload.getSample().getSchoolName());
     assertEquals(
