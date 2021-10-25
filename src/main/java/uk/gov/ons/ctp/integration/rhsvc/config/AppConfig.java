@@ -14,7 +14,7 @@ import uk.gov.ons.ctp.common.config.CustomCircuitBreakerConfig;
 @ConfigurationProperties
 @Data
 public class AppConfig {
-  private String collectionExerciseId;
+  private Sis sis;
   private Logging logging;
   private QueueConfig queueConfig;
   private MessagingConfig messaging;
