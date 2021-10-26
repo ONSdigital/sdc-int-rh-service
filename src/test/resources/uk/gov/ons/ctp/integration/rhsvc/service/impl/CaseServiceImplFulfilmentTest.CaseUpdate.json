@@ -1,8 +1,11 @@
 [
 	{
 		"caseId": "dc4477d1-dd3f-4c69-b181-7ff725dc9fa4",
+		"caseRef": "10000000017",
 		"surveyId": "a66de4dc-3c3b-11e9-b210-d663bd873d93",
 		"collectionExerciseId": "a66de4dc-3c3b-11e9-b210-d663bd873d93",
+		"invalid": false,
+		"refusalReceived": "HARD_REFUSAL",
 		"sample": {
 			"addressLine1": "1 main street",
 			"addressLine2": "upper upperingham",
@@ -15,7 +18,7 @@
 		"sampleSensitive": {
 			"phoneNumber": "REDACTED"
 		},
-		"invalid": false,
-		"refusalReceived": "HARD_REFUSAL"
+		"createdAt": "2021-01-01T01:02:03.456Z",
+		"lastUpdatedAt": "2021-10-10T00:00:00.000Z"
 	}
 ]

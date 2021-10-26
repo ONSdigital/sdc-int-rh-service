@@ -44,7 +44,7 @@ public class RHSvcBeanMapperTest {
   }
 
   @Test
-  @DisplayName("CollectionCase -> CaseDTO mapping")
+  @DisplayName("CaseUpdate -> CaseDTO mapping")
   public void shouldMapCaseUpdateToCaseDTO() {
     CaseDTO dto = mapper.map(caseUpdate, CaseDTO.class);
     assertEquals(UUID.fromString("aa4477d1-dd3f-4c69-b181-7ff725dc9fa4"), dto.getCaseId());
@@ -70,12 +70,4 @@ public class RHSvcBeanMapperTest {
     assertEquals(94, dto.getWave());
     assertTrue(dto.isEqLaunched());
   }
-
-  /*
-  UacUpdate uac
-  UniqueAccessCodeDTO uniqueAccessCodeDTO = new UniqueAccessCodeDTO();
-
-  uniqueAccessCodeDTO.setWave(uac.getMetadata().getWave());
-   */
-
 }
