@@ -118,7 +118,6 @@ public class CaseServiceImpl implements CaseService {
 
     // Ignore the collexid from the ui and use environment specific value
     UUID collexid = appConfig.getSis().getCollectionExerciseIdAsUUID();
-    System.out.println("PMB: collexid: " + collexid);
     payload.setCollectionExerciseId(collexid);
 
     eventPublisher.sendEvent(TopicType.NEW_CASE, Source.RESPONDENT_HOME, Channel.RH, payload);
