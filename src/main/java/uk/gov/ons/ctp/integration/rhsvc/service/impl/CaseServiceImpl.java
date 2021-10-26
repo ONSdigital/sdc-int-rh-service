@@ -116,6 +116,10 @@ public class CaseServiceImpl implements CaseService {
 
     NewCasePayloadContent payload = createNewCaseRequestPayload(newCaseDTO);
 
+    // Ignore the collexid from the ui and use environment specific value
+    UUID collexid = appConfig.getSis().getCollectionExerciseIdAsUUID();
+    payload.setCollectionExerciseId(collexid);
+
     eventPublisher.sendEvent(TopicType.NEW_CASE, Source.RESPONDENT_HOME, Channel.RH, payload);
   }
 

@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import ma.glasnost.orika.MapperFacade;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,6 +33,7 @@ import uk.gov.ons.ctp.common.event.model.NewCasePayloadContent;
 import uk.gov.ons.ctp.integration.common.product.ProductReference;
 import uk.gov.ons.ctp.integration.rhsvc.RHSvcBeanMapper;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
+import uk.gov.ons.ctp.integration.rhsvc.config.Sis;
 import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.NewCaseDTO;
@@ -68,7 +70,9 @@ public class CaseServiceImplTest {
     this.caseUpdate = FixtureHelper.loadClassFixtures(CaseUpdate[].class);
     this.newCaseDTO = FixtureHelper.loadClassFixtures(NewCaseDTO[].class);
 
-    appConfig.setCollectionExerciseId(COLLECTION_EXERCISE_ID);
+    Sis sis = new Sis();
+    sis.setCollectionExerciseId(COLLECTION_EXERCISE_ID);
+    appConfig.setSis(sis);
     ReflectionTestUtils.setField(caseSvc, "appConfig", appConfig);
   }
 
@@ -134,8 +138,8 @@ public class CaseServiceImplTest {
             sendEventCaptor.capture());
     NewCasePayloadContent eventPayload = sendEventCaptor.getValue();
 
-    assertEquals(
-        newCaseDTO.get(0).getCollectionExerciseId(), eventPayload.getCollectionExerciseId());
+    UUID expectedCollectionExerciseId = UUID.fromString(COLLECTION_EXERCISE_ID);
+    assertEquals(expectedCollectionExerciseId, eventPayload.getCollectionExerciseId());
     assertEquals(newCaseDTO.get(0).getSchoolId(), eventPayload.getSample().getSchoolId());
     assertEquals(newCaseDTO.get(0).getSchoolName(), eventPayload.getSample().getSchoolName());
     assertEquals(

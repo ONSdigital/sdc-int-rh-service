@@ -70,5 +70,4 @@ public class RHSvcBeanMapperTest {
     assertEquals(94, dto.getWave());
     assertTrue(dto.isEqLaunched());
   }
-
 }
