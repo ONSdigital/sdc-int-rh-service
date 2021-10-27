@@ -37,4 +37,4 @@ $SCRIPT_DIR/../scripts/pubsub-setup.sh
 
 echo "5/5 Starting mocks and RH Service ..."
 docker compose -f $SCRIPT_DIR/docker-compose-mock-envoy.yml up -d
-docker compose -f $SCRIPT_DIR/docker-compose-rh-service.yml up -d
+docker compose -f $SCRIPT_DIR/docker-compose-rh-service.yml up --force-recreate -d
