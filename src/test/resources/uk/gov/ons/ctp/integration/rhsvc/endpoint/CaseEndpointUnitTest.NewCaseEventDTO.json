@@ -11,9 +11,6 @@
   "childMiddleNames": "Rose",
   "childLastName": "Bloggs",
   "childDob": "2001-12-31",
-  "additionalInfo": "Class 2A",
-  "childMobileNumber": "447123456777",
-  "childEmailAddress": "jo.rose.bloggs@domain.com",
-  "parentMobileNumber": "447123456999",
-  "parentEmailAddress": "fred.bloggs@domain.com"
+  "mobileNumber": "447123456999",
+  "emailAddress": "fred.bloggs@domain.com"
 }
