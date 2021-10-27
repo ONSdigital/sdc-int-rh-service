@@ -115,14 +115,14 @@ public class CaseServiceImpl implements CaseService {
 
     // Use the fixed collexid when sending the newCase event
     UUID collectionExerciseId = appConfig.getSis().getCollectionExerciseIdAsUUID();
-    
+
     NewCasePayloadContent payload = createNewCaseRequestPayload(newCaseDTO, collectionExerciseId);
 
     eventPublisher.sendEvent(TopicType.NEW_CASE, Source.RESPONDENT_HOME, Channel.RH, payload);
   }
 
-  private NewCasePayloadContent createNewCaseRequestPayload(NewCaseDTO caseRegistrationDTO, UUID collectionExerciseId)
-      throws CTPException {
+  private NewCasePayloadContent createNewCaseRequestPayload(
+      NewCaseDTO caseRegistrationDTO, UUID collectionExerciseId) throws CTPException {
 
     final UUID caseId = UUID.randomUUID();
 
