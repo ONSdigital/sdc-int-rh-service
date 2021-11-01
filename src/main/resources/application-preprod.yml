@@ -1,5 +1,0 @@
-logging:
-  level:
-    uk.gov.ons.ctp: INFO
-    org.springframework: OFF
-  profile: CLOUD
