@@ -155,10 +155,8 @@ public class CaseServiceImplTest {
         newCaseDTO.get(0).getChildLastName(), eventPayload.getSampleSensitive().getChildLastName());
     assertEquals(newCaseDTO.get(0).getChildDob(), eventPayload.getSampleSensitive().getChildDob());
     assertEquals(
-        newCaseDTO.get(0).getParentMobileNumber(),
-        eventPayload.getSampleSensitive().getParentMobileNumber());
+        newCaseDTO.get(0).getMobileNumber(), eventPayload.getSampleSensitive().getMobileNumber());
     assertEquals(
-        newCaseDTO.get(0).getParentEmailAddress(),
-        eventPayload.getSampleSensitive().getParentEmailAddress());
+        newCaseDTO.get(0).getEmailAddress(), eventPayload.getSampleSensitive().getEmailAddress());
   }
 }

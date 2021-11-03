@@ -110,24 +110,21 @@ public class CaseServiceImpl implements CaseService {
   public void sendNewCaseEvent(NewCaseDTO newCaseDTO) throws CTPException {
     log.debug(
         "Entering createAndSendNewCase",
-        kv("collectionExerciseSid", newCaseDTO.getCollectionExerciseId()),
         kv("schoolId", newCaseDTO.getSchoolId()),
         kv("lastName", newCaseDTO.getLastName()));
 
-    NewCasePayloadContent payload = createNewCaseRequestPayload(newCaseDTO);
+    // Use the fixed collexid when sending the newCase event
+    UUID collectionExerciseId = appConfig.getSis().getCollectionExerciseIdAsUUID();
 
-    // Ignore the collexid from the ui and use environment specific value
-    UUID collexid = appConfig.getSis().getCollectionExerciseIdAsUUID();
-    payload.setCollectionExerciseId(collexid);
+    NewCasePayloadContent payload = createNewCaseRequestPayload(newCaseDTO, collectionExerciseId);
 
     eventPublisher.sendEvent(TopicType.NEW_CASE, Source.RESPONDENT_HOME, Channel.RH, payload);
   }
 
-  private NewCasePayloadContent createNewCaseRequestPayload(NewCaseDTO caseRegistrationDTO)
-      throws CTPException {
+  private NewCasePayloadContent createNewCaseRequestPayload(
+      NewCaseDTO caseRegistrationDTO, UUID collectionExerciseId) throws CTPException {
 
     final UUID caseId = UUID.randomUUID();
-    final UUID collectionExerciseId = caseRegistrationDTO.getCollectionExerciseId();
 
     NewCaseSample newCaseSample = mapper.map(caseRegistrationDTO, NewCaseSample.class);
     NewCaseSampleSensitive newCaseSampleSensitive =
