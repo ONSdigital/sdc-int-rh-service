@@ -124,7 +124,6 @@ public class CaseEndpoint {
     log.info(
         "Entering POST {}",
         methodName,
-        kv("surveyId", caseRegistrationDTO.getSurveyId()),
         kv("schoolId", caseRegistrationDTO.getSchoolId()),
         kv("schoolName", caseRegistrationDTO.getSchoolName()),
         kv("consentGivenTest", caseRegistrationDTO.isConsentGivenTest()),

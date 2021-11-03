@@ -339,16 +339,6 @@ public class CaseEndpointUnitTest {
   }
 
   @Test
-  public void shouldRejectNewCaseIfCollectionExerciseIdMissing() throws Exception {
-    ObjectNode json = getNewCaseEventFixture();
-    json.remove("collectionExerciseId");
-    json.put("collectionExerciseId", "");
-    String url = "/cases/new";
-    mockMvc.perform(postJson(url, json.toString())).andExpect(status().is4xxClientError());
-    verify(caseService, never()).sendNewCaseEvent(any(NewCaseDTO.class));
-  }
-
-  @Test
   public void shouldRejectNewCaseIfSchoolIdNotPresent() throws Exception {
     ObjectNode json = getNewCaseEventFixture();
     json.remove("schoolId");
@@ -429,20 +419,20 @@ public class CaseEndpointUnitTest {
   }
 
   @Test
-  public void shouldRejectNewCaseIfParentMobileNumberNotPresent() throws Exception {
+  public void shouldRejectNewCaseIfMobileNumberNotPresent() throws Exception {
     ObjectNode json = getNewCaseEventFixture();
-    json.remove("parentMobileNumber");
-    json.put("parentMobileNumber", "");
+    json.remove("mobileNumber");
+    json.put("mobileNumber", "");
     String url = "/cases/new";
     mockMvc.perform(postJson(url, json.toString())).andExpect(status().is4xxClientError());
     verify(caseService, never()).sendNewCaseEvent(any(NewCaseDTO.class));
   }
 
   @Test
-  public void shouldRejectNewCaseIfParentEmailNotPresent() throws Exception {
+  public void shouldRejectNewCaseIfEmailNotPresent() throws Exception {
     ObjectNode json = getNewCaseEventFixture();
-    json.remove("parentEmailAddress");
-    json.put("parentEmailAddress", "");
+    json.remove("emailAddress");
+    json.put("emailAddress", "");
     String url = "/cases/new";
     mockMvc.perform(postJson(url, json.toString())).andExpect(status().is4xxClientError());
     verify(caseService, never()).sendNewCaseEvent(any(NewCaseDTO.class));
