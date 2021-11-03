@@ -13,7 +13,14 @@
       "townName": "upton",
       "postcode": "UP103UP",
       "region": "E",
-      "uprn": "123456"
+      "uprn": "123456",
+      "questionnaire": "dummy_9wbthzvgj6",
+      "sampleUnitRef": "dummy_6zfd5iq9pg",
+      "cohort": "7",
+      "gor9d": "dummy_99n62dhi40",
+      "laCode": "dummy_p468dsuyo5",
+      "uprnLatitude": "52.35064053950229",
+      "uprnLongitude": "-1.580400903268521"
     },
     "sampleSensitive": {
       "phoneNumber": "REDACTED"
