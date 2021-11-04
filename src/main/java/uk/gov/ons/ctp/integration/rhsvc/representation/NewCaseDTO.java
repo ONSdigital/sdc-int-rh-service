@@ -35,7 +35,6 @@ public class NewCaseDTO {
   private String childFirstName;
 
   @LoggingScope(scope = Scope.MASK)
-  @NotBlank
   private String childMiddleNames;
 
   @LoggingScope(scope = Scope.MASK)
