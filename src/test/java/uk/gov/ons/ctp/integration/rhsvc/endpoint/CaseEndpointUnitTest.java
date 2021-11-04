@@ -389,13 +389,13 @@ public class CaseEndpointUnitTest {
   }
 
   @Test
-  public void shouldRejectNewCaseIfChildMiddleNameNotPresent() throws Exception {
+  public void shouldAcceptNewCaseWithNoChildMiddleNames() throws Exception {
     ObjectNode json = getNewCaseEventFixture();
-    json.remove("childFirstName");
-    json.put("childFirstName", "");
+    json.remove("childMiddleNames");
+    json.put("childMiddleNames", "");
     String url = "/cases/new";
-    mockMvc.perform(postJson(url, json.toString())).andExpect(status().is4xxClientError());
-    verify(caseService, never()).sendNewCaseEvent(any(NewCaseDTO.class));
+    mockMvc.perform(postJson(url, json.toString())).andExpect(status().isOk());
+    verify(caseService).sendNewCaseEvent(any(NewCaseDTO.class));
   }
 
   @Test
