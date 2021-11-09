@@ -89,7 +89,7 @@ public class RHSvcApplication {
     EventSender sender =
         new PubSubEventSender(pubSubTemplate, appConfig.getMessaging().getPublish().getTimeout());
     CircuitBreaker circuitBreaker = circuitBreakerFactory.create("eventSendCircuitBreaker");
-    return EventPublisher.createWithEventPersistence(sender, eventPersistence, circuitBreaker);
+    return EventPublisher.create(sender, eventPersistence, circuitBreaker);
   }
 
   @Bean
