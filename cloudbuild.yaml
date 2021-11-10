@@ -30,7 +30,7 @@ steps:
 
   - name: 'gcr.io/cloud-builders/curl'
     entrypoint: bash
-    env:
+    args:
     - '-eEuo'
     - 'pipefail'
     - '-c'
