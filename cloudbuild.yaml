@@ -42,7 +42,7 @@ steps:
       gpgv codecov.SHA256SUM.sig codecov.SHA256SUM
       shasum -a 256 -c codecov.SHA256SUM
       chmod +x codecov
-      ./codecov # -t ${CODECOV_TOKEN}
+      ./codecov
 
 images: [ 'europe-west2-docker.pkg.dev/ons-ci-int/int-docker-snapshot/rh-service:$BRANCH_NAME-$SHORT_SHA' ]
 
