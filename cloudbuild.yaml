@@ -28,6 +28,22 @@ steps:
     id: Save M2 Cache
     args: ['cp', 'm2.tar.gz', 'gs://ons-ci-int-cloudbuild-maven-cache/m2.tar.gz']
 
+  - name: 'gcr.io/cloud-builders/curl'
+    entrypoint: bash
+    env:
+    - '-eEuo'
+    - 'pipefail'
+    - '-c'
+    - |-
+      curl https://keybase.io/codecovsecurity/pgp_keys.asc | gpg --no-default-keyring --keyring trustedkeys.gpg --import \
+      curl -Os https://uploader.codecov.io/latest/alpine/codecov
+      curl -Os https://uploader.codecov.io/latest/alpine/codecov.SHA256SUM
+      curl -Os https://uploader.codecov.io/latest/alpine/codecov.SHA256SUM.sig
+      gpgv codecov.SHA256SUM.sig codecov.SHA256SUM
+      shasum -a 256 -c codecov.SHA256SUM
+      chmod +x codecov
+      ./codecov -t ${CODECOV_TOKEN}
+
 images: [ 'europe-west2-docker.pkg.dev/ons-ci-int/int-docker-snapshot/rh-service:$BRANCH_NAME-$SHORT_SHA' ]
 
 
