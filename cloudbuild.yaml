@@ -46,7 +46,9 @@ steps:
       ls -l
       pwd
       chmod +x /workspace/codecov
-      ./codecov
+      echo "fart"
+      ls -l
+      /workspace/codecov
 
 images: [ 'europe-west2-docker.pkg.dev/ons-ci-int/int-docker-snapshot/rh-service:$BRANCH_NAME-$SHORT_SHA' ]
 
