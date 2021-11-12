@@ -45,7 +45,7 @@ steps:
       gpgv codecov.SHA256SUM.sig codecov.SHA256SUM
       sha256sum -c codecov.SHA256SUM
       chmod +x ./codecov
-      ./codecov -t ${SDC_INT_RH_SERVICE_CODECOV}
+      ./codecov -t $$SDC_INT_RH_SERVICE_CODECOV
 
 images: [ 'europe-west2-docker.pkg.dev/ons-ci-int/int-docker-snapshot/rh-service:$BRANCH_NAME-$SHORT_SHA' ]
 
