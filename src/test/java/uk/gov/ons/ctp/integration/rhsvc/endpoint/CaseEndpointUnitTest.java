@@ -51,8 +51,6 @@ public class CaseEndpointUnitTest {
 
   private MockMvc mockMvc;
 
-  private List<CaseDTO> caseDTO;
-
   /** Setup tests */
   @BeforeEach
   public void setUp() {
@@ -60,12 +58,12 @@ public class CaseEndpointUnitTest {
         MockMvcBuilders.standaloneSetup(caseEndpoint)
             .setHandlerExceptionResolvers(mockAdviceFor(RestExceptionHandler.class))
             .build();
-    this.caseDTO = FixtureHelper.loadClassFixtures(CaseDTO[].class);
   }
 
   /** Test returns valid JSON for valid UPRN */
   @Test
   public void getCaseByUPRNFound() throws Exception {
+    List<CaseDTO> caseDTO = FixtureHelper.loadClassFixtures(CaseDTO[].class);
     CaseDTO rmCase0 = caseDTO.get(0);
 
     when(caseService.getLatestValidCaseByUPRN(new UniquePropertyReferenceNumber(UPRN)))
