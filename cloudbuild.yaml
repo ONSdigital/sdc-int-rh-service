@@ -43,8 +43,9 @@ steps:
       curl -Os https://uploader.codecov.io/latest/alpine/codecov.SHA256SUM.sig
       gpgv codecov.SHA256SUM.sig codecov.SHA256SUM
       sha256sum -c codecov.SHA256SUM
-      ls
-      chmod +x codecov
+      ls -l
+      pwd
+      chmod +x /workspace/codecov
       ./codecov
 
 images: [ 'europe-west2-docker.pkg.dev/ons-ci-int/int-docker-snapshot/rh-service:$BRANCH_NAME-$SHORT_SHA' ]
