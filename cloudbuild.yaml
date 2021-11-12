@@ -32,6 +32,10 @@ steps:
     secretEnv: [ SDC_INT_RH_SERVICE_CODECOV ]
     entrypoint: bash
     args:
+    - 'VCS_COMMIT_ID=$COMMIT_SHA'
+    - 'VCS_BRANCH_NAME=$BRANCH_NAME'
+    - 'VCS_PULL_REQUEST=$_PR_NUMBER'
+    - 'CI_BUILD_ID=$BUILD_ID'
     - '-eEuo'
     - 'pipefail'
     - '-c'
