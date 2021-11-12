@@ -29,13 +29,8 @@ steps:
     args: ['cp', 'm2.tar.gz', 'gs://ons-ci-int-cloudbuild-maven-cache/m2.tar.gz']
 
   - name: 'gcr.io/cloud-builders/curl'
-    secretEnv: [ SDC_INT_RH_SERVICE_CODECOV ]
     entrypoint: bash
     args:
-    - 'VCS_COMMIT_ID=$COMMIT_SHA'
-    - 'VCS_BRANCH_NAME=$BRANCH_NAME'
-    - 'VCS_PULL_REQUEST=$_PR_NUMBER'
-    - 'CI_BUILD_ID=$BUILD_ID'
     - '-eEuo'
     - 'pipefail'
     - '-c'
@@ -49,7 +44,7 @@ steps:
       gpgv codecov.SHA256SUM.sig codecov.SHA256SUM
       sha256sum -c codecov.SHA256SUM
       chmod +x ./codecov
-      ./codecov -t $$SDC_INT_RH_SERVICE_CODECOV
+      ./codecov
 
 images: [ 'europe-west2-docker.pkg.dev/ons-ci-int/int-docker-snapshot/rh-service:$BRANCH_NAME-$SHORT_SHA' ]
 
