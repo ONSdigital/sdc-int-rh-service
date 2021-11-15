@@ -6,7 +6,6 @@
 		"invalid": false,
 		"refusalReceived": "HARD_REFUSAL",
 		"address": {
-			"addressType": "SPG",
 			"addressLine1": "1 main street",
 			"addressLine2": "upper upperingham",
 			"addressLine3": "",
@@ -23,7 +22,6 @@
 		"invalid": false,
 		"refusalReceived": "HARD_REFUSAL",
 		"address": {
-			"addressType": "SPG",
 			"addressLine1": "1 main street",
 			"addressLine2": "upper upperingham",
 			"addressLine3": "",
