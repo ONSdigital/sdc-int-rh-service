@@ -74,7 +74,7 @@ public class UniqueAccessCodeServiceImplTest {
             payloadCapture.capture());
 
     assertEquals(UAC_HASH, uacDTO.getUacHash());
-    assertEquals(Boolean.valueOf(uacTest.getActive()), uacDTO.isActive());
+    assertEquals(uacTest.isActive(), uacDTO.isActive());
     assertEquals(CaseStatus.OK, uacDTO.getCaseStatus());
     assertEquals(UUID.fromString(uacTest.getCaseId()), uacDTO.getCaseId());
     assertEquals(
@@ -122,7 +122,7 @@ public class UniqueAccessCodeServiceImplTest {
             payloadCapture.capture());
 
     assertEquals(UAC_HASH, uacDTO.getUacHash());
-    assertEquals(Boolean.valueOf(uacTest.getActive()), uacDTO.isActive());
+    assertEquals(uacTest.isActive(), uacDTO.isActive());
     assertEquals(CaseStatus.UNLINKED, uacDTO.getCaseStatus());
     assertNull(uacDTO.getCaseId());
     assertNull(uacDTO.getCollectionExerciseId());
@@ -162,7 +162,7 @@ public class UniqueAccessCodeServiceImplTest {
             payloadCapture.capture());
 
     assertEquals(UAC_HASH, uacDTO.getUacHash());
-    assertEquals(Boolean.valueOf(uacTest.getActive()), uacDTO.isActive());
+    assertEquals(uacTest.isActive(), uacDTO.isActive());
     assertEquals(CaseStatus.UNLINKED, uacDTO.getCaseStatus());
     assertNull(uacDTO.getCaseId());
     assertNull(uacDTO.getCollectionExerciseId());

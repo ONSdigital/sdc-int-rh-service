@@ -133,7 +133,7 @@ public class UacEventReceiverImplIT_Test {
     UacPayload uacPayload = UacEvent.getPayload();
     UacUpdate uac = uacPayload.getUacUpdate();
     uac.setUacHash("999999999");
-    uac.setActive("true");
+    uac.setActive(true);
     uac.setQid(qid);
     uac.setCaseId("c45de4dc-3c3b-11e9-b210-d663bd873d93");
     Header header = new Header();
