@@ -45,8 +45,7 @@ steps:
       gpgv codecov.SHA256SUM.sig codecov.SHA256SUM
       sha256sum -c codecov.SHA256SUM
       chmod +x ./codecov
-      CODECOV_SLUG=ONSdigital/sdc-int-rh-service
-      ./codecov -t $$SDC_INT_RH_SERVICE_CODECOV -C $COMMIT_SHA
+      ./codecov -t $$SDC_INT_RH_SERVICE_CODECOV -C $COMMIT_SHA -r "ONSdigital/sdc-int-rh-service"
 
 images: [ 'europe-west2-docker.pkg.dev/ons-ci-int/int-docker-snapshot/rh-service:$BRANCH_NAME-$SHORT_SHA' ]
 
