@@ -15,7 +15,7 @@ import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.EventPublisher;
 import uk.gov.ons.ctp.common.event.TopicType;
 import uk.gov.ons.ctp.common.event.model.CaseUpdate;
-import uk.gov.ons.ctp.common.event.model.UacAuthenticateResponse;
+import uk.gov.ons.ctp.common.event.model.UacAuthenticationResponse;
 import uk.gov.ons.ctp.common.event.model.UacUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
 import uk.gov.ons.ctp.integration.rhsvc.representation.UniqueAccessCodeDTO;
@@ -62,7 +62,7 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
         log.debug("UAC is unlinked", kv("uacHash", uacHash));
         data = createUniqueAccessCodeDTO(uacMatch.get(), Optional.empty(), CaseStatus.UNLINKED);
       }
-      sendUacAuthenticatedEvent(data);
+      sendUacAuthenticationEvent(data);
     } else {
       log.warn("Unknown UAC", kv("uacHash", uacHash));
       throw new CTPException(CTPException.Fault.RESOURCE_NOT_FOUND, "Failed to retrieve UAC");
@@ -71,26 +71,26 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
     return data;
   }
 
-  /** Send UacAuthenticated event */
-  private void sendUacAuthenticatedEvent(UniqueAccessCodeDTO data) throws CTPException {
+  /** Send UacAuthentication event */
+  private void sendUacAuthenticationEvent(UniqueAccessCodeDTO data) throws CTPException {
 
     log.info(
-        "Generating UacAuthenticated event for caseId",
+        "Generating UacAuthentication event for caseId",
         kv("caseId", data.getCaseId()),
         kv("questionnaireId", data.getQid()));
 
-    UacAuthenticateResponse response =
-        UacAuthenticateResponse.builder()
+    UacAuthenticationResponse response =
+        UacAuthenticationResponse.builder()
             .questionnaireId(data.getQid())
             .caseId(data.getCaseId())
             .build();
 
     UUID messageId =
         eventPublisher.sendEvent(
-            TopicType.UAC_AUTHENTICATE, Source.RESPONDENT_HOME, Channel.RH, response);
+            TopicType.UAC_AUTHENTICATION, Source.RESPONDENT_HOME, Channel.RH, response);
 
     log.debug(
-        "UacAuthenticated event published for caseId: "
+        "UacAuthentication event published for caseId: "
             + response.getCaseId()
             + ", messageId: "
             + messageId);
