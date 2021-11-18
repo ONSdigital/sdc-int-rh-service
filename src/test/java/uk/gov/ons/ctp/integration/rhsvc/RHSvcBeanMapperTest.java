@@ -3,6 +3,8 @@ package uk.gov.ons.ctp.integration.rhsvc;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.sql.Date;
+import java.time.Instant;
 import java.util.UUID;
 import ma.glasnost.orika.MapperFacade;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,9 +14,13 @@ import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.domain.Region;
 import uk.gov.ons.ctp.common.domain.UniquePropertyReferenceNumber;
 import uk.gov.ons.ctp.common.event.model.CaseUpdate;
+import uk.gov.ons.ctp.common.event.model.CollectionExercise;
+import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 import uk.gov.ons.ctp.common.event.model.UacUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.representation.AddressDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.CollectionExerciseDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.SurveyLiteDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.UniqueAccessCodeDTO;
 
 @DisplayName("RHSvc Bean Mapper Test")
@@ -24,11 +30,15 @@ public class RHSvcBeanMapperTest {
 
   private CaseUpdate caseUpdate;
   private UacUpdate uacUpdate;
+  private SurveyUpdate surveyUpdate;
+  private CollectionExercise collectionExercise;
 
   @BeforeEach
   public void setup() {
     caseUpdate = FixtureHelper.loadClassFixtures(CaseUpdate[].class).get(0);
     uacUpdate = FixtureHelper.loadClassFixtures(UacUpdate[].class).get(0);
+    surveyUpdate = FixtureHelper.loadClassFixtures(SurveyUpdate[].class).get(0);
+    collectionExercise = FixtureHelper.loadClassFixtures(CollectionExercise[].class).get(0);
   }
 
   private AddressDTO expectedAddress() {
@@ -60,8 +70,6 @@ public class RHSvcBeanMapperTest {
   @DisplayName("UacUpdate -> UniqueAccessCodeDTO mapping")
   public void shouldMapUacUpdateToUniqueAccessCodeDTO() {
     UniqueAccessCodeDTO dto = mapper.map(uacUpdate, UniqueAccessCodeDTO.class);
-
-    assertEquals(UUID.fromString("bfb5cdca-3119-4d2c-a807-51ae55443b33"), dto.getCaseId());
     assertTrue(dto.isActive());
     assertEquals(
         "8a9d5db4bbee34fd16e40aa2aaae52cfbdf1842559023614c30edb480ec252b4", dto.getUacHash());
@@ -69,5 +77,29 @@ public class RHSvcBeanMapperTest {
     assertTrue(dto.isReceiptReceived());
     assertEquals(94, dto.getWave());
     assertTrue(dto.isEqLaunched());
+  }
+
+  @Test
+  @DisplayName("CollectionExercise -> CollectionExerciseDTO mapping")
+  public void shouldMapCollectionExerciseToCollectionExerciseDTO() {
+    CollectionExerciseDTO dto = mapper.map(collectionExercise, CollectionExerciseDTO.class);
+    assertEquals("44d7f3bb-91c9-45d0-bb2d-90afce4fc790", dto.getCollectionExerciseId());
+    assertEquals("3883af91-0052-4497-9805-3238544fcf8a", dto.getSurveyId());
+    assertEquals("velit", dto.getName());
+    assertEquals("MVP012021", dto.getReference());
+    assertEquals(Date.from(Instant.parse("2021-09-17T23:59:59.999Z")), dto.getStartDate());
+    assertEquals(Date.from(Instant.parse("2021-09-27T23:59:59.999Z")), dto.getEndDate());
+    assertEquals(3, dto.getNumberOfWaves());
+    assertEquals(2, dto.getWaveLength());
+    assertEquals(3, dto.getCohorts());
+    assertEquals(7, dto.getCohortSchedule());
+  }
+
+  @Test
+  @DisplayName("SurveyUpdate -> urveyLiteDTO mapping")
+  public void shouldMapSurveyUpdateToSurveyLiteDTO() {
+    SurveyLiteDTO dto = mapper.map(surveyUpdate, SurveyLiteDTO.class);
+    assertEquals("3883af91-0052-4497-9805-3238544fcf8a", dto.getSurveyId());
+    assertEquals("LMS", dto.getName());
   }
 }

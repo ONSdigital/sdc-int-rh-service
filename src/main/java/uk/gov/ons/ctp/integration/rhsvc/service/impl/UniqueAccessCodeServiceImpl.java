@@ -15,11 +15,15 @@ import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.EventPublisher;
 import uk.gov.ons.ctp.common.event.TopicType;
 import uk.gov.ons.ctp.common.event.model.CaseUpdate;
+import uk.gov.ons.ctp.common.event.model.CollectionExercise;
+import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 import uk.gov.ons.ctp.common.event.model.UacAuthenticateResponse;
 import uk.gov.ons.ctp.common.event.model.UacUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
+import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.CollectionExerciseDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.SurveyLiteDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.UniqueAccessCodeDTO;
-import uk.gov.ons.ctp.integration.rhsvc.representation.UniqueAccessCodeDTO.CaseStatus;
 import uk.gov.ons.ctp.integration.rhsvc.service.UniqueAccessCodeService;
 
 /** Implementation to deal with UAC data */
@@ -47,20 +51,30 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
         if (caseMatch.isPresent()) {
           // Case found
           log.debug("UAC is linked", kv("uacHash", uacHash), kv("caseId", caseId));
-          data = createUniqueAccessCodeDTO(uacMatch.get(), caseMatch, CaseStatus.OK);
+
+          // TODO log if missing?
+          // Will always exist if the case exsits as it can't be saved without them
+          Optional<SurveyUpdate> surveyMatch = dataRepo.readSurvey(caseMatch.get().getSurveyId());
+          Optional<CollectionExercise> collexMatch =
+              dataRepo.readCollectionExercise(caseMatch.get().getCollectionExerciseId());
+
+          data = createUniqueAccessCodeDTO(uacMatch.get(), caseMatch, collexMatch, surveyMatch);
         } else {
           // Case NOT found
           log.info(
               "Cannot find Case for UAC - telling UI unlinked - RM remediation required",
               kv("uacHash", uacHash),
               kv("caseId", caseId));
-          data = createUniqueAccessCodeDTO(uacMatch.get(), Optional.empty(), CaseStatus.UNLINKED);
-          data.setCaseId(null);
+          data =
+              createUniqueAccessCodeDTO(
+                  uacMatch.get(), Optional.empty(), Optional.empty(), Optional.empty());
         }
       } else {
         // unlinked logkv(uacHash)
         log.debug("UAC is unlinked", kv("uacHash", uacHash));
-        data = createUniqueAccessCodeDTO(uacMatch.get(), Optional.empty(), CaseStatus.UNLINKED);
+        data =
+            createUniqueAccessCodeDTO(
+                uacMatch.get(), Optional.empty(), Optional.empty(), Optional.empty());
       }
       sendUacAuthenticatedEvent(data);
     } else {
@@ -73,17 +87,18 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
 
   /** Send UacAuthenticated event */
   private void sendUacAuthenticatedEvent(UniqueAccessCodeDTO data) throws CTPException {
+    UUID caseId = null;
+    if (data.getCaseDTO() != null) {
+      caseId = data.getCaseDTO().getCaseId();
+    }
 
     log.info(
         "Generating UacAuthenticated event for caseId",
-        kv("caseId", data.getCaseId()),
+        kv("caseId", caseId),
         kv("questionnaireId", data.getQid()));
 
     UacAuthenticateResponse response =
-        UacAuthenticateResponse.builder()
-            .questionnaireId(data.getQid())
-            .caseId(data.getCaseId())
-            .build();
+        UacAuthenticateResponse.builder().questionnaireId(data.getQid()).caseId(caseId).build();
 
     UUID messageId =
         eventPublisher.sendEvent(
@@ -97,17 +112,32 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
   }
 
   private UniqueAccessCodeDTO createUniqueAccessCodeDTO(
-      UacUpdate uac, Optional<CaseUpdate> collectionCase, CaseStatus caseStatus) {
+      UacUpdate uac,
+      Optional<CaseUpdate> collectionCase,
+      Optional<CollectionExercise> collectionExercise,
+      Optional<SurveyUpdate> surveyUpdate) {
     UniqueAccessCodeDTO uniqueAccessCodeDTO = new UniqueAccessCodeDTO();
 
     // Copy the UAC first, then Case
     mapperFacade.map(uac, uniqueAccessCodeDTO);
 
     if (collectionCase.isPresent()) {
-      mapperFacade.map(collectionCase.get(), uniqueAccessCodeDTO);
+      CaseDTO caseDTO = new CaseDTO();
+      mapperFacade.map(collectionCase.get(), caseDTO);
+      uniqueAccessCodeDTO.setCaseDTO(caseDTO);
     }
 
-    uniqueAccessCodeDTO.setCaseStatus(caseStatus);
+    if (collectionExercise.isPresent()) {
+      CollectionExerciseDTO collectionExerciseDTO = new CollectionExerciseDTO();
+      mapperFacade.map(collectionExercise.get(), collectionExerciseDTO);
+      uniqueAccessCodeDTO.setCollectionExerciseDTO(collectionExerciseDTO);
+    }
+
+    if (surveyUpdate.isPresent()) {
+      SurveyLiteDTO surveyLiteDTO = new SurveyLiteDTO();
+      mapperFacade.map(surveyUpdate.get(), surveyLiteDTO);
+      uniqueAccessCodeDTO.setSurveyLiteDTO(surveyLiteDTO);
+    }
 
     return uniqueAccessCodeDTO;
   }
