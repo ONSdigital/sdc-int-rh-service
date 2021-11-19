@@ -37,7 +37,7 @@ bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' '$PUBSUB_HOST:$PUB
 echo "<<< Creating topics >>>"
 createTopic event_case-update
 createTopic event_uac-update
-createTopic event_uac-authenticate
+createTopic event_uac-authentication
 createTopic event_survey-launch
 createTopic event_fulfilment
 createTopic event_survey-update

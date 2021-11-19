@@ -27,7 +27,7 @@ import uk.gov.ons.ctp.common.event.EventPublisher;
 import uk.gov.ons.ctp.common.event.TopicType;
 import uk.gov.ons.ctp.common.event.model.CaseUpdate;
 import uk.gov.ons.ctp.common.event.model.EventPayload;
-import uk.gov.ons.ctp.common.event.model.UacAuthenticateResponse;
+import uk.gov.ons.ctp.common.event.model.UacAuthenticationResponse;
 import uk.gov.ons.ctp.common.event.model.UacUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.RHSvcBeanMapper;
 import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
@@ -53,8 +53,8 @@ public class UniqueAccessCodeServiceImplTest {
   @Test
   public void getUACLinkedToExistingCase() throws Exception {
 
-    ArgumentCaptor<UacAuthenticateResponse> payloadCapture =
-        ArgumentCaptor.forClass(UacAuthenticateResponse.class);
+    ArgumentCaptor<UacAuthenticationResponse> payloadCapture =
+        ArgumentCaptor.forClass(UacAuthenticationResponse.class);
 
     UacUpdate uacTest = getUAC("linkedHousehold");
     CaseUpdate caseTest = getCase("household");
@@ -68,7 +68,7 @@ public class UniqueAccessCodeServiceImplTest {
     verify(dataRepo, times(1)).readCaseUpdate(CASE_ID);
     verify(eventPublisher, times(1))
         .sendEvent(
-            eq(TopicType.UAC_AUTHENTICATE),
+            eq(TopicType.UAC_AUTHENTICATION),
             eq(Source.RESPONDENT_HOME),
             eq(Channel.RH),
             payloadCapture.capture());
@@ -94,7 +94,7 @@ public class UniqueAccessCodeServiceImplTest {
     assertEquals(uacTest.isEqLaunched(), uacDTO.isEqLaunched());
     assertEquals(uacTest.getMetadata().getWave(), uacDTO.getWave());
 
-    UacAuthenticateResponse payload = payloadCapture.getValue();
+    UacAuthenticationResponse payload = payloadCapture.getValue();
     assertEquals(uacDTO.getCaseId(), payload.getCaseId());
     assertEquals(uacDTO.getQid(), payload.getQuestionnaireId());
   }
@@ -102,8 +102,8 @@ public class UniqueAccessCodeServiceImplTest {
   @Test
   public void getUACLinkedToCaseThatCannotBeFound() throws Exception {
 
-    ArgumentCaptor<UacAuthenticateResponse> payloadCapture =
-        ArgumentCaptor.forClass(UacAuthenticateResponse.class);
+    ArgumentCaptor<UacAuthenticationResponse> payloadCapture =
+        ArgumentCaptor.forClass(UacAuthenticationResponse.class);
 
     UacUpdate uacTest = getUAC("linkedHousehold");
 
@@ -116,7 +116,7 @@ public class UniqueAccessCodeServiceImplTest {
 
     verify(eventPublisher, times(1))
         .sendEvent(
-            eq(TopicType.UAC_AUTHENTICATE),
+            eq(TopicType.UAC_AUTHENTICATION),
             eq(Source.RESPONDENT_HOME),
             eq(Channel.RH),
             payloadCapture.capture());
@@ -131,7 +131,7 @@ public class UniqueAccessCodeServiceImplTest {
 
     assertNull(uacDTO.getAddress());
 
-    UacAuthenticateResponse payload = payloadCapture.getValue();
+    UacAuthenticationResponse payload = payloadCapture.getValue();
     assertNull(payload.getCaseId());
     assertEquals(uacDTO.getQid(), payload.getQuestionnaireId());
 
@@ -143,8 +143,8 @@ public class UniqueAccessCodeServiceImplTest {
   @Test
   public void getUACNotLInkedToCase() throws Exception {
 
-    ArgumentCaptor<UacAuthenticateResponse> payloadCapture =
-        ArgumentCaptor.forClass(UacAuthenticateResponse.class);
+    ArgumentCaptor<UacAuthenticationResponse> payloadCapture =
+        ArgumentCaptor.forClass(UacAuthenticationResponse.class);
 
     UacUpdate uacTest = getUAC("unlinkedHousehold");
 
@@ -156,7 +156,7 @@ public class UniqueAccessCodeServiceImplTest {
     verify(dataRepo, times(0)).readCaseUpdate(CASE_ID);
     verify(eventPublisher, times(1))
         .sendEvent(
-            eq(TopicType.UAC_AUTHENTICATE),
+            eq(TopicType.UAC_AUTHENTICATION),
             eq(Source.RESPONDENT_HOME),
             eq(Channel.RH),
             payloadCapture.capture());
@@ -171,7 +171,7 @@ public class UniqueAccessCodeServiceImplTest {
 
     assertNull(uacDTO.getAddress());
 
-    UacAuthenticateResponse payload = payloadCapture.getValue();
+    UacAuthenticationResponse payload = payloadCapture.getValue();
     assertEquals(uacDTO.getCaseId(), payload.getCaseId());
     assertEquals(uacDTO.getQid(), payload.getQuestionnaireId());
 
