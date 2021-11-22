@@ -30,6 +30,9 @@ public class CaseEventReceiverImplUnit_Test {
 
   @InjectMocks private CaseEventReceiverImpl target;
 
+  //TODO saveValidCase() {}
+  //doNotSaveInvalidCase() {}
+
   @Test
   public void test_acceptCaseEvent_success() throws Exception {
     Header header = new Header();

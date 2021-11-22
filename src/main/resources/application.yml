@@ -134,3 +134,6 @@ notify:
 
 loadshedding:
   modulus: 10
+
+survey: |-
+  social

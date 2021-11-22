@@ -25,4 +25,5 @@ public class AppConfig {
   private NotifyConfig notify;
   private WebformConfig webform;
   private LoadsheddingConfig loadshedding;
+  private SurveyConfig surveyConfig;
 }
