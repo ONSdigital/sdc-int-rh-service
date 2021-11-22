@@ -17,7 +17,7 @@ import uk.gov.ons.ctp.common.event.TopicType;
 import uk.gov.ons.ctp.common.event.model.CaseUpdate;
 import uk.gov.ons.ctp.common.event.model.CollectionExercise;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
-import uk.gov.ons.ctp.common.event.model.UacAuthenticateResponse;
+import uk.gov.ons.ctp.common.event.model.UacAuthenticationResponse;
 import uk.gov.ons.ctp.common.event.model.UacUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
@@ -76,7 +76,7 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
             createUniqueAccessCodeDTO(
                 uacMatch.get(), Optional.empty(), Optional.empty(), Optional.empty());
       }
-      sendUacAuthenticatedEvent(data);
+      sendUacAuthenticationEvent(data);
     } else {
       log.warn("Unknown UAC", kv("uacHash", uacHash));
       throw new CTPException(CTPException.Fault.RESOURCE_NOT_FOUND, "Failed to retrieve UAC");
@@ -85,27 +85,27 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
     return data;
   }
 
-  /** Send UacAuthenticated event */
-  private void sendUacAuthenticatedEvent(UniqueAccessCodeDTO data) throws CTPException {
+  /** Send UacAuthentication event */
+  private void sendUacAuthenticationEvent(UniqueAccessCodeDTO data) throws CTPException {
     UUID caseId = null;
     if (data.getCaseDTO() != null) {
       caseId = data.getCaseDTO().getCaseId();
     }
 
     log.info(
-        "Generating UacAuthenticated event for caseId",
+        "Generating UacAuthentication event for caseId",
         kv("caseId", caseId),
         kv("questionnaireId", data.getQid()));
 
-    UacAuthenticateResponse response =
-        UacAuthenticateResponse.builder().questionnaireId(data.getQid()).caseId(caseId).build();
+    UacAuthenticationResponse response =
+        UacAuthenticationResponse.builder().questionnaireId(data.getQid()).caseId(caseId).build();
 
     UUID messageId =
         eventPublisher.sendEvent(
-            TopicType.UAC_AUTHENTICATE, Source.RESPONDENT_HOME, Channel.RH, response);
+            TopicType.UAC_AUTHENTICATION, Source.RESPONDENT_HOME, Channel.RH, response);
 
     log.debug(
-        "UacAuthenticated event published for caseId: "
+        "UacAuthentication event published for caseId: "
             + response.getCaseId()
             + ", messageId: "
             + messageId);

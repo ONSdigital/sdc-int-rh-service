@@ -36,16 +36,16 @@ You should see an acknowledgement in the RHSvc logs, and the message should now 
 
 Ensure that you have successfully received a `CASE_UPDATE` and matching `UAC_UPDATE` event from the above steps, and that both appear in firestore
 
-Create a subscription for the `event_uac-authenticate` topic using
+Create a subscription for the `event_uac-authentication` topic using
 
-    `python subscriber.py local create event_uac-authenticate fake_subscription`
+    `python subscriber.py local create event_uac-authentication fake_subscription`
 
 In a new terminal window run:
 
     $(gcloud beta emulators pubsub env-init)
     python3 subscriber.py local receive fake_subscription
 
-Generate respondent authenticated event using the `uacHash` from the previously sent `UAC_UPDATE` event and hitting the `uacs` endpoint
+Generate respondent authentication event using the `uacHash` from the previously sent `UAC_UPDATE` event and hitting the `uacs` endpoint
 
        $ curl -s -H "Content-Type: application/json" "http://localhost:8071/uacs/<UAC_HASH>"
 
@@ -66,7 +66,7 @@ Format the event text and make sure it looks like:
 
 	{
 	  "event": {
-	    "type": "RESPONDENT_AUTHENTICATED",
+	    "type": "RESPONDENT_AUTHENTICATION",
 	    "source": "RESPONDENT_HOME",
 	    "channel": "RH",
 	    "dateTime": "2019-06-24T10:38:07.550Z",
