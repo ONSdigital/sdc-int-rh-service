@@ -1,5 +1,9 @@
 package uk.gov.ons.ctp.integration.rhsvc;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.util.Date;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.converter.BidirectionalConverter;
@@ -40,6 +44,7 @@ public class RHSvcBeanMapper extends ConfigurableMapper {
     ConverterFactory converterFactory = factory.getConverterFactory();
     converterFactory.registerConverter(new StringToUUIDConverter());
     converterFactory.registerConverter(new StringToUPRNConverter());
+    converterFactory.registerConverter(new LocalDateConverter());
     converterFactory.registerConverter(new EstabTypeConverter());
 
     factory
@@ -89,6 +94,21 @@ public class RHSvcBeanMapper extends ConfigurableMapper {
     public EstabType convertTo(
         String source, Type<EstabType> destinationType, MappingContext mappingContext) {
       return EstabType.forCode(source);
+    }
+  }
+
+  static class LocalDateConverter extends BidirectionalConverter<Date, LocalDateTime> {
+
+    @Override
+    public LocalDateTime convertTo(
+        Date date, Type<LocalDateTime> type, MappingContext mappingContext) {
+      return LocalDateTime.ofInstant(date.toInstant(), ZoneId.of(ZoneOffset.UTC.getId()));
+    }
+
+    @Override
+    public Date convertFrom(
+        LocalDateTime localDateTime, Type<Date> type, MappingContext mappingContext) {
+      return Date.from(localDateTime.toInstant(ZoneOffset.UTC));
     }
   }
 }

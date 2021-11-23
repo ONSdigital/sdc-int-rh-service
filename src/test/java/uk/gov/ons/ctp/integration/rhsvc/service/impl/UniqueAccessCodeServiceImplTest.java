@@ -1,7 +1,7 @@
 package uk.gov.ons.ctp.integration.rhsvc.service.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -9,6 +9,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 import ma.glasnost.orika.MapperFacade;
@@ -91,17 +95,19 @@ public class UniqueAccessCodeServiceImplTest {
     assertEquals(uacTest.isEqLaunched(), uacDTO.isEqLaunched());
     assertEquals(uacTest.getMetadata().getWave(), uacDTO.getWave());
 
-    assertEquals(surveyTest.getSurveyId(), uacDTO.getSurvey().getSurveyId());
+    assertEquals(UUID.fromString(surveyTest.getSurveyId()), uacDTO.getSurvey().getSurveyId());
     assertEquals(surveyTest.getName(), uacDTO.getSurvey().getName());
 
     assertEquals(
-        collexTest.getCollectionExerciseId(),
+        UUID.fromString(collexTest.getCollectionExerciseId()),
         uacDTO.getCollectionExercise().getCollectionExerciseId());
-    assertEquals(collexTest.getSurveyId(), uacDTO.getCollectionExercise().getSurveyId());
+    assertEquals(
+        UUID.fromString(collexTest.getSurveyId()), uacDTO.getCollectionExercise().getSurveyId());
     assertEquals(collexTest.getName(), uacDTO.getCollectionExercise().getName());
     assertEquals(collexTest.getReference(), uacDTO.getCollectionExercise().getReference());
-    assertEquals(collexTest.getStartDate(), uacDTO.getCollectionExercise().getStartDate());
-    assertEquals(collexTest.getEndDate(), uacDTO.getCollectionExercise().getEndDate());
+    assertEquals(
+        convertDate(collexTest.getStartDate()), uacDTO.getCollectionExercise().getStartDate());
+    assertEquals(convertDate(collexTest.getEndDate()), uacDTO.getCollectionExercise().getEndDate());
     assertEquals(
         collexTest.getMetadata().getNumberOfWaves(),
         uacDTO.getCollectionExercise().getNumberOfWaves());
@@ -115,7 +121,7 @@ public class UniqueAccessCodeServiceImplTest {
 
     assertEquals(UUID.fromString(uacTest.getCaseId()), uacDTO.getCollectionCase().getCaseId());
     assertEquals(
-        caseTest.getCollectionExerciseId(),
+        UUID.fromString(caseTest.getCollectionExerciseId()),
         uacDTO.getCollectionExercise().getCollectionExerciseId());
     assertEquals(
         Region.valueOf(caseTest.getSample().getRegion()),
@@ -153,34 +159,20 @@ public class UniqueAccessCodeServiceImplTest {
     when(dataRepo.readUAC(UAC_HASH)).thenReturn(Optional.of(uacTest));
     when(dataRepo.readCaseUpdate(CASE_ID)).thenReturn(Optional.empty());
 
-    UniqueAccessCodeDTO uacDTO = uacSvc.getAndAuthenticateUAC(UAC_HASH);
+    CTPException thrown =
+        assertThrows(
+            CTPException.class,
+            () -> uacSvc.getAndAuthenticateUAC(UAC_HASH),
+            "UAC has no associated case");
+
+    assertEquals("UAC has no associated case", thrown.getMessage());
 
     verify(dataRepo, times(1)).readUAC(UAC_HASH);
     verify(dataRepo, times(1)).readCaseUpdate(CASE_ID);
     verify(dataRepo, times(0)).readSurvey(any());
     verify(dataRepo, times(0)).readCollectionExercise(any());
 
-    verify(eventPublisher, times(1))
-        .sendEvent(
-            eq(TopicType.UAC_AUTHENTICATION),
-            eq(Source.RESPONDENT_HOME),
-            eq(Channel.RH),
-            payloadCapture.capture());
-
-    assertEquals(UAC_HASH, uacDTO.getUacHash());
-    assertEquals(uacTest.isActive(), uacDTO.isActive());
-    assertNull(uacDTO.getCollectionCase());
-    assertNull(uacDTO.getCollectionExercise());
-    assertNull(uacDTO.getSurvey());
-    assertEquals(uacTest.getQid(), uacDTO.getQid());
-
-    UacAuthenticationResponse payload = payloadCapture.getValue();
-    assertNull(payload.getCaseId());
-    assertEquals(uacDTO.getQid(), payload.getQuestionnaireId());
-
-    assertEquals(uacTest.isReceiptReceived(), uacDTO.isReceiptReceived());
-    assertEquals(uacTest.isEqLaunched(), uacDTO.isEqLaunched());
-    assertEquals(uacTest.getMetadata().getWave(), uacDTO.getWave());
+    verify(eventPublisher, times(0)).sendEvent(any(), any(), any(), payloadCapture.capture());
   }
 
   @Test
@@ -193,31 +185,15 @@ public class UniqueAccessCodeServiceImplTest {
 
     when(dataRepo.readUAC(UAC_HASH)).thenReturn(Optional.of(uacTest));
 
-    UniqueAccessCodeDTO uacDTO = uacSvc.getAndAuthenticateUAC(UAC_HASH);
+    CTPException thrown =
+        assertThrows(
+            CTPException.class, () -> uacSvc.getAndAuthenticateUAC(UAC_HASH), "UAC has no caseId");
+
+    assertEquals("UAC has no caseId", thrown.getMessage());
 
     verify(dataRepo, times(1)).readUAC(UAC_HASH);
     verify(dataRepo, times(0)).readCaseUpdate(CASE_ID);
-    verify(eventPublisher, times(1))
-        .sendEvent(
-            eq(TopicType.UAC_AUTHENTICATION),
-            eq(Source.RESPONDENT_HOME),
-            eq(Channel.RH),
-            payloadCapture.capture());
-
-    assertEquals(UAC_HASH, uacDTO.getUacHash());
-    assertEquals(uacTest.isActive(), uacDTO.isActive());
-    assertNull(uacDTO.getCollectionCase());
-    assertNull(uacDTO.getCollectionExercise());
-    assertNull(uacDTO.getSurvey());
-    assertEquals(uacTest.getQid(), uacDTO.getQid());
-
-    UacAuthenticationResponse payload = payloadCapture.getValue();
-    assertNull(payload.getCaseId());
-    assertEquals(uacDTO.getQid(), payload.getQuestionnaireId());
-
-    assertEquals(uacTest.isReceiptReceived(), uacDTO.isReceiptReceived());
-    assertEquals(uacTest.isEqLaunched(), uacDTO.isEqLaunched());
-    assertEquals(uacTest.getMetadata().getWave(), uacDTO.getWave());
+    verify(eventPublisher, times(0)).sendEvent(any(), any(), any(), payloadCapture.capture());
   }
 
   /** Test request for claim object where UAC not found */
@@ -252,5 +228,9 @@ public class UniqueAccessCodeServiceImplTest {
 
   private CollectionExercise getCollex() {
     return FixtureHelper.loadClassFixtures(CollectionExercise[].class).get(0);
+  }
+
+  private LocalDateTime convertDate(Date date) {
+    return LocalDateTime.ofInstant(date.toInstant(), ZoneId.of(ZoneOffset.UTC.getId()));
   }
 }

@@ -3,8 +3,6 @@ package uk.gov.ons.ctp.integration.rhsvc;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.sql.Date;
-import java.time.Instant;
 import java.util.UUID;
 import ma.glasnost.orika.MapperFacade;
 import org.junit.jupiter.api.BeforeEach;
@@ -83,12 +81,13 @@ public class RHSvcBeanMapperTest {
   @DisplayName("CollectionExercise -> CollectionExerciseDTO mapping")
   public void shouldMapCollectionExerciseToCollectionExerciseDTO() {
     CollectionExerciseDTO dto = mapper.map(collectionExercise, CollectionExerciseDTO.class);
-    assertEquals("44d7f3bb-91c9-45d0-bb2d-90afce4fc790", dto.getCollectionExerciseId());
-    assertEquals("3883af91-0052-4497-9805-3238544fcf8a", dto.getSurveyId());
+    assertEquals(
+        UUID.fromString("44d7f3bb-91c9-45d0-bb2d-90afce4fc790"), dto.getCollectionExerciseId());
+    assertEquals(UUID.fromString("3883af91-0052-4497-9805-3238544fcf8a"), dto.getSurveyId());
     assertEquals("velit", dto.getName());
     assertEquals("MVP012021", dto.getReference());
-    assertEquals(Date.from(Instant.parse("2021-09-17T23:59:59.999Z")), dto.getStartDate());
-    assertEquals(Date.from(Instant.parse("2021-09-27T23:59:59.999Z")), dto.getEndDate());
+    assertEquals("2021-09-17T23:59:59.999", dto.getStartDate().toString());
+    assertEquals("2021-09-27T23:59:59.999", dto.getEndDate().toString());
     assertEquals(3, dto.getNumberOfWaves());
     assertEquals(2, dto.getWaveLength());
     assertEquals(3, dto.getCohorts());
@@ -99,7 +98,7 @@ public class RHSvcBeanMapperTest {
   @DisplayName("SurveyUpdate -> urveyLiteDTO mapping")
   public void shouldMapSurveyUpdateToSurveyLiteDTO() {
     SurveyLiteDTO dto = mapper.map(surveyUpdate, SurveyLiteDTO.class);
-    assertEquals("3883af91-0052-4497-9805-3238544fcf8a", dto.getSurveyId());
+    assertEquals(UUID.fromString("3883af91-0052-4497-9805-3238544fcf8a"), dto.getSurveyId());
     assertEquals("LMS", dto.getName());
   }
 }

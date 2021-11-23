@@ -1,19 +1,20 @@
 package uk.gov.ons.ctp.integration.rhsvc.representation;
 
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.util.UUID;
 import lombok.Data;
 
 @Data
 public class CollectionExerciseDTO {
 
-  private String collectionExerciseId;
-  private String surveyId;
+  private UUID collectionExerciseId;
+  private UUID surveyId;
   private String name;
   private String reference;
-  private Date startDate;
-  private Date endDate;
-  private Integer numberOfWaves;
-  private Integer waveLength;
-  private Integer cohorts;
-  private Integer cohortSchedule;
+  private LocalDateTime startDate;
+  private LocalDateTime endDate;
+  private int numberOfWaves;
+  private int waveLength;
+  private int cohorts;
+  private int cohortSchedule;
 }

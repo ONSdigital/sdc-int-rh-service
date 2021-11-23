@@ -2,7 +2,6 @@ package uk.gov.ons.ctp.integration.rhsvc.service.impl;
 
 import static uk.gov.ons.ctp.common.log.ScopedStructuredArguments.kv;
 
-import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import ma.glasnost.orika.MapperFacade;
@@ -41,45 +40,36 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
   public UniqueAccessCodeDTO getAndAuthenticateUAC(String uacHash) throws CTPException {
 
     UniqueAccessCodeDTO data;
-    Optional<UacUpdate> uacMatch = dataRepo.readUAC(uacHash);
-    if (uacMatch.isPresent()) {
-      // we found UAC
-      String caseId = uacMatch.get().getCaseId();
-      if (!StringUtils.isEmpty(caseId)) {
-        // UAC has a caseId
-        Optional<CaseUpdate> caseMatch = dataRepo.readCaseUpdate(caseId);
-        if (caseMatch.isPresent()) {
-          // Case found
-          log.debug("UAC is linked", kv("uacHash", uacHash), kv("caseId", caseId));
+    UacUpdate uac =
+        dataRepo.readUAC(uacHash).orElseThrow(() -> createException("Failed to retrieve UAC"));
+    String caseId = uac.getCaseId();
+    if (!StringUtils.isEmpty(caseId)) {
+      // UAC has a caseId
+      CaseUpdate caseUpdate =
+          dataRepo
+              .readCaseUpdate(caseId)
+              .orElseThrow(() -> createException("UAC has no associated case"));
+      log.debug("UAC is linked", kv("uacHash", uacHash), kv("caseId", caseId));
 
-          // TODO log if missing?
-          // Will always exist if the case exsits as it can't be saved without them
-          Optional<SurveyUpdate> surveyMatch = dataRepo.readSurvey(caseMatch.get().getSurveyId());
-          Optional<CollectionExercise> collexMatch =
-              dataRepo.readCollectionExercise(caseMatch.get().getCollectionExerciseId());
+      SurveyUpdate survey =
+          dataRepo
+              .readSurvey(caseUpdate.getSurveyId())
+              .orElseThrow(
+                  () ->
+                      new CTPException(
+                          CTPException.Fault.RESOURCE_NOT_FOUND, "SurveyUpdate Not Found"));
+      CollectionExercise collex =
+          dataRepo
+              .readCollectionExercise(caseUpdate.getCollectionExerciseId())
+              .orElseThrow(
+                  () ->
+                      new CTPException(
+                          CTPException.Fault.RESOURCE_NOT_FOUND, "CollectionExercise Not Found"));
 
-          data = createUniqueAccessCodeDTO(uacMatch.get(), caseMatch, collexMatch, surveyMatch);
-        } else {
-          // Case NOT found
-          log.info(
-              "Cannot find Case for UAC - telling UI unlinked - RM remediation required",
-              kv("uacHash", uacHash),
-              kv("caseId", caseId));
-          data =
-              createUniqueAccessCodeDTO(
-                  uacMatch.get(), Optional.empty(), Optional.empty(), Optional.empty());
-        }
-      } else {
-        // unlinked logkv(uacHash)
-        log.debug("UAC is unlinked", kv("uacHash", uacHash));
-        data =
-            createUniqueAccessCodeDTO(
-                uacMatch.get(), Optional.empty(), Optional.empty(), Optional.empty());
-      }
+      data = createUniqueAccessCodeDTO(uac, caseUpdate, collex, survey);
       sendUacAuthenticationEvent(data);
     } else {
-      log.warn("Unknown UAC", kv("uacHash", uacHash));
-      throw new CTPException(CTPException.Fault.RESOURCE_NOT_FOUND, "Failed to retrieve UAC");
+      throw new CTPException(CTPException.Fault.RESOURCE_NOT_FOUND, "UAC has no caseId");
     }
 
     return data;
@@ -113,32 +103,30 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
 
   private UniqueAccessCodeDTO createUniqueAccessCodeDTO(
       UacUpdate uac,
-      Optional<CaseUpdate> collectionCase,
-      Optional<CollectionExercise> collectionExercise,
-      Optional<SurveyUpdate> surveyUpdate) {
+      CaseUpdate collectionCase,
+      CollectionExercise collectionExercise,
+      SurveyUpdate surveyUpdate) {
     UniqueAccessCodeDTO uniqueAccessCodeDTO = new UniqueAccessCodeDTO();
 
     // Copy the UAC first, then Case
     mapperFacade.map(uac, uniqueAccessCodeDTO);
 
-    if (collectionCase.isPresent()) {
-      CaseDTO caseDTO = new CaseDTO();
-      mapperFacade.map(collectionCase.get(), caseDTO);
-      uniqueAccessCodeDTO.setCollectionCase(caseDTO);
-    }
+    CaseDTO caseDTO = new CaseDTO();
+    mapperFacade.map(collectionCase, caseDTO);
+    uniqueAccessCodeDTO.setCollectionCase(caseDTO);
 
-    if (collectionExercise.isPresent()) {
-      CollectionExerciseDTO collectionExerciseDTO = new CollectionExerciseDTO();
-      mapperFacade.map(collectionExercise.get(), collectionExerciseDTO);
-      uniqueAccessCodeDTO.setCollectionExercise(collectionExerciseDTO);
-    }
+    CollectionExerciseDTO collectionExerciseDTO = new CollectionExerciseDTO();
+    mapperFacade.map(collectionExercise, collectionExerciseDTO);
+    uniqueAccessCodeDTO.setCollectionExercise(collectionExerciseDTO);
 
-    if (surveyUpdate.isPresent()) {
-      SurveyLiteDTO surveyLiteDTO = new SurveyLiteDTO();
-      mapperFacade.map(surveyUpdate.get(), surveyLiteDTO);
-      uniqueAccessCodeDTO.setSurvey(surveyLiteDTO);
-    }
+    SurveyLiteDTO surveyLiteDTO = new SurveyLiteDTO();
+    mapperFacade.map(surveyUpdate, surveyLiteDTO);
+    uniqueAccessCodeDTO.setSurvey(surveyLiteDTO);
 
     return uniqueAccessCodeDTO;
+  }
+
+  private CTPException createException(String message) {
+    return new CTPException(CTPException.Fault.RESOURCE_NOT_FOUND, message);
   }
 }
