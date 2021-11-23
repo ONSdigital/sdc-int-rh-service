@@ -44,7 +44,7 @@ public class RHSvcBeanMapper extends ConfigurableMapper {
     ConverterFactory converterFactory = factory.getConverterFactory();
     converterFactory.registerConverter(new StringToUUIDConverter());
     converterFactory.registerConverter(new StringToUPRNConverter());
-    converterFactory.registerConverter(new LocalDateConverter());
+    converterFactory.registerConverter(new LocalDateTimeConverter());
     converterFactory.registerConverter(new EstabTypeConverter());
 
     factory
@@ -97,7 +97,7 @@ public class RHSvcBeanMapper extends ConfigurableMapper {
     }
   }
 
-  static class LocalDateConverter extends BidirectionalConverter<Date, LocalDateTime> {
+  static class LocalDateTimeConverter extends BidirectionalConverter<Date, LocalDateTime> {
 
     @Override
     public LocalDateTime convertTo(
