@@ -88,8 +88,8 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
   /** Send UacAuthentication event */
   private void sendUacAuthenticationEvent(UniqueAccessCodeDTO data) throws CTPException {
     UUID caseId = null;
-    if (data.getCaseDTO() != null) {
-      caseId = data.getCaseDTO().getCaseId();
+    if (data.getCollectionCase() != null) {
+      caseId = data.getCollectionCase().getCaseId();
     }
 
     log.info(
@@ -124,19 +124,19 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
     if (collectionCase.isPresent()) {
       CaseDTO caseDTO = new CaseDTO();
       mapperFacade.map(collectionCase.get(), caseDTO);
-      uniqueAccessCodeDTO.setCaseDTO(caseDTO);
+      uniqueAccessCodeDTO.setCollectionCase(caseDTO);
     }
 
     if (collectionExercise.isPresent()) {
       CollectionExerciseDTO collectionExerciseDTO = new CollectionExerciseDTO();
       mapperFacade.map(collectionExercise.get(), collectionExerciseDTO);
-      uniqueAccessCodeDTO.setCollectionExerciseDTO(collectionExerciseDTO);
+      uniqueAccessCodeDTO.setCollectionExercise(collectionExerciseDTO);
     }
 
     if (surveyUpdate.isPresent()) {
       SurveyLiteDTO surveyLiteDTO = new SurveyLiteDTO();
       mapperFacade.map(surveyUpdate.get(), surveyLiteDTO);
-      uniqueAccessCodeDTO.setSurveyLiteDTO(surveyLiteDTO);
+      uniqueAccessCodeDTO.setSurvey(surveyLiteDTO);
     }
 
     return uniqueAccessCodeDTO;

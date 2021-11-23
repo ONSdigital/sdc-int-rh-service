@@ -12,7 +12,7 @@ public class UniqueAccessCodeDTO {
   private boolean receiptReceived;
   private boolean eqLaunched;
   private int wave;
-  private SurveyLiteDTO surveyLiteDTO;
-  private CollectionExerciseDTO collectionExerciseDTO;
-  private CaseDTO caseDTO;
+  private SurveyLiteDTO survey;
+  private CollectionExerciseDTO collectionExercise;
+  private CaseDTO collectionCase;
 }

@@ -31,8 +31,6 @@ public class UniqueAccessCodeEndpointTest {
   private static final String UAC_HASH =
       "8a9d5db4bbee34fd16e40aa2aaae52cfbdf1842559023614c30edb480ec252b4";
   private static final String CASE_ID = "dc4477d1-dd3f-4c69-b181-7ff725dc9fa4";
-  private static String SURVEY_ID = "3883af91-0052-4497-9805-3238544fcf8a";
-  private static String COLLECTION_EXERCISE_ID = "4883af91-0052-4497-9805-3238544fcf8a";
   private static final String QID = "1110000009";
   private static final String POSTCODE = "UP103UP";
   private static final String ERROR_CODE = "RESOURCE_NOT_FOUND";
@@ -61,17 +59,19 @@ public class UniqueAccessCodeEndpointTest {
   public void getUACClaimContextUACFound() throws Exception {
     when(uacService.getAndAuthenticateUAC(UAC_HASH)).thenReturn(uacDTO.get(0));
 
+    String COLLECTION_EXERCISE_ID = "4883af91-0052-4497-9805-3238544fcf8a";
+    String SURVEY_ID = "3883af91-0052-4497-9805-3238544fcf8a";
     mockMvc
         .perform(get(String.format("/uacs/%s", UAC_HASH)))
         .andExpect(status().isOk())
         .andExpect(content().contentType(EXPECTED_JSON_CONTENT_TYPE))
         .andExpect(jsonPath("$.uacHash", is(UAC_HASH)))
-        .andExpect(jsonPath("$.caseDTO.caseId", is(CASE_ID)))
-        .andExpect(jsonPath("$.surveyLiteDTO.surveyId", is(SURVEY_ID)))
+        .andExpect(jsonPath("$.collectionCase.caseId", is(CASE_ID)))
+        .andExpect(jsonPath("$.survey.surveyId", is(SURVEY_ID)))
         .andExpect(
-            jsonPath("$.collectionExerciseDTO.collectionExerciseId", is(COLLECTION_EXERCISE_ID)))
+            jsonPath("$.collectionExercise.collectionExerciseId", is(COLLECTION_EXERCISE_ID)))
         .andExpect(jsonPath("$.qid", is(QID)))
-        .andExpect(jsonPath("$.caseDTO.address.postcode", is(POSTCODE)))
+        .andExpect(jsonPath("$.collectionCase.address.postcode", is(POSTCODE)))
         .andExpect(jsonPath("$.receiptReceived", is(Boolean.TRUE)))
         .andExpect(jsonPath("$.eqLaunched", is(Boolean.TRUE)))
         .andExpect(jsonPath("$.wave", is(82)));

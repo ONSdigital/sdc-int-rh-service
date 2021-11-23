@@ -91,52 +91,54 @@ public class UniqueAccessCodeServiceImplTest {
     assertEquals(uacTest.isEqLaunched(), uacDTO.isEqLaunched());
     assertEquals(uacTest.getMetadata().getWave(), uacDTO.getWave());
 
-    assertEquals(surveyTest.getSurveyId(), uacDTO.getSurveyLiteDTO().getSurveyId());
-    assertEquals(surveyTest.getName(), uacDTO.getSurveyLiteDTO().getName());
+    assertEquals(surveyTest.getSurveyId(), uacDTO.getSurvey().getSurveyId());
+    assertEquals(surveyTest.getName(), uacDTO.getSurvey().getName());
 
     assertEquals(
         collexTest.getCollectionExerciseId(),
-        uacDTO.getCollectionExerciseDTO().getCollectionExerciseId());
-    assertEquals(collexTest.getSurveyId(), uacDTO.getCollectionExerciseDTO().getSurveyId());
-    assertEquals(collexTest.getName(), uacDTO.getCollectionExerciseDTO().getName());
-    assertEquals(collexTest.getReference(), uacDTO.getCollectionExerciseDTO().getReference());
-    assertEquals(collexTest.getStartDate(), uacDTO.getCollectionExerciseDTO().getStartDate());
-    assertEquals(collexTest.getEndDate(), uacDTO.getCollectionExerciseDTO().getEndDate());
+        uacDTO.getCollectionExercise().getCollectionExerciseId());
+    assertEquals(collexTest.getSurveyId(), uacDTO.getCollectionExercise().getSurveyId());
+    assertEquals(collexTest.getName(), uacDTO.getCollectionExercise().getName());
+    assertEquals(collexTest.getReference(), uacDTO.getCollectionExercise().getReference());
+    assertEquals(collexTest.getStartDate(), uacDTO.getCollectionExercise().getStartDate());
+    assertEquals(collexTest.getEndDate(), uacDTO.getCollectionExercise().getEndDate());
     assertEquals(
         collexTest.getMetadata().getNumberOfWaves(),
-        uacDTO.getCollectionExerciseDTO().getNumberOfWaves());
+        uacDTO.getCollectionExercise().getNumberOfWaves());
     assertEquals(
-        collexTest.getMetadata().getWaveLength(),
-        uacDTO.getCollectionExerciseDTO().getWaveLength());
+        collexTest.getMetadata().getWaveLength(), uacDTO.getCollectionExercise().getWaveLength());
     assertEquals(
-        collexTest.getMetadata().getCohorts(), uacDTO.getCollectionExerciseDTO().getCohorts());
+        collexTest.getMetadata().getCohorts(), uacDTO.getCollectionExercise().getCohorts());
     assertEquals(
         collexTest.getMetadata().getCohortSchedule(),
-        uacDTO.getCollectionExerciseDTO().getCohortSchedule());
+        uacDTO.getCollectionExercise().getCohortSchedule());
 
-    assertEquals(UUID.fromString(uacTest.getCaseId()), uacDTO.getCaseDTO().getCaseId());
+    assertEquals(UUID.fromString(uacTest.getCaseId()), uacDTO.getCollectionCase().getCaseId());
     assertEquals(
         caseTest.getCollectionExerciseId(),
-        uacDTO.getCollectionExerciseDTO().getCollectionExerciseId());
+        uacDTO.getCollectionExercise().getCollectionExerciseId());
     assertEquals(
         Region.valueOf(caseTest.getSample().getRegion()),
-        uacDTO.getCaseDTO().getAddress().getRegion());
+        uacDTO.getCollectionCase().getAddress().getRegion());
     assertEquals(
-        caseTest.getSample().getAddressLine1(), uacDTO.getCaseDTO().getAddress().getAddressLine1());
+        caseTest.getSample().getAddressLine1(),
+        uacDTO.getCollectionCase().getAddress().getAddressLine1());
     assertEquals(
-        caseTest.getSample().getAddressLine2(), uacDTO.getCaseDTO().getAddress().getAddressLine2());
+        caseTest.getSample().getAddressLine2(),
+        uacDTO.getCollectionCase().getAddress().getAddressLine2());
     assertEquals(
-        caseTest.getSample().getAddressLine3(), uacDTO.getCaseDTO().getAddress().getAddressLine3());
+        caseTest.getSample().getAddressLine3(),
+        uacDTO.getCollectionCase().getAddress().getAddressLine3());
     assertEquals(
-        caseTest.getSample().getTownName(), uacDTO.getCaseDTO().getAddress().getTownName());
+        caseTest.getSample().getTownName(), uacDTO.getCollectionCase().getAddress().getTownName());
     assertEquals(
-        caseTest.getSample().getPostcode(), uacDTO.getCaseDTO().getAddress().getPostcode());
+        caseTest.getSample().getPostcode(), uacDTO.getCollectionCase().getAddress().getPostcode());
     assertEquals(
         caseTest.getSample().getUprn(),
-        Long.toString(uacDTO.getCaseDTO().getAddress().getUprn().getValue()));
+        Long.toString(uacDTO.getCollectionCase().getAddress().getUprn().getValue()));
 
     UacAuthenticationResponse payload = payloadCapture.getValue();
-    assertEquals(uacDTO.getCaseDTO().getCaseId(), payload.getCaseId());
+    assertEquals(uacDTO.getCollectionCase().getCaseId(), payload.getCaseId());
     assertEquals(uacDTO.getQid(), payload.getQuestionnaireId());
   }
 
@@ -167,9 +169,9 @@ public class UniqueAccessCodeServiceImplTest {
 
     assertEquals(UAC_HASH, uacDTO.getUacHash());
     assertEquals(uacTest.isActive(), uacDTO.isActive());
-    assertNull(uacDTO.getCaseDTO());
-    assertNull(uacDTO.getCollectionExerciseDTO());
-    assertNull(uacDTO.getSurveyLiteDTO());
+    assertNull(uacDTO.getCollectionCase());
+    assertNull(uacDTO.getCollectionExercise());
+    assertNull(uacDTO.getSurvey());
     assertEquals(uacTest.getQid(), uacDTO.getQid());
 
     UacAuthenticationResponse payload = payloadCapture.getValue();
@@ -204,9 +206,9 @@ public class UniqueAccessCodeServiceImplTest {
 
     assertEquals(UAC_HASH, uacDTO.getUacHash());
     assertEquals(uacTest.isActive(), uacDTO.isActive());
-    assertNull(uacDTO.getCaseDTO());
-    assertNull(uacDTO.getCollectionExerciseDTO());
-    assertNull(uacDTO.getSurveyLiteDTO());
+    assertNull(uacDTO.getCollectionCase());
+    assertNull(uacDTO.getCollectionExercise());
+    assertNull(uacDTO.getSurvey());
     assertEquals(uacTest.getQid(), uacDTO.getQid());
 
     UacAuthenticationResponse payload = payloadCapture.getValue();
