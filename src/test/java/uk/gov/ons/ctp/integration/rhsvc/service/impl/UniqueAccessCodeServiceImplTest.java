@@ -163,13 +163,73 @@ public class UniqueAccessCodeServiceImplTest {
         assertThrows(
             CTPException.class, () -> uacSvc.getAndAuthenticateUAC(UAC_HASH));
 
-    assertEquals(CTPException.Fault.RESOURCE_NOT_FOUND,  thrown.getFault());
-    assertEquals("UAC has no associated case", thrown.getMessage());
+    assertEquals(CTPException.Fault.SYSTEM_ERROR,  thrown.getFault());
+    assertEquals("Case Not Found", thrown.getMessage());
 
     verify(dataRepo, times(1)).readUAC(UAC_HASH);
     verify(dataRepo, times(1)).readCaseUpdate(CASE_ID);
     verify(dataRepo, times(0)).readSurvey(any());
     verify(dataRepo, times(0)).readCollectionExercise(any());
+
+    verify(eventPublisher, times(0)).sendEvent(any(), any(), any(), payloadCapture.capture());
+  }
+
+  @Test
+  public void getUACLinkedToSurveyThatCannotBeFound() throws Exception {
+
+    ArgumentCaptor<UacAuthenticationResponse> payloadCapture =
+        ArgumentCaptor.forClass(UacAuthenticationResponse.class);
+
+    UacUpdate uacTest = getUAC("linkedHousehold");
+    CaseUpdate caseTest = getCase("household");
+
+    when(dataRepo.readUAC(UAC_HASH)).thenReturn(Optional.of(uacTest));
+    when(dataRepo.readCaseUpdate(CASE_ID)).thenReturn(Optional.empty());
+    when(dataRepo.readCaseUpdate(CASE_ID)).thenReturn(Optional.of(caseTest));
+    when(dataRepo.readSurvey(SURVEY_ID)).thenReturn(Optional.empty());
+
+    CTPException thrown =
+        assertThrows(
+            CTPException.class, () -> uacSvc.getAndAuthenticateUAC(UAC_HASH));
+
+    assertEquals(CTPException.Fault.SYSTEM_ERROR,  thrown.getFault());
+    assertEquals("Survey Not Found", thrown.getMessage());
+
+    verify(dataRepo, times(1)).readUAC(UAC_HASH);
+    verify(dataRepo, times(1)).readCaseUpdate(CASE_ID);
+    verify(dataRepo, times(1)).readSurvey(SURVEY_ID);
+    verify(dataRepo, times(0)).readCollectionExercise(any());
+
+    verify(eventPublisher, times(0)).sendEvent(any(), any(), any(), payloadCapture.capture());
+  }
+
+  @Test
+  public void getUACLinkedToCollectionExerciseThatCannotBeFound() throws Exception {
+
+    ArgumentCaptor<UacAuthenticationResponse> payloadCapture =
+        ArgumentCaptor.forClass(UacAuthenticationResponse.class);
+
+    UacUpdate uacTest = getUAC("linkedHousehold");
+    CaseUpdate caseTest = getCase("household");
+    SurveyUpdate surveyTest = getSurvey();
+
+    when(dataRepo.readUAC(UAC_HASH)).thenReturn(Optional.of(uacTest));
+    when(dataRepo.readCaseUpdate(CASE_ID)).thenReturn(Optional.of(caseTest));
+    when(dataRepo.readSurvey(SURVEY_ID)).thenReturn(Optional.of(surveyTest));
+    when(dataRepo.readCollectionExercise(COLLECTION_EXERCISE_ID))
+        .thenReturn(Optional.empty());
+
+    CTPException thrown =
+        assertThrows(
+            CTPException.class, () -> uacSvc.getAndAuthenticateUAC(UAC_HASH));
+
+    assertEquals(CTPException.Fault.SYSTEM_ERROR,  thrown.getFault());
+    assertEquals("CollectionExercise Not Found", thrown.getMessage());
+
+    verify(dataRepo, times(1)).readUAC(UAC_HASH);
+    verify(dataRepo, times(1)).readCaseUpdate(CASE_ID);
+    verify(dataRepo, times(1)).readSurvey(SURVEY_ID);
+    verify(dataRepo, times(1)).readCollectionExercise(COLLECTION_EXERCISE_ID);
 
     verify(eventPublisher, times(0)).sendEvent(any(), any(), any(), payloadCapture.capture());
   }
@@ -188,7 +248,7 @@ public class UniqueAccessCodeServiceImplTest {
         assertThrows(
             CTPException.class, () -> uacSvc.getAndAuthenticateUAC(UAC_HASH));
 
-    assertEquals(CTPException.Fault.RESOURCE_NOT_FOUND,  thrown.getFault());
+    assertEquals(CTPException.Fault.SYSTEM_ERROR,  thrown.getFault());
     assertEquals("UAC has no caseId", thrown.getMessage());
 
     verify(dataRepo, times(1)).readUAC(UAC_HASH);
@@ -200,18 +260,17 @@ public class UniqueAccessCodeServiceImplTest {
   @Test
   public void getUACNotFound() throws Exception {
 
-    boolean exceptionThrown = false;
-    try {
-      uacSvc.getAndAuthenticateUAC(UAC_HASH);
-    } catch (CTPException e) {
-      exceptionThrown = true;
-    }
+    CTPException thrown =
+        assertThrows(
+            CTPException.class, () -> uacSvc.getAndAuthenticateUAC(UAC_HASH));
+
+    assertEquals(CTPException.Fault.RESOURCE_NOT_FOUND,  thrown.getFault());
+    assertEquals("Failed to retrieve UAC", thrown.getMessage());
 
     verify(dataRepo, times(1)).readUAC(UAC_HASH);
     verify(dataRepo, times(0)).readCaseUpdate(CASE_ID);
     verify(eventPublisher, times(0)).sendEvent(any(), any(), any(), any(EventPayload.class));
 
-    assertTrue(exceptionThrown);
   }
 
   private UacUpdate getUAC(String qualifier) {

@@ -41,15 +41,16 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
 
     UniqueAccessCodeDTO data;
     UacUpdate uac =
-        dataRepo.readUAC(uacHash).orElseThrow(() -> createException("Failed to retrieve UAC"));
+        dataRepo.readUAC(uacHash).orElseThrow(() -> new CTPException(
+            CTPException.Fault.RESOURCE_NOT_FOUND, "Failed to retrieve UAC"));
     String caseId = uac.getCaseId();
     if (!StringUtils.isEmpty(caseId)) {
       // UAC has a caseId
       CaseUpdate caseUpdate =
           dataRepo
               .readCaseUpdate(caseId)
-              .orElseThrow(() -> createException("UAC has no associated case"));
-      log.debug("UAC is linked", kv("uacHash", uacHash), kv("caseId", caseId));
+              .orElseThrow(() -> new CTPException(
+                  CTPException.Fault.SYSTEM_ERROR, "Case Not Found"));
 
       SurveyUpdate survey =
           dataRepo
@@ -57,19 +58,19 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
               .orElseThrow(
                   () ->
                       new CTPException(
-                          CTPException.Fault.RESOURCE_NOT_FOUND, "SurveyUpdate Not Found"));
+                          CTPException.Fault.SYSTEM_ERROR, "Survey Not Found"));
       CollectionExercise collex =
           dataRepo
               .readCollectionExercise(caseUpdate.getCollectionExerciseId())
               .orElseThrow(
                   () ->
                       new CTPException(
-                          CTPException.Fault.RESOURCE_NOT_FOUND, "CollectionExercise Not Found"));
+                          CTPException.Fault.SYSTEM_ERROR, "CollectionExercise Not Found"));
 
       data = createUniqueAccessCodeDTO(uac, caseUpdate, collex, survey);
       sendUacAuthenticationEvent(data);
     } else {
-      throw new CTPException(CTPException.Fault.RESOURCE_NOT_FOUND, "UAC has no caseId");
+      throw new CTPException(CTPException.Fault.SYSTEM_ERROR, "UAC has no caseId");
     }
 
     return data;
@@ -126,7 +127,4 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
     return uniqueAccessCodeDTO;
   }
 
-  private CTPException createException(String message) {
-    return new CTPException(CTPException.Fault.RESOURCE_NOT_FOUND, message);
-  }
 }
