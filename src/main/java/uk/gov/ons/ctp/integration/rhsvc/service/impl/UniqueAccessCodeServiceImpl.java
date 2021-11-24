@@ -41,23 +41,25 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
 
     UniqueAccessCodeDTO data;
     UacUpdate uac =
-        dataRepo.readUAC(uacHash).orElseThrow(() -> new CTPException(
-            CTPException.Fault.RESOURCE_NOT_FOUND, "Failed to retrieve UAC"));
+        dataRepo
+            .readUAC(uacHash)
+            .orElseThrow(
+                () ->
+                    new CTPException(
+                        CTPException.Fault.RESOURCE_NOT_FOUND, "Failed to retrieve UAC"));
     String caseId = uac.getCaseId();
     if (!StringUtils.isEmpty(caseId)) {
       // UAC has a caseId
       CaseUpdate caseUpdate =
           dataRepo
               .readCaseUpdate(caseId)
-              .orElseThrow(() -> new CTPException(
-                  CTPException.Fault.SYSTEM_ERROR, "Case Not Found"));
+              .orElseThrow(
+                  () -> new CTPException(CTPException.Fault.SYSTEM_ERROR, "Case Not Found"));
       SurveyUpdate survey =
           dataRepo
               .readSurvey(caseUpdate.getSurveyId())
               .orElseThrow(
-                  () ->
-                      new CTPException(
-                          CTPException.Fault.SYSTEM_ERROR, "Survey Not Found"));
+                  () -> new CTPException(CTPException.Fault.SYSTEM_ERROR, "Survey Not Found"));
       CollectionExercise collex =
           dataRepo
               .readCollectionExercise(caseUpdate.getCollectionExerciseId())
@@ -77,7 +79,7 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
 
   /** Send UacAuthentication event */
   private void sendUacAuthenticationEvent(UniqueAccessCodeDTO data) throws CTPException {
-      UUID caseId = data.getCollectionCase().getCaseId();
+    UUID caseId = data.getCollectionCase().getCaseId();
 
     log.info(
         "Generating UacAuthentication event for caseId",
@@ -121,5 +123,4 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
 
     return uniqueAccessCodeDTO;
   }
-
 }

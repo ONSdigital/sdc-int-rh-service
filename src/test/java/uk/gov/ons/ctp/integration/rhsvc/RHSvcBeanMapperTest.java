@@ -111,5 +111,4 @@ public class RHSvcBeanMapperTest {
     Date date = mapper.map(LocalDateTime.parse("2021-09-17T23:59:59.999"), Date.class);
     assertEquals(Date.from(Instant.parse("2021-09-17T23:59:59.999Z")), date);
   }
-
 }
