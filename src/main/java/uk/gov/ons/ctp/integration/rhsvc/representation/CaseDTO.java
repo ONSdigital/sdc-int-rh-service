@@ -12,5 +12,6 @@ public class CaseDTO {
   private UUID collectionExerciseId;
   private boolean invalid;
   private String refusalReceived;
+  private String caseRef;
   private AddressDTO address;
 }
