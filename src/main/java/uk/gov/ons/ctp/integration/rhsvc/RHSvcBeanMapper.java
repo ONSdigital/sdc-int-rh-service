@@ -1,5 +1,9 @@
 package uk.gov.ons.ctp.integration.rhsvc;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.util.Date;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.converter.BidirectionalConverter;
@@ -12,14 +16,18 @@ import uk.gov.ons.ctp.common.event.model.Address;
 import uk.gov.ons.ctp.common.event.model.AddressCompact;
 import uk.gov.ons.ctp.common.event.model.CaseUpdate;
 import uk.gov.ons.ctp.common.event.model.CaseUpdateSample;
+import uk.gov.ons.ctp.common.event.model.CollectionExercise;
 import uk.gov.ons.ctp.common.event.model.NewCaseSample;
 import uk.gov.ons.ctp.common.event.model.NewCaseSampleSensitive;
+import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 import uk.gov.ons.ctp.common.event.model.UacUpdate;
 import uk.gov.ons.ctp.common.util.StringToUPRNConverter;
 import uk.gov.ons.ctp.common.util.StringToUUIDConverter;
 import uk.gov.ons.ctp.integration.rhsvc.representation.AddressDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.CollectionExerciseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.NewCaseDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.SurveyLiteDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.UniqueAccessCodeDTO;
 
 /** The bean mapper that maps to/from DTOs and repository entity types. */
@@ -36,6 +44,7 @@ public class RHSvcBeanMapper extends ConfigurableMapper {
     ConverterFactory converterFactory = factory.getConverterFactory();
     converterFactory.registerConverter(new StringToUUIDConverter());
     converterFactory.registerConverter(new StringToUPRNConverter());
+    converterFactory.registerConverter(new LocalDateTimeConverter());
     converterFactory.registerConverter(new EstabTypeConverter());
 
     factory
@@ -51,20 +60,17 @@ public class RHSvcBeanMapper extends ConfigurableMapper {
         .register();
 
     factory
-        .classMap(CaseUpdate.class, UniqueAccessCodeDTO.class)
-        .field("sample.region", "region")
-        .field("sample.uprn", "address.uprn")
-        .field("sample.addressLine1", "address.addressLine1")
-        .field("sample.addressLine2", "address.addressLine2")
-        .field("sample.addressLine3", "address.addressLine3")
-        .field("sample.townName", "address.townName")
-        .field("sample.postcode", "address.postcode")
+        .classMap(UacUpdate.class, UniqueAccessCodeDTO.class)
+        .field("metadata.wave", "wave")
         .byDefault()
         .register();
 
     factory
-        .classMap(UacUpdate.class, UniqueAccessCodeDTO.class)
-        .field("metadata.wave", "wave")
+        .classMap(CollectionExercise.class, CollectionExerciseDTO.class)
+        .field("metadata.numberOfWaves", "numberOfWaves")
+        .field("metadata.waveLength", "waveLength")
+        .field("metadata.cohorts", "cohorts")
+        .field("metadata.cohortSchedule", "cohortSchedule")
         .byDefault()
         .register();
 
@@ -74,6 +80,7 @@ public class RHSvcBeanMapper extends ConfigurableMapper {
     factory.classMap(AddressDTO.class, AddressCompact.class).byDefault().register();
     factory.classMap(Address.class, AddressCompact.class).byDefault().register();
     factory.classMap(NewCaseSample.class, NewCaseDTO.class).byDefault().register();
+    factory.classMap(SurveyUpdate.class, SurveyLiteDTO.class).byDefault().register();
   }
 
   static class EstabTypeConverter extends BidirectionalConverter<String, EstabType> {
@@ -87,6 +94,21 @@ public class RHSvcBeanMapper extends ConfigurableMapper {
     public EstabType convertTo(
         String source, Type<EstabType> destinationType, MappingContext mappingContext) {
       return EstabType.forCode(source);
+    }
+  }
+
+  static class LocalDateTimeConverter extends BidirectionalConverter<Date, LocalDateTime> {
+
+    @Override
+    public LocalDateTime convertTo(
+        Date date, Type<LocalDateTime> type, MappingContext mappingContext) {
+      return LocalDateTime.ofInstant(date.toInstant(), ZoneId.of(ZoneOffset.UTC.getId()));
+    }
+
+    @Override
+    public Date convertFrom(
+        LocalDateTime localDateTime, Type<Date> type, MappingContext mappingContext) {
+      return Date.from(localDateTime.toInstant(ZoneOffset.UTC));
     }
   }
 }

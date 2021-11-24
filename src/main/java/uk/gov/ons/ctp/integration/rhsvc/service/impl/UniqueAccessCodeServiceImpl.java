@@ -2,7 +2,6 @@ package uk.gov.ons.ctp.integration.rhsvc.service.impl;
 
 import static uk.gov.ons.ctp.common.log.ScopedStructuredArguments.kv;
 
-import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import ma.glasnost.orika.MapperFacade;
@@ -15,11 +14,15 @@ import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.EventPublisher;
 import uk.gov.ons.ctp.common.event.TopicType;
 import uk.gov.ons.ctp.common.event.model.CaseUpdate;
+import uk.gov.ons.ctp.common.event.model.CollectionExercise;
+import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 import uk.gov.ons.ctp.common.event.model.UacAuthenticationResponse;
 import uk.gov.ons.ctp.common.event.model.UacUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
+import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.CollectionExerciseDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.SurveyLiteDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.UniqueAccessCodeDTO;
-import uk.gov.ons.ctp.integration.rhsvc.representation.UniqueAccessCodeDTO.CaseStatus;
 import uk.gov.ons.ctp.integration.rhsvc.service.UniqueAccessCodeService;
 
 /** Implementation to deal with UAC data */
@@ -37,35 +40,38 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
   public UniqueAccessCodeDTO getAndAuthenticateUAC(String uacHash) throws CTPException {
 
     UniqueAccessCodeDTO data;
-    Optional<UacUpdate> uacMatch = dataRepo.readUAC(uacHash);
-    if (uacMatch.isPresent()) {
-      // we found UAC
-      String caseId = uacMatch.get().getCaseId();
-      if (!StringUtils.isEmpty(caseId)) {
-        // UAC has a caseId
-        Optional<CaseUpdate> caseMatch = dataRepo.readCaseUpdate(caseId);
-        if (caseMatch.isPresent()) {
-          // Case found
-          log.debug("UAC is linked", kv("uacHash", uacHash), kv("caseId", caseId));
-          data = createUniqueAccessCodeDTO(uacMatch.get(), caseMatch, CaseStatus.OK);
-        } else {
-          // Case NOT found
-          log.info(
-              "Cannot find Case for UAC - telling UI unlinked - RM remediation required",
-              kv("uacHash", uacHash),
-              kv("caseId", caseId));
-          data = createUniqueAccessCodeDTO(uacMatch.get(), Optional.empty(), CaseStatus.UNLINKED);
-          data.setCaseId(null);
-        }
-      } else {
-        // unlinked logkv(uacHash)
-        log.debug("UAC is unlinked", kv("uacHash", uacHash));
-        data = createUniqueAccessCodeDTO(uacMatch.get(), Optional.empty(), CaseStatus.UNLINKED);
-      }
+    UacUpdate uac =
+        dataRepo
+            .readUAC(uacHash)
+            .orElseThrow(
+                () ->
+                    new CTPException(
+                        CTPException.Fault.RESOURCE_NOT_FOUND, "Failed to retrieve UAC"));
+    String caseId = uac.getCaseId();
+    if (!StringUtils.isEmpty(caseId)) {
+      // UAC has a caseId
+      CaseUpdate caseUpdate =
+          dataRepo
+              .readCaseUpdate(caseId)
+              .orElseThrow(
+                  () -> new CTPException(CTPException.Fault.SYSTEM_ERROR, "Case Not Found"));
+      SurveyUpdate survey =
+          dataRepo
+              .readSurvey(caseUpdate.getSurveyId())
+              .orElseThrow(
+                  () -> new CTPException(CTPException.Fault.SYSTEM_ERROR, "Survey Not Found"));
+      CollectionExercise collex =
+          dataRepo
+              .readCollectionExercise(caseUpdate.getCollectionExerciseId())
+              .orElseThrow(
+                  () ->
+                      new CTPException(
+                          CTPException.Fault.SYSTEM_ERROR, "CollectionExercise Not Found"));
+
+      data = createUniqueAccessCodeDTO(uac, caseUpdate, collex, survey);
       sendUacAuthenticationEvent(data);
     } else {
-      log.warn("Unknown UAC", kv("uacHash", uacHash));
-      throw new CTPException(CTPException.Fault.RESOURCE_NOT_FOUND, "Failed to retrieve UAC");
+      throw new CTPException(CTPException.Fault.SYSTEM_ERROR, "UAC has no caseId");
     }
 
     return data;
@@ -73,17 +79,15 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
 
   /** Send UacAuthentication event */
   private void sendUacAuthenticationEvent(UniqueAccessCodeDTO data) throws CTPException {
+    UUID caseId = data.getCollectionCase().getCaseId();
 
     log.info(
         "Generating UacAuthentication event for caseId",
-        kv("caseId", data.getCaseId()),
+        kv("caseId", caseId),
         kv("questionnaireId", data.getQid()));
 
     UacAuthenticationResponse response =
-        UacAuthenticationResponse.builder()
-            .questionnaireId(data.getQid())
-            .caseId(data.getCaseId())
-            .build();
+        UacAuthenticationResponse.builder().questionnaireId(data.getQid()).caseId(caseId).build();
 
     UUID messageId =
         eventPublisher.sendEvent(
@@ -97,17 +101,25 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
   }
 
   private UniqueAccessCodeDTO createUniqueAccessCodeDTO(
-      UacUpdate uac, Optional<CaseUpdate> collectionCase, CaseStatus caseStatus) {
+      UacUpdate uac,
+      CaseUpdate collectionCase,
+      CollectionExercise collectionExercise,
+      SurveyUpdate surveyUpdate) {
     UniqueAccessCodeDTO uniqueAccessCodeDTO = new UniqueAccessCodeDTO();
 
-    // Copy the UAC first, then Case
     mapperFacade.map(uac, uniqueAccessCodeDTO);
 
-    if (collectionCase.isPresent()) {
-      mapperFacade.map(collectionCase.get(), uniqueAccessCodeDTO);
-    }
+    CaseDTO caseDTO = new CaseDTO();
+    mapperFacade.map(collectionCase, caseDTO);
+    uniqueAccessCodeDTO.setCollectionCase(caseDTO);
 
-    uniqueAccessCodeDTO.setCaseStatus(caseStatus);
+    CollectionExerciseDTO collectionExerciseDTO = new CollectionExerciseDTO();
+    mapperFacade.map(collectionExercise, collectionExerciseDTO);
+    uniqueAccessCodeDTO.setCollectionExercise(collectionExerciseDTO);
+
+    SurveyLiteDTO surveyLiteDTO = new SurveyLiteDTO();
+    mapperFacade.map(surveyUpdate, surveyLiteDTO);
+    uniqueAccessCodeDTO.setSurvey(surveyLiteDTO);
 
     return uniqueAccessCodeDTO;
   }
