@@ -59,14 +59,19 @@ public class UniqueAccessCodeEndpointTest {
   public void getUACClaimContextUACFound() throws Exception {
     when(uacService.getAndAuthenticateUAC(UAC_HASH)).thenReturn(uacDTO.get(0));
 
+    String COLLECTION_EXERCISE_ID = "4883af91-0052-4497-9805-3238544fcf8a";
+    String SURVEY_ID = "3883af91-0052-4497-9805-3238544fcf8a";
     mockMvc
         .perform(get(String.format("/uacs/%s", UAC_HASH)))
         .andExpect(status().isOk())
         .andExpect(content().contentType(EXPECTED_JSON_CONTENT_TYPE))
         .andExpect(jsonPath("$.uacHash", is(UAC_HASH)))
-        .andExpect(jsonPath("$.caseId", is(CASE_ID)))
+        .andExpect(jsonPath("$.collectionCase.caseId", is(CASE_ID)))
+        .andExpect(jsonPath("$.survey.surveyId", is(SURVEY_ID)))
+        .andExpect(
+            jsonPath("$.collectionExercise.collectionExerciseId", is(COLLECTION_EXERCISE_ID)))
         .andExpect(jsonPath("$.qid", is(QID)))
-        .andExpect(jsonPath("$.address.postcode", is(POSTCODE)))
+        .andExpect(jsonPath("$.collectionCase.address.postcode", is(POSTCODE)))
         .andExpect(jsonPath("$.receiptReceived", is(Boolean.TRUE)))
         .andExpect(jsonPath("$.eqLaunched", is(Boolean.TRUE)))
         .andExpect(jsonPath("$.wave", is(82)));
