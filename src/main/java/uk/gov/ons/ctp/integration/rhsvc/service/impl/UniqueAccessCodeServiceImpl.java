@@ -77,10 +77,7 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
 
   /** Send UacAuthentication event */
   private void sendUacAuthenticationEvent(UniqueAccessCodeDTO data) throws CTPException {
-    UUID caseId = null;
-    if (data.getCollectionCase() != null) {
-      caseId = data.getCollectionCase().getCaseId();
-    }
+      UUID caseId = data.getCollectionCase().getCaseId();
 
     log.info(
         "Generating UacAuthentication event for caseId",
