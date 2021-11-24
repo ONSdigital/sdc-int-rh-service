@@ -161,10 +161,9 @@ public class UniqueAccessCodeServiceImplTest {
 
     CTPException thrown =
         assertThrows(
-            CTPException.class,
-            () -> uacSvc.getAndAuthenticateUAC(UAC_HASH),
-            "UAC has no associated case");
+            CTPException.class, () -> uacSvc.getAndAuthenticateUAC(UAC_HASH));
 
+    assertEquals(CTPException.Fault.RESOURCE_NOT_FOUND,  thrown.getFault());
     assertEquals("UAC has no associated case", thrown.getMessage());
 
     verify(dataRepo, times(1)).readUAC(UAC_HASH);
@@ -187,8 +186,9 @@ public class UniqueAccessCodeServiceImplTest {
 
     CTPException thrown =
         assertThrows(
-            CTPException.class, () -> uacSvc.getAndAuthenticateUAC(UAC_HASH), "UAC has no caseId");
+            CTPException.class, () -> uacSvc.getAndAuthenticateUAC(UAC_HASH));
 
+    assertEquals(CTPException.Fault.RESOURCE_NOT_FOUND,  thrown.getFault());
     assertEquals("UAC has no caseId", thrown.getMessage());
 
     verify(dataRepo, times(1)).readUAC(UAC_HASH);
