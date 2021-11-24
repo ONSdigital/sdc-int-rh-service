@@ -51,7 +51,6 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
               .readCaseUpdate(caseId)
               .orElseThrow(() -> new CTPException(
                   CTPException.Fault.SYSTEM_ERROR, "Case Not Found"));
-
       SurveyUpdate survey =
           dataRepo
               .readSurvey(caseUpdate.getSurveyId())
@@ -109,7 +108,6 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
       SurveyUpdate surveyUpdate) {
     UniqueAccessCodeDTO uniqueAccessCodeDTO = new UniqueAccessCodeDTO();
 
-    // Copy the UAC first, then Case
     mapperFacade.map(uac, uniqueAccessCodeDTO);
 
     CaseDTO caseDTO = new CaseDTO();

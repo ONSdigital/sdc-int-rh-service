@@ -3,6 +3,9 @@ package uk.gov.ons.ctp.integration.rhsvc;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.UUID;
 import ma.glasnost.orika.MapperFacade;
 import org.junit.jupiter.api.BeforeEach;
@@ -101,4 +104,12 @@ public class RHSvcBeanMapperTest {
     assertEquals(UUID.fromString("3883af91-0052-4497-9805-3238544fcf8a"), dto.getSurveyId());
     assertEquals("LMS", dto.getName());
   }
+
+  @Test
+  @DisplayName("LocalDateTime -> Date")
+  public void convertLocalDateTimeToDatetest() {
+    Date date = mapper.map(LocalDateTime.parse("2021-09-17T23:59:59.999"), Date.class);
+    assertEquals(Date.from(Instant.parse("2021-09-17T23:59:59.999Z")), date);
+  }
+
 }
