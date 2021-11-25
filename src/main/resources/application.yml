@@ -135,6 +135,6 @@ notify:
 loadshedding:
   modulus: 10
 
-survey: |-
+surveys: |-
   social
   asteroid

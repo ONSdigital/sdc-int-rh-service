@@ -14,6 +14,7 @@ import uk.gov.ons.ctp.common.event.model.UacEvent;
 import uk.gov.ons.ctp.common.event.model.UacUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
+import uk.gov.ons.ctp.integration.rhsvc.util.AcceptedEventFilter;
 
 /**
  * Service implementation responsible for receipt of UAC Events. See Spring Integration flow for
@@ -27,6 +28,7 @@ import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
 public class UACEventReceiverImpl {
   @Autowired private RespondentDataRepository respondentDataRepo;
   @Autowired private AppConfig appConfig;
+  @Autowired private AcceptedEventFilter acceptedEventFilter;
 
   /**
    * Message end point for events from Response Management. At present sends straight to publisher
@@ -55,7 +57,13 @@ public class UACEventReceiverImpl {
     }
 
     try {
-      respondentDataRepo.writeUAC(uac);
+      if (acceptedEventFilter.filterAcceptedEvents(
+          uac.getSurveyId(),
+          uac.getCollectionExerciseId(),
+          uac.getCaseId(),
+          uacMessageId)) {
+        respondentDataRepo.writeUAC(uac);
+      }
     } catch (CTPException ctpEx) {
       log.error("UAC Event processing failed", kv("uacMessageId", uacMessageId), ctpEx);
       throw new CTPException(ctpEx.getFault());

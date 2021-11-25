@@ -46,13 +46,17 @@ public class CaseEventReceiverImpl implements CaseEventReceiver {
         "Entering acceptCaseEvent",
         kv("messageId", caseMessageId),
         kv("caseId", caseUpdate.getCaseId()));
-
-    if (acceptedEventFilter.filterAcceptedEvents(
-        caseUpdate.getSurveyId(),
-        caseUpdate.getCollectionExerciseId(),
-        caseUpdate.getCaseId(),
-        caseMessageId)) {
-      respondentDataRepo.writeCaseUpdate(caseUpdate);
+    try {
+      if (acceptedEventFilter.filterAcceptedEvents(
+          caseUpdate.getSurveyId(),
+          caseUpdate.getCollectionExerciseId(),
+          caseUpdate.getCaseId(),
+          caseMessageId)) {
+        respondentDataRepo.writeCaseUpdate(caseUpdate);
+      }
+    } catch (CTPException ctpEx) {
+      log.error("Case Event processing failed", kv("messageId", caseMessageId), ctpEx);
+      throw ctpEx;
     }
   }
 }

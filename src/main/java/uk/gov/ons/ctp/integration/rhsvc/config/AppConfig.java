@@ -7,6 +7,8 @@ import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.validation.annotation.Validated;
 import uk.gov.ons.ctp.common.config.CustomCircuitBreakerConfig;
 
+import java.util.Set;
+
 /** Application Config bean */
 @EnableRetry
 @Validated
@@ -25,5 +27,5 @@ public class AppConfig {
   private NotifyConfig notify;
   private WebformConfig webform;
   private LoadsheddingConfig loadshedding;
-  private SurveyConfig surveyConfig;
+  private Set<String> surveys;
 }

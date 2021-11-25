@@ -5,5 +5,5 @@ import lombok.Data;
 
 @Data
 public class SurveyConfig {
-  private Set<String> surveys;
+  private Set<String> acceptedSurveys;
 }
