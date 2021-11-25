@@ -39,7 +39,7 @@ import uk.gov.ons.ctp.common.utility.ParallelTestLocks;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.event.impl.CaseEventReceiverImpl;
 import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentDataRepositoryImpl;
-import uk.gov.ons.ctp.integration.rhsvc.util.AcceptedEventFilter;
+import uk.gov.ons.ctp.integration.rhsvc.util.AcceptableEventFilter;
 
 /** Spring Integration test of flow received from Response Management */
 @SpringBootTest
@@ -54,7 +54,7 @@ public class CaseEventReceiverImplIT_Test {
   @Autowired private PubSubInboundChannelAdapter caseEventInbound;
   @MockBean private RespondentDataRepositoryImpl respondentDataRepo;
   @MockBean private PubSubTemplate pubSubTemplate;
-  @MockBean private AcceptedEventFilter acceptedEventFilter;
+  @MockBean private AcceptableEventFilter acceptableEventFilter;
 
   @BeforeEach
   public void initMocks() {

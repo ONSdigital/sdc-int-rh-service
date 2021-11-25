@@ -14,7 +14,7 @@ import uk.gov.ons.ctp.common.event.model.CaseEvent;
 import uk.gov.ons.ctp.common.event.model.CaseUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.event.CaseEventReceiver;
 import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
-import uk.gov.ons.ctp.integration.rhsvc.util.AcceptedEventFilter;
+import uk.gov.ons.ctp.integration.rhsvc.util.AcceptableEventFilter;
 
 /**
  * Service implementation responsible for receipt of Case Events. See Spring Integration flow for
@@ -28,7 +28,7 @@ import uk.gov.ons.ctp.integration.rhsvc.util.AcceptedEventFilter;
 public class CaseEventReceiverImpl implements CaseEventReceiver {
   @Autowired private RespondentDataRepository respondentDataRepo;
 
-  @Autowired private AcceptedEventFilter acceptedEventFilter;
+  @Autowired private AcceptableEventFilter acceptableEventFilter;
 
   /**
    * Message end point for events from Response Management.
@@ -47,7 +47,7 @@ public class CaseEventReceiverImpl implements CaseEventReceiver {
         kv("messageId", caseMessageId),
         kv("caseId", caseUpdate.getCaseId()));
     try {
-      if (acceptedEventFilter.filterAcceptedEvents(
+      if (acceptableEventFilter.filterAcceptedEvents(
           caseUpdate.getSurveyId(),
           caseUpdate.getCollectionExerciseId(),
           caseUpdate.getCaseId(),

@@ -3,7 +3,6 @@ package uk.gov.ons.ctp.integration.rhsvc.message.impl;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -16,10 +15,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
-import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.EventTopic;
-import uk.gov.ons.ctp.common.event.model.CaseEvent;
 import uk.gov.ons.ctp.common.event.model.Header;
 import uk.gov.ons.ctp.common.event.model.UacEvent;
 import uk.gov.ons.ctp.common.event.model.UacPayload;
@@ -30,13 +27,13 @@ import uk.gov.ons.ctp.integration.rhsvc.config.QueueConfig;
 import uk.gov.ons.ctp.integration.rhsvc.event.impl.UACEventReceiverImpl;
 import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
 import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentDataRepositoryImpl;
-import uk.gov.ons.ctp.integration.rhsvc.util.AcceptedEventFilter;
+import uk.gov.ons.ctp.integration.rhsvc.util.AcceptableEventFilter;
 
 @ExtendWith(MockitoExtension.class)
 public class UacEventReceiverImplUnit_Test {
 
   private RespondentDataRepository mockRespondentDataRepo;
-  private AcceptedEventFilter acceptedEventFilter;
+  private AcceptableEventFilter acceptableEventFilter;
   private UACEventReceiverImpl target;
   private UacEvent UacEventFixture;
   private UacUpdate uacFixture;
@@ -50,9 +47,9 @@ public class UacEventReceiverImplUnit_Test {
     appConfig.setQueueConfig(queueConfig);
     ReflectionTestUtils.setField(target, "appConfig", appConfig);
     mockRespondentDataRepo = mock(RespondentDataRepositoryImpl.class);
-    acceptedEventFilter = mock(AcceptedEventFilter.class);
+    acceptableEventFilter = mock(AcceptableEventFilter.class);
     target.setRespondentDataRepo(mockRespondentDataRepo);
-    target.setAcceptedEventFilter(acceptedEventFilter);
+    target.setAcceptableEventFilter(acceptableEventFilter);
   }
 
   @SneakyThrows
@@ -79,7 +76,7 @@ public class UacEventReceiverImplUnit_Test {
 
   @SneakyThrows
   private void acceptUacEvent(String qid, EventTopic topic) {
-    when(acceptedEventFilter.filterAcceptedEvents(any(), any(), any(), any())).thenReturn(true);
+    when(acceptableEventFilter.filterAcceptedEvents(any(), any(), any(), any())).thenReturn(true);
     prepareAndAcceptEvent(qid, topic);
     verify(mockRespondentDataRepo).writeUAC(uacFixture);
   }
@@ -132,7 +129,7 @@ public class UacEventReceiverImplUnit_Test {
 
   @Test
   public void shouldRejectUacWhenPrerequisiteEventsDoNotExistInFirestore() throws CTPException {
-    when(acceptedEventFilter.filterAcceptedEvents(any(), any(), any(), any())).thenReturn(false);
+    when(acceptableEventFilter.filterAcceptedEvents(any(), any(), any(), any())).thenReturn(false);
     prepareAndAcceptEvent(RespondentHomeFixture.QID_01, EventTopic.UAC_UPDATE);
     verify(mockRespondentDataRepo, never()).writeUAC(uacFixture);
   }
