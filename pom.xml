@@ -23,7 +23,7 @@
     <groupId>ons.sdc.int.common</groupId>
     <artifactId>common</artifactId>
     <!-- change this to the version of ALL common libs to be used by this build -->
-    <version>1.0.59</version>
+    <version>1.0.63</version>
   </parent>
 
   <scm>
@@ -303,7 +303,6 @@
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <version>${jacoco.version}</version>
         <configuration>
           <!-- exclude generated classes that cause javaco failures -->
           <excludes>
@@ -409,7 +408,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
-        <version>3.0.0-M3</version>
         <configuration>
           <argLine>${failsafeArgLine}</argLine>
           <skip>${skip.integration.tests}</skip>
