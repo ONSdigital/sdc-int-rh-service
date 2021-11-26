@@ -19,20 +19,20 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.error.RestExceptionHandler;
 import uk.gov.ons.ctp.common.jackson.CustomObjectMapper;
-import uk.gov.ons.ctp.integration.rhsvc.representation.SurveyLaunchedDTO;
-import uk.gov.ons.ctp.integration.rhsvc.service.SurveyLaunchedService;
+import uk.gov.ons.ctp.integration.rhsvc.representation.EqLaunchedDTO;
+import uk.gov.ons.ctp.integration.rhsvc.service.EqLaunchedService;
 
 /** Respondent Home Endpoint Unit tests */
 @ExtendWith(MockitoExtension.class)
-public final class SurveyLaunchedEndpointUnitTest {
-  @InjectMocks private SurveyLaunchedEndpoint surveyLaunchedEndpoint;
+public final class EqLaunchedEndpointUnitTest {
+  @InjectMocks private EqLaunchedEndpoint eqLaunchedEndpoint;
 
-  @Mock SurveyLaunchedService surveyLaunchedService;
+  @Mock EqLaunchedService eqLaunchedService;
 
   private ObjectMapper mapper = new ObjectMapper();
 
   private MockMvc mockMvc;
-  private SurveyLaunchedDTO dto;
+  private EqLaunchedDTO dto;
 
   /**
    * Set up of tests
@@ -42,22 +42,22 @@ public final class SurveyLaunchedEndpointUnitTest {
   @BeforeEach
   public void setUp() throws Exception {
     this.mockMvc =
-        MockMvcBuilders.standaloneSetup(surveyLaunchedEndpoint)
+        MockMvcBuilders.standaloneSetup(eqLaunchedEndpoint)
             .setHandlerExceptionResolvers(mockAdviceFor(RestExceptionHandler.class))
             .setMessageConverters(new MappingJackson2HttpMessageConverter(new CustomObjectMapper()))
             .build();
-    dto = FixtureHelper.loadClassFixtures(SurveyLaunchedDTO[].class).get(0);
+    dto = FixtureHelper.loadClassFixtures(EqLaunchedDTO[].class).get(0);
   }
 
   @Test
-  public void surveyLaunchedSuccessCaseEmptyString() throws Exception {
-    Mockito.doNothing().when(surveyLaunchedService).surveyLaunched(any());
+  public void eqLaunchedSuccessCaseEmptyString() throws Exception {
+    Mockito.doNothing().when(eqLaunchedService).eqLaunched(any());
     callEndpointExpectingSuccess();
   }
 
   @Test
-  public void surveyLaunchedSuccessCaseAssistedDigitalLocation() throws Exception {
-    Mockito.doNothing().when(surveyLaunchedService).surveyLaunched(any());
+  public void eqLaunchedSuccessCaseAssistedDigitalLocation() throws Exception {
+    Mockito.doNothing().when(eqLaunchedService).eqLaunched(any());
     callEndpointExpectingSuccess();
   }
 
@@ -75,15 +75,15 @@ public final class SurveyLaunchedEndpointUnitTest {
 
   @Test
   public void shouldRejectInvalidCaseId() throws Exception {
-    String surveyLaunchedRequestBody =
+    String eqLaunchedRequestBody =
         "{ \"questionnaireId\": \"23434234234\",   \"caseId\": \"euieuieu@#$@#$\" }";
-    callEndpointExpectingBadRequest(surveyLaunchedRequestBody);
+    callEndpointExpectingBadRequest(eqLaunchedRequestBody);
   }
 
   @Test
   public void shouldRejectInvalidRequest() throws Exception {
-    String surveyLaunchedRequestBody = "uoeuoeu 45345345 euieuiaooo";
-    callEndpointExpectingBadRequest(surveyLaunchedRequestBody);
+    String eqLaunchedRequestBody = "uoeuoeu 45345345 euieuiaooo";
+    callEndpointExpectingBadRequest(eqLaunchedRequestBody);
   }
 
   private void callEndpointExpectingSuccess() throws Exception {
