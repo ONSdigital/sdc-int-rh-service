@@ -1,6 +1,5 @@
 package uk.gov.ons.ctp.integration.rhsvc.message.impl;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -13,9 +12,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.event.model.CaseEvent;
+import uk.gov.ons.ctp.integration.rhsvc.event.impl.AcceptableEventFilter;
 import uk.gov.ons.ctp.integration.rhsvc.event.impl.CaseEventReceiverImpl;
 import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
-import uk.gov.ons.ctp.integration.rhsvc.util.AcceptableEventFilter;
 
 @ExtendWith(MockitoExtension.class)
 public class CaseEventReceiverImplUnit_Test {
@@ -25,9 +24,6 @@ public class CaseEventReceiverImplUnit_Test {
   @Mock private AcceptableEventFilter acceptableEventFilter;
 
   @InjectMocks private CaseEventReceiverImpl target;
-
-  //TODO saveValidCase() {}
-  //doNotSaveInvalidCase() {}
 
   @Test
   public void test_successfulFilter_caseSaved() throws Exception {
@@ -46,7 +42,7 @@ public class CaseEventReceiverImplUnit_Test {
 
     target.acceptCaseEvent(caseEvent);
 
-    verify(mockRespondentDataRepo, times(0)).writeCaseUpdate(caseEvent.getPayload().getCaseUpdate());
+    verify(mockRespondentDataRepo, times(0))
+        .writeCaseUpdate(caseEvent.getPayload().getCaseUpdate());
   }
-
 }

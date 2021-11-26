@@ -76,6 +76,7 @@ public class RHSvcBeanMapperTest {
         "8a9d5db4bbee34fd16e40aa2aaae52cfbdf1842559023614c30edb480ec252b4", dto.getUacHash());
     assertEquals("1110000009", dto.getQid());
     assertTrue(dto.isReceiptReceived());
+    assertEquals(uacUpdate.getCollectionInstrumentUrl(), dto.getCollectionInstrumentUrl());
     assertEquals(94, dto.getWave());
     assertTrue(dto.isEqLaunched());
   }

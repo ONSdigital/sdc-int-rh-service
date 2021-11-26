@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.wildfly.common.Assert.assertTrue;
 
 import com.google.cloud.spring.pubsub.core.PubSubTemplate;
@@ -40,6 +41,7 @@ import uk.gov.ons.ctp.common.event.model.UacUpdate;
 import uk.gov.ons.ctp.common.utility.ParallelTestLocks;
 import uk.gov.ons.ctp.integration.rhsvc.RespondentHomeFixture;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
+import uk.gov.ons.ctp.integration.rhsvc.event.impl.AcceptableEventFilter;
 import uk.gov.ons.ctp.integration.rhsvc.event.impl.UACEventReceiverImpl;
 import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentDataRepositoryImpl;
 
@@ -57,6 +59,7 @@ public class UacEventReceiverImplIT_Test {
   @Autowired private UACEventReceiverImpl receiver;
   @MockBean private PubSubTemplate pubSubTemplate;
   @MockBean private RespondentDataRepositoryImpl respondentDataRepo;
+  @MockBean private AcceptableEventFilter acceptableEventFilter;
 
   @BeforeEach
   public void initMocks() {
@@ -69,6 +72,9 @@ public class UacEventReceiverImplIT_Test {
 
     // Construct message
     Message<UacEvent> message = new GenericMessage<>(UacEvent, new HashMap<>());
+
+    when(acceptableEventFilter.filterAcceptedEvents(any(), any(), any(), any())).thenReturn(true);
+
     // Send message to container
     uacEventInbound.getOutputChannel().send(message);
 
@@ -93,6 +99,9 @@ public class UacEventReceiverImplIT_Test {
 
     // Construct message
     Message<UacEvent> message = new GenericMessage<>(UacEvent, new HashMap<>());
+
+    when(acceptableEventFilter.filterAcceptedEvents(any(), any(), any(), any())).thenReturn(true);
+
     // Send message to container
     uacEventInbound.getOutputChannel().send(message);
 
@@ -115,6 +124,8 @@ public class UacEventReceiverImplIT_Test {
 
     // Construct message
     Message<UacEvent> message = new GenericMessage<>(UacEvent, new HashMap<>());
+
+    when(acceptableEventFilter.filterAcceptedEvents(any(), any(), any(), any())).thenReturn(true);
     // Send message to container
     uacEventInbound.getOutputChannel().send(message);
 

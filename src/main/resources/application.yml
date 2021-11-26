@@ -135,6 +135,7 @@ notify:
 loadshedding:
   modulus: 10
 
-surveys: |-
-  social
-  asteroid
+surveys:
+  - social
+  - asteroid
+  - boat

@@ -24,10 +24,10 @@ import uk.gov.ons.ctp.common.event.model.UacUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.RespondentHomeFixture;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.config.QueueConfig;
+import uk.gov.ons.ctp.integration.rhsvc.event.impl.AcceptableEventFilter;
 import uk.gov.ons.ctp.integration.rhsvc.event.impl.UACEventReceiverImpl;
 import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
 import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentDataRepositoryImpl;
-import uk.gov.ons.ctp.integration.rhsvc.util.AcceptableEventFilter;
 
 @ExtendWith(MockitoExtension.class)
 public class UacEventReceiverImplUnit_Test {

@@ -14,7 +14,6 @@ import uk.gov.ons.ctp.common.event.model.UacEvent;
 import uk.gov.ons.ctp.common.event.model.UacUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
-import uk.gov.ons.ctp.integration.rhsvc.util.AcceptableEventFilter;
 
 /**
  * Service implementation responsible for receipt of UAC Events. See Spring Integration flow for
@@ -58,10 +57,7 @@ public class UACEventReceiverImpl {
 
     try {
       if (acceptableEventFilter.filterAcceptedEvents(
-          uac.getSurveyId(),
-          uac.getCollectionExerciseId(),
-          uac.getCaseId(),
-          uacMessageId)) {
+          uac.getSurveyId(), uac.getCollectionExerciseId(), uac.getCaseId(), uacMessageId)) {
         respondentDataRepo.writeUAC(uac);
       }
     } catch (CTPException ctpEx) {

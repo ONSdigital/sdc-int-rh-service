@@ -12,7 +12,6 @@ import com.google.cloud.spring.pubsub.integration.inbound.PubSubInboundChannelAd
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Locale;
-import java.util.Optional;
 import java.util.TimeZone;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,14 +31,12 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.event.model.CaseEvent;
-import uk.gov.ons.ctp.common.event.model.CollectionExercise;
 import uk.gov.ons.ctp.common.event.model.Header;
-import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 import uk.gov.ons.ctp.common.utility.ParallelTestLocks;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
+import uk.gov.ons.ctp.integration.rhsvc.event.impl.AcceptableEventFilter;
 import uk.gov.ons.ctp.integration.rhsvc.event.impl.CaseEventReceiverImpl;
 import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentDataRepositoryImpl;
-import uk.gov.ons.ctp.integration.rhsvc.util.AcceptableEventFilter;
 
 /** Spring Integration test of flow received from Response Management */
 @SpringBootTest
@@ -72,13 +69,7 @@ public class CaseEventReceiverImplIT_Test {
     // Construct message
     Message<CaseEvent> message = new GenericMessage<>(caseEvent, new HashMap<>());
 
-    SurveyUpdate surveyUpdate = new SurveyUpdate();
-    surveyUpdate.setSurveyId("c45de4dc-3c3b-11e9-b210-d663bd873d93");
-    surveyUpdate.setSampleDefinitionUrl("test/social.json");
-    when(respondentDataRepo.readSurvey(any())).thenReturn(Optional.of(surveyUpdate));
-    CollectionExercise collectionExercise = new CollectionExercise();
-    when(respondentDataRepo.readCollectionExercise(any()))
-        .thenReturn(Optional.of(collectionExercise));
+    when(acceptableEventFilter.filterAcceptedEvents(any(), any(), any(), any())).thenReturn(true);
 
     // Send message to container
     caseEventInbound.getOutputChannel().send(message);
@@ -101,10 +92,7 @@ public class CaseEventReceiverImplIT_Test {
     // Construct message
     Message<CaseEvent> message = new GenericMessage<>(caseEvent, new HashMap<>());
 
-    SurveyUpdate surveyUpdate = new SurveyUpdate();
-    surveyUpdate.setSurveyId("c45de4dc-3c3b-11e9-b210-d663bd873d93");
-    surveyUpdate.setSampleDefinitionUrl("test/socialnot.json");
-    when(respondentDataRepo.readSurvey(any())).thenReturn(Optional.of(surveyUpdate));
+    when(acceptableEventFilter.filterAcceptedEvents(any(), any(), any(), any())).thenReturn(false);
 
     // Send message to container
     caseEventInbound.getOutputChannel().send(message);
@@ -132,10 +120,7 @@ public class CaseEventReceiverImplIT_Test {
     // Construct message
     Message<CaseEvent> message = new GenericMessage<>(caseEvent, new HashMap<>());
 
-    SurveyUpdate surveyUpdate = new SurveyUpdate();
-    surveyUpdate.setSurveyId("c45de4dc-3c3b-11e9-b210-d663bd873d93");
-    surveyUpdate.setSampleDefinitionUrl("test/social.json");
-    when(respondentDataRepo.readSurvey(any())).thenReturn(Optional.of(surveyUpdate));
+    when(acceptableEventFilter.filterAcceptedEvents(any(), any(), any(), any())).thenReturn(true);
 
     // Send message to container
     caseEventInbound.getOutputChannel().send(message);

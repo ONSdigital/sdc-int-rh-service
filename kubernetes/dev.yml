@@ -112,3 +112,8 @@ spec:
             configMapKeyRef:
               name: rh-config
               key: webform-email-cy
+        - name: SURVEYS
+            valueFrom:
+              configMapKeyRef:
+                name: rh-config
+                key: surveys

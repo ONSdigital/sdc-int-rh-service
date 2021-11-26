@@ -29,6 +29,7 @@ import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdateEvent;
 import uk.gov.ons.ctp.common.utility.ParallelTestLocks;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
+import uk.gov.ons.ctp.integration.rhsvc.event.impl.AcceptableEventFilter;
 import uk.gov.ons.ctp.integration.rhsvc.event.impl.SurveyEventReceiverImpl;
 import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentDataRepositoryImpl;
 
@@ -45,6 +46,7 @@ public class SurveyUpdateEventReceiverImplIT_Test {
   @Autowired private PubSubInboundChannelAdapter surveyEventInbound;
   @MockBean private RespondentDataRepositoryImpl respondentDataRepo;
   @MockBean private PubSubTemplate pubSubTemplate;
+  @MockBean private AcceptableEventFilter acceptableEventFilter;
 
   @BeforeEach
   public void initMocks() {

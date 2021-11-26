@@ -14,7 +14,6 @@ import uk.gov.ons.ctp.common.event.model.CaseEvent;
 import uk.gov.ons.ctp.common.event.model.CaseUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.event.CaseEventReceiver;
 import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
-import uk.gov.ons.ctp.integration.rhsvc.util.AcceptableEventFilter;
 
 /**
  * Service implementation responsible for receipt of Case Events. See Spring Integration flow for
