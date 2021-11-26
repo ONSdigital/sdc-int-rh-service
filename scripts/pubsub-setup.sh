@@ -38,7 +38,7 @@ echo "<<< Creating topics >>>"
 createTopic event_case-update
 createTopic event_uac-update
 createTopic event_uac-authentication
-createTopic event_survey-launch
+createTopic event_eq-launch
 createTopic event_fulfilment
 createTopic event_survey-update
 createTopic event_collection-exercise-update

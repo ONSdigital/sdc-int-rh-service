@@ -35,7 +35,7 @@ Create the following topics/subscriptions:
       event_survey-update              | event_survey-update_rh
       event_collection-exercise-update | event_collection-exercise-update_rh
       event_uac-authentication         | N/A
-      event_survey-launch              | N/A
+      event_eq-launch                  | N/A
       event_fulfilment                 | N/A
       event_new-case                   | N/A
 
@@ -44,7 +44,7 @@ Create the following topics/subscriptions:
     python publisher.py local create event_survey-update
     python publisher.py local create event_collection-exercise-update
     python publisher.py local create event_uac-authentication
-    python publisher.py local create event_survey-launch
+    python publisher.py local create event_eq-launch
     python publisher.py local create event_fulfilment
     python publisher.py local create event_new-case
 

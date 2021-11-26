@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @SuppressWarnings("serial")
-public class SurveyLaunchedDTO implements Serializable {
+public class EqLaunchedDTO implements Serializable {
 
   @NotNull private String questionnaireId;
 

@@ -12,23 +12,23 @@ import uk.gov.ons.ctp.common.domain.Source;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.EventPublisher;
 import uk.gov.ons.ctp.common.event.TopicType;
-import uk.gov.ons.ctp.common.event.model.SurveyLaunchResponse;
+import uk.gov.ons.ctp.common.event.model.EqLaunchResponse;
 import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient;
 import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient.Domain;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
-import uk.gov.ons.ctp.integration.rhsvc.representation.SurveyLaunchedDTO;
-import uk.gov.ons.ctp.integration.rhsvc.service.SurveyLaunchedService;
+import uk.gov.ons.ctp.integration.rhsvc.representation.EqLaunchedDTO;
+import uk.gov.ons.ctp.integration.rhsvc.service.EqLaunchedService;
 
 /** This is a service layer class, which performs RH business level logic for the endpoints. */
 @Slf4j
 @Service
-public class SurveyLaunchedServiceImpl implements SurveyLaunchedService {
+public class EqLaunchedServiceImpl implements EqLaunchedService {
   private EventPublisher eventPublisher;
   private RateLimiterClient rateLimiterClient;
   private AppConfig appConfig;
 
   @Autowired
-  public SurveyLaunchedServiceImpl(
+  public EqLaunchedServiceImpl(
       EventPublisher eventPublisher, RateLimiterClient rateLimiterClient, AppConfig appConfig) {
     this.eventPublisher = eventPublisher;
     this.rateLimiterClient = rateLimiterClient;
@@ -36,31 +36,28 @@ public class SurveyLaunchedServiceImpl implements SurveyLaunchedService {
   }
 
   @Override
-  public void surveyLaunched(SurveyLaunchedDTO surveyLaunchedDTO) throws CTPException {
-    log.info("Generating SurveyLaunched event", kv("surveyLaunchedDTO", surveyLaunchedDTO));
+  public void eqLaunched(EqLaunchedDTO eqLaunchedDTO) throws CTPException {
+    log.info("Generating EqLaunched event", kv("eqLaunchedDTO", eqLaunchedDTO));
 
-    checkRateLimit(surveyLaunchedDTO.getClientIP());
+    checkRateLimit(eqLaunchedDTO.getClientIP());
 
-    SurveyLaunchResponse response =
-        SurveyLaunchResponse.builder()
-            .questionnaireId(surveyLaunchedDTO.getQuestionnaireId())
-            .caseId(surveyLaunchedDTO.getCaseId())
-            .agentId(surveyLaunchedDTO.getAgentId())
+    EqLaunchResponse response =
+        EqLaunchResponse.builder()
+            .questionnaireId(eqLaunchedDTO.getQuestionnaireId())
+            .caseId(eqLaunchedDTO.getCaseId())
+            .agentId(eqLaunchedDTO.getAgentId())
             .build();
 
     Channel channel = Channel.RH;
-    if (!StringUtils.isEmpty(surveyLaunchedDTO.getAgentId())) {
+    if (!StringUtils.isEmpty(eqLaunchedDTO.getAgentId())) {
       channel = Channel.AD;
     }
 
     UUID messageId =
-        eventPublisher.sendEvent(
-            TopicType.SURVEY_LAUNCH, Source.RESPONDENT_HOME, channel, response);
+        eventPublisher.sendEvent(TopicType.EQ_LAUNCH, Source.RESPONDENT_HOME, channel, response);
 
     log.debug(
-        "SurveyLaunch event published",
-        kv("caseId", response.getCaseId()),
-        kv("messageId", messageId));
+        "EqLaunch event published", kv("caseId", response.getCaseId()), kv("messageId", messageId));
   }
 
   private void checkRateLimit(String ipAddress) throws CTPException {
