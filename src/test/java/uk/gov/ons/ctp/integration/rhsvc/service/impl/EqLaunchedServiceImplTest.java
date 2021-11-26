@@ -20,16 +20,16 @@ import uk.gov.ons.ctp.common.domain.Channel;
 import uk.gov.ons.ctp.common.domain.Source;
 import uk.gov.ons.ctp.common.event.EventPublisher;
 import uk.gov.ons.ctp.common.event.TopicType;
-import uk.gov.ons.ctp.common.event.model.SurveyLaunchResponse;
+import uk.gov.ons.ctp.common.event.model.EqLaunchResponse;
 import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient;
 import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient.Domain;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.config.LoadsheddingConfig;
 import uk.gov.ons.ctp.integration.rhsvc.config.RateLimiterConfig;
-import uk.gov.ons.ctp.integration.rhsvc.representation.SurveyLaunchedDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.EqLaunchedDTO;
 
 @ExtendWith(MockitoExtension.class)
-public class SurveyLaunchedServiceImplTest {
+public class EqLaunchedServiceImplTest {
   private static final int A_MODULUS = 10;
   private static final String AN_IP_ADDR = "254.123.786.3";
 
@@ -37,11 +37,11 @@ public class SurveyLaunchedServiceImplTest {
   @Mock private RateLimiterClient rateLimiterClient;
   @Mock private AppConfig appConfig;
 
-  @InjectMocks SurveyLaunchedServiceImpl surveyLaunchedService;
+  @InjectMocks EqLaunchedServiceImpl eqLaunchedService;
 
-  @Captor ArgumentCaptor<SurveyLaunchResponse> sendEventCaptor;
+  @Captor ArgumentCaptor<EqLaunchResponse> sendEventCaptor;
 
-  private SurveyLaunchedDTO surveyLaunchedDTO;
+  private EqLaunchedDTO eqLaunchedDTO;
 
   @BeforeEach
   public void setup() {
@@ -55,11 +55,11 @@ public class SurveyLaunchedServiceImplTest {
   }
 
   private void createPayload() {
-    surveyLaunchedDTO = new SurveyLaunchedDTO();
-    surveyLaunchedDTO.setQuestionnaireId("1234");
-    surveyLaunchedDTO.setCaseId(UUID.fromString("3fa85f64-5717-4562-b3fc-2c963f66afa6"));
-    surveyLaunchedDTO.setAgentId("1000007");
-    surveyLaunchedDTO.setClientIP(AN_IP_ADDR);
+    eqLaunchedDTO = new EqLaunchedDTO();
+    eqLaunchedDTO.setQuestionnaireId("1234");
+    eqLaunchedDTO.setCaseId(UUID.fromString("3fa85f64-5717-4562-b3fc-2c963f66afa6"));
+    eqLaunchedDTO.setAgentId("1000007");
+    eqLaunchedDTO.setClientIP(AN_IP_ADDR);
   }
 
   private void mockEnableRateLimiter(boolean enabled) {
@@ -77,48 +77,48 @@ public class SurveyLaunchedServiceImplTest {
         .checkEqLaunchLimit(eq(Domain.RH), eq(AN_IP_ADDR), eq(A_MODULUS));
   }
 
-  private void callAndVerifySurveyLaunched(Channel expectedChannel) throws Exception {
-    surveyLaunchedService.surveyLaunched(surveyLaunchedDTO);
+  private void callAndVerifyEqLaunched(Channel expectedChannel) throws Exception {
+    eqLaunchedService.eqLaunched(eqLaunchedDTO);
 
-    // Get hold of the event pay load that surveyLaunchedService created
+    // Get hold of the event pay load that eqLaunchedService created
     verify(publisher)
         .sendEvent(
-            eq(TopicType.SURVEY_LAUNCH),
+            eq(TopicType.EQ_LAUNCH),
             eq(Source.RESPONDENT_HOME),
             eq(expectedChannel),
             sendEventCaptor.capture());
-    SurveyLaunchResponse eventPayload = sendEventCaptor.getValue();
+    EqLaunchResponse eventPayload = sendEventCaptor.getValue();
 
     // Verify contents of pay load object
-    assertEquals(surveyLaunchedDTO.getQuestionnaireId(), eventPayload.getQuestionnaireId());
-    assertEquals(surveyLaunchedDTO.getCaseId(), eventPayload.getCaseId());
-    assertEquals(surveyLaunchedDTO.getAgentId(), eventPayload.getAgentId());
+    assertEquals(eqLaunchedDTO.getQuestionnaireId(), eventPayload.getQuestionnaireId());
+    assertEquals(eqLaunchedDTO.getCaseId(), eventPayload.getCaseId());
+    assertEquals(eqLaunchedDTO.getAgentId(), eventPayload.getAgentId());
   }
 
   @Test
-  public void testSurveyLaunchedAddressAgentIdValue() throws Exception {
-    callAndVerifySurveyLaunched(Channel.AD);
+  public void testEqLaunchedAddressAgentIdValue() throws Exception {
+    callAndVerifyEqLaunched(Channel.AD);
     verifyRateLimiterCalled();
   }
 
   @Test
-  public void testSurveyLaunchedAddressAgentIdEmptyString() throws Exception {
-    surveyLaunchedDTO.setAgentId("");
-    callAndVerifySurveyLaunched(Channel.RH);
+  public void testEqLaunchedAddressAgentIdEmptyString() throws Exception {
+    eqLaunchedDTO.setAgentId("");
+    callAndVerifyEqLaunched(Channel.RH);
     verifyRateLimiterCalled();
   }
 
   @Test
-  public void testSurveyLaunchedAddressAgentIdNull() throws Exception {
-    surveyLaunchedDTO.setAgentId(null);
-    callAndVerifySurveyLaunched(Channel.RH);
+  public void testEqLaunchedAddressAgentIdNull() throws Exception {
+    eqLaunchedDTO.setAgentId(null);
+    callAndVerifyEqLaunched(Channel.RH);
     verifyRateLimiterCalled();
   }
 
   @Test
   public void shouldNotCallRateLimterWhenNotEnabled() throws Exception {
     mockEnableRateLimiter(false);
-    callAndVerifySurveyLaunched(Channel.AD);
+    callAndVerifyEqLaunched(Channel.AD);
     verifyRateLimiterNotCalled();
   }
 }

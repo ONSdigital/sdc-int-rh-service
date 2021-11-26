@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.ons.ctp.common.error.CTPException;
-import uk.gov.ons.ctp.integration.rhsvc.representation.SurveyLaunchedDTO;
-import uk.gov.ons.ctp.integration.rhsvc.service.SurveyLaunchedService;
+import uk.gov.ons.ctp.integration.rhsvc.representation.EqLaunchedDTO;
+import uk.gov.ons.ctp.integration.rhsvc.service.EqLaunchedService;
 
 /**
  * The REST endpoint controller for the Respondent Home service. This class covers top level
@@ -22,17 +22,16 @@ import uk.gov.ons.ctp.integration.rhsvc.service.SurveyLaunchedService;
 @Timed
 @RestController
 @RequestMapping(value = "/", produces = "application/json")
-public final class SurveyLaunchedEndpoint {
-  @Autowired private SurveyLaunchedService surveyLaunchedService;
+public final class EqLaunchedEndpoint {
+  @Autowired private EqLaunchedService eqLaunchedService;
 
   @RequestMapping(value = "/surveyLaunched", method = RequestMethod.POST)
-  public void surveyLaunched(@Valid @RequestBody SurveyLaunchedDTO surveyLaunchedDTO)
-      throws CTPException {
+  public void surveyLaunched(@Valid @RequestBody EqLaunchedDTO eqLaunchedDTO) throws CTPException {
 
-    log.info("Entering POST surveyLaunched", kv("requestBody", surveyLaunchedDTO));
+    log.info("Entering POST surveyLaunched", kv("requestBody", eqLaunchedDTO));
 
-    surveyLaunchedService.surveyLaunched(surveyLaunchedDTO);
+    eqLaunchedService.eqLaunched(eqLaunchedDTO);
 
-    log.debug("Exit POST surveyLaunched", kv("caseId", surveyLaunchedDTO.getCaseId()));
+    log.debug("Exit POST surveyLaunched", kv("caseId", eqLaunchedDTO.getCaseId()));
   }
 }
