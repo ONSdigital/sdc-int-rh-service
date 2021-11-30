@@ -20,7 +20,7 @@ import uk.gov.ons.ctp.common.domain.Channel;
 import uk.gov.ons.ctp.common.domain.Source;
 import uk.gov.ons.ctp.common.event.EventPublisher;
 import uk.gov.ons.ctp.common.event.TopicType;
-import uk.gov.ons.ctp.common.event.model.EqLaunchResponse;
+import uk.gov.ons.ctp.common.event.model.EqLaunch;
 import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient;
 import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient.Domain;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
@@ -39,7 +39,7 @@ public class EqLaunchedServiceImplTest {
 
   @InjectMocks EqLaunchedServiceImpl eqLaunchedService;
 
-  @Captor ArgumentCaptor<EqLaunchResponse> sendEventCaptor;
+  @Captor ArgumentCaptor<EqLaunch> sendEventCaptor;
 
   private EqLaunchedDTO eqLaunchedDTO;
 
@@ -87,12 +87,10 @@ public class EqLaunchedServiceImplTest {
             eq(Source.RESPONDENT_HOME),
             eq(expectedChannel),
             sendEventCaptor.capture());
-    EqLaunchResponse eventPayload = sendEventCaptor.getValue();
+    EqLaunch eventPayload = sendEventCaptor.getValue();
 
     // Verify contents of pay load object
-    assertEquals(eqLaunchedDTO.getQuestionnaireId(), eventPayload.getQuestionnaireId());
-    assertEquals(eqLaunchedDTO.getCaseId(), eventPayload.getCaseId());
-    assertEquals(eqLaunchedDTO.getAgentId(), eventPayload.getAgentId());
+    assertEquals(eqLaunchedDTO.getQuestionnaireId(), eventPayload.getQid());
   }
 
   @Test

@@ -12,7 +12,7 @@ import uk.gov.ons.ctp.common.domain.Source;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.EventPublisher;
 import uk.gov.ons.ctp.common.event.TopicType;
-import uk.gov.ons.ctp.common.event.model.EqLaunchResponse;
+import uk.gov.ons.ctp.common.event.model.EqLaunch;
 import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient;
 import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient.Domain;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
@@ -41,12 +41,7 @@ public class EqLaunchedServiceImpl implements EqLaunchedService {
 
     checkRateLimit(eqLaunchedDTO.getClientIP());
 
-    EqLaunchResponse response =
-        EqLaunchResponse.builder()
-            .questionnaireId(eqLaunchedDTO.getQuestionnaireId())
-            .caseId(eqLaunchedDTO.getCaseId())
-            .agentId(eqLaunchedDTO.getAgentId())
-            .build();
+    EqLaunch eqLaunch = EqLaunch.builder().qid(eqLaunchedDTO.getQuestionnaireId()).build();
 
     Channel channel = Channel.RH;
     if (!StringUtils.isEmpty(eqLaunchedDTO.getAgentId())) {
@@ -54,10 +49,9 @@ public class EqLaunchedServiceImpl implements EqLaunchedService {
     }
 
     UUID messageId =
-        eventPublisher.sendEvent(TopicType.EQ_LAUNCH, Source.RESPONDENT_HOME, channel, response);
+        eventPublisher.sendEvent(TopicType.EQ_LAUNCH, Source.RESPONDENT_HOME, channel, eqLaunch);
 
-    log.debug(
-        "EqLaunch event published", kv("caseId", response.getCaseId()), kv("messageId", messageId));
+    log.debug("EqLaunch event published", kv("qid", eqLaunch.getQid()), kv("messageId", messageId));
   }
 
   private void checkRateLimit(String ipAddress) throws CTPException {
