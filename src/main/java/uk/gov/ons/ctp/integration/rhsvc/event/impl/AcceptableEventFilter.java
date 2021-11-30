@@ -58,7 +58,6 @@ public class AcceptableEventFilter {
   private boolean isAcceptedSurveyType(String sampleDefinitionUrl) {
     Set<String> surveys = appConfig.getSurveys();
     for (String survey : surveys) {
-      System.out.println(survey + ".json");
       if (sampleDefinitionUrl.endsWith(survey + ".json")) {
         return true;
       }
