@@ -42,7 +42,7 @@ public class AcceptableEventFilter {
         }
       } else {
         log.warn(
-            "Survey is not a social survey - discarding message",
+            "Survey is not an accepted survey type - discarding message",
             kv("messageId", messageId),
             kv("caseId", caseId));
       }
