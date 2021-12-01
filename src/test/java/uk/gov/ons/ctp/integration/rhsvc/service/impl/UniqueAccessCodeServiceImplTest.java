@@ -18,6 +18,7 @@ import ma.glasnost.orika.MapperFacade;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -33,7 +34,7 @@ import uk.gov.ons.ctp.common.event.model.CaseUpdate;
 import uk.gov.ons.ctp.common.event.model.CollectionExercise;
 import uk.gov.ons.ctp.common.event.model.EventPayload;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
-import uk.gov.ons.ctp.common.event.model.UacAuthenticationResponse;
+import uk.gov.ons.ctp.common.event.model.UacAuthentication;
 import uk.gov.ons.ctp.common.event.model.UacUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.RHSvcBeanMapper;
 import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
@@ -57,11 +58,10 @@ public class UniqueAccessCodeServiceImplTest {
 
   @Spy private MapperFacade mapperFacade = new RHSvcBeanMapper();
 
+  @Captor private ArgumentCaptor<UacAuthentication> uacAuthenticationCaptor;
+
   @Test
   public void getUACLinkedToExistingCase() throws Exception {
-
-    ArgumentCaptor<UacAuthenticationResponse> payloadCapture =
-        ArgumentCaptor.forClass(UacAuthenticationResponse.class);
 
     UacUpdate uacTest = getUAC("linkedHousehold");
     CaseUpdate caseTest = getCase("household");
@@ -85,7 +85,7 @@ public class UniqueAccessCodeServiceImplTest {
             eq(TopicType.UAC_AUTHENTICATION),
             eq(Source.RESPONDENT_HOME),
             eq(Channel.RH),
-            payloadCapture.capture());
+            uacAuthenticationCaptor.capture());
 
     assertEquals(UAC_HASH, uacDTO.getUacHash());
     assertEquals(uacTest.isActive(), uacDTO.isActive());
@@ -143,17 +143,12 @@ public class UniqueAccessCodeServiceImplTest {
         caseTest.getSample().getUprn(),
         Long.toString(uacDTO.getCollectionCase().getAddress().getUprn().getValue()));
 
-    UacAuthenticationResponse payload = payloadCapture.getValue();
-    assertEquals(uacDTO.getCollectionCase().getCaseId(), payload.getCaseId());
-    assertEquals(uacDTO.getQid(), payload.getQuestionnaireId());
+    UacAuthentication payload = uacAuthenticationCaptor.getValue();
+    assertEquals(uacDTO.getQid(), payload.getQid());
   }
 
   @Test
   public void getUACLinkedToCaseThatCannotBeFound() throws Exception {
-
-    ArgumentCaptor<UacAuthenticationResponse> payloadCapture =
-        ArgumentCaptor.forClass(UacAuthenticationResponse.class);
-
     UacUpdate uacTest = getUAC("linkedHousehold");
 
     when(dataRepo.readUAC(UAC_HASH)).thenReturn(Optional.of(uacTest));
@@ -170,15 +165,12 @@ public class UniqueAccessCodeServiceImplTest {
     verify(dataRepo, times(0)).readSurvey(any());
     verify(dataRepo, times(0)).readCollectionExercise(any());
 
-    verify(eventPublisher, times(0)).sendEvent(any(), any(), any(), payloadCapture.capture());
+    verify(eventPublisher, times(0))
+        .sendEvent(any(), any(), any(), uacAuthenticationCaptor.capture());
   }
 
   @Test
   public void getUACLinkedToSurveyThatCannotBeFound() throws Exception {
-
-    ArgumentCaptor<UacAuthenticationResponse> payloadCapture =
-        ArgumentCaptor.forClass(UacAuthenticationResponse.class);
-
     UacUpdate uacTest = getUAC("linkedHousehold");
     CaseUpdate caseTest = getCase("household");
 
@@ -198,15 +190,12 @@ public class UniqueAccessCodeServiceImplTest {
     verify(dataRepo, times(1)).readSurvey(SURVEY_ID);
     verify(dataRepo, times(0)).readCollectionExercise(any());
 
-    verify(eventPublisher, times(0)).sendEvent(any(), any(), any(), payloadCapture.capture());
+    verify(eventPublisher, times(0))
+        .sendEvent(any(), any(), any(), uacAuthenticationCaptor.capture());
   }
 
   @Test
   public void getUACLinkedToCollectionExerciseThatCannotBeFound() throws Exception {
-
-    ArgumentCaptor<UacAuthenticationResponse> payloadCapture =
-        ArgumentCaptor.forClass(UacAuthenticationResponse.class);
-
     UacUpdate uacTest = getUAC("linkedHousehold");
     CaseUpdate caseTest = getCase("household");
     SurveyUpdate surveyTest = getSurvey();
@@ -227,15 +216,12 @@ public class UniqueAccessCodeServiceImplTest {
     verify(dataRepo, times(1)).readSurvey(SURVEY_ID);
     verify(dataRepo, times(1)).readCollectionExercise(COLLECTION_EXERCISE_ID);
 
-    verify(eventPublisher, times(0)).sendEvent(any(), any(), any(), payloadCapture.capture());
+    verify(eventPublisher, times(0))
+        .sendEvent(any(), any(), any(), uacAuthenticationCaptor.capture());
   }
 
   @Test
   public void getUACNotLinkedToCase() throws Exception {
-
-    ArgumentCaptor<UacAuthenticationResponse> payloadCapture =
-        ArgumentCaptor.forClass(UacAuthenticationResponse.class);
-
     UacUpdate uacTest = getUAC("unlinkedHousehold");
 
     when(dataRepo.readUAC(UAC_HASH)).thenReturn(Optional.of(uacTest));
@@ -248,7 +234,8 @@ public class UniqueAccessCodeServiceImplTest {
 
     verify(dataRepo, times(1)).readUAC(UAC_HASH);
     verify(dataRepo, times(0)).readCaseUpdate(CASE_ID);
-    verify(eventPublisher, times(0)).sendEvent(any(), any(), any(), payloadCapture.capture());
+    verify(eventPublisher, times(0))
+        .sendEvent(any(), any(), any(), uacAuthenticationCaptor.capture());
   }
 
   /** Test request for claim object where UAC not found */

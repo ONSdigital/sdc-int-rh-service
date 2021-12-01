@@ -16,7 +16,7 @@ import uk.gov.ons.ctp.common.event.TopicType;
 import uk.gov.ons.ctp.common.event.model.CaseUpdate;
 import uk.gov.ons.ctp.common.event.model.CollectionExercise;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
-import uk.gov.ons.ctp.common.event.model.UacAuthenticationResponse;
+import uk.gov.ons.ctp.common.event.model.UacAuthentication;
 import uk.gov.ons.ctp.common.event.model.UacUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
@@ -86,16 +86,15 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
         kv("caseId", caseId),
         kv("questionnaireId", data.getQid()));
 
-    UacAuthenticationResponse response =
-        UacAuthenticationResponse.builder().questionnaireId(data.getQid()).caseId(caseId).build();
+    UacAuthentication uacAuthentication = UacAuthentication.builder().qid(data.getQid()).build();
 
     UUID messageId =
         eventPublisher.sendEvent(
-            TopicType.UAC_AUTHENTICATION, Source.RESPONDENT_HOME, Channel.RH, response);
+            TopicType.UAC_AUTHENTICATION, Source.RESPONDENT_HOME, Channel.RH, uacAuthentication);
 
     log.debug(
-        "UacAuthentication event published for caseId: "
-            + response.getCaseId()
+        "UacAuthentication event published for qid: "
+            + uacAuthentication.getQid()
             + ", messageId: "
             + messageId);
   }
