@@ -1,4 +1,4 @@
-package uk.gov.ons.ctp.integration.rhsvc;
+package uk.gov.ons.ctp.integration.rhsvc.message.impl;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
