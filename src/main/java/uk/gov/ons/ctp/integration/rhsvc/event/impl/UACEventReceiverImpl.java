@@ -27,7 +27,7 @@ import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
 public class UACEventReceiverImpl {
   @Autowired private RespondentDataRepository respondentDataRepo;
   @Autowired private AppConfig appConfig;
-  @Autowired private AcceptableEventFilter acceptableEventFilter;
+  @Autowired private EventFilter eventFilter;
 
   /**
    * Message end point for events from Response Management. At present sends straight to publisher
@@ -56,13 +56,13 @@ public class UACEventReceiverImpl {
     }
 
     try {
-      if (acceptableEventFilter.filterAcceptedEvents(
+      if (eventFilter.isValidEvent(
           uac.getSurveyId(), uac.getCollectionExerciseId(), uac.getCaseId(), uacMessageId)) {
         respondentDataRepo.writeUAC(uac);
       }
     } catch (CTPException ctpEx) {
       log.error("UAC Event processing failed", kv("uacMessageId", uacMessageId), ctpEx);
-      throw new CTPException(ctpEx.getFault());
+      throw ctpEx;
     }
   }
 

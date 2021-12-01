@@ -16,25 +16,23 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.model.CaseEvent;
-import uk.gov.ons.ctp.integration.rhsvc.event.impl.AcceptableEventFilter;
 import uk.gov.ons.ctp.integration.rhsvc.event.impl.CaseEventReceiverImpl;
+import uk.gov.ons.ctp.integration.rhsvc.event.impl.EventFilter;
 import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
-
-import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 public class CaseEventReceiverImplUnit_Test {
 
   @Mock private RespondentDataRepository mockRespondentDataRepo;
 
-  @Mock private AcceptableEventFilter acceptableEventFilter;
+  @Mock private EventFilter eventFilter;
 
   @InjectMocks private CaseEventReceiverImpl target;
 
   @Test
   public void test_successfulFilter_caseSaved() throws Exception {
     CaseEvent caseEvent = FixtureHelper.loadPackageFixtures(CaseEvent[].class).get(0);
-    when(acceptableEventFilter.filterAcceptedEvents(any(), any(), any(), any())).thenReturn(true);
+    when(eventFilter.isValidEvent(any(), any(), any(), any())).thenReturn(true);
 
     target.acceptCaseEvent(caseEvent);
 
@@ -44,7 +42,7 @@ public class CaseEventReceiverImplUnit_Test {
   @Test
   public void test_unsucessfulFilter_caseRejected() throws Exception {
     CaseEvent caseEvent = FixtureHelper.loadPackageFixtures(CaseEvent[].class).get(0);
-    when(acceptableEventFilter.filterAcceptedEvents(any(), any(), any(), any())).thenReturn(false);
+    when(eventFilter.isValidEvent(any(), any(), any(), any())).thenReturn(false);
 
     target.acceptCaseEvent(caseEvent);
 
@@ -55,13 +53,13 @@ public class CaseEventReceiverImplUnit_Test {
   @Test
   public void testExceptionThrown() throws CTPException {
     CaseEvent caseEvent = FixtureHelper.loadPackageFixtures(CaseEvent[].class).get(0);
-    when(acceptableEventFilter.filterAcceptedEvents(any(), any(), any(), any())).thenReturn(true);
-    doThrow(new CTPException(CTPException.Fault.SYSTEM_ERROR)).when(mockRespondentDataRepo).writeCaseUpdate(any());
+    when(eventFilter.isValidEvent(any(), any(), any(), any())).thenReturn(true);
+    doThrow(new CTPException(CTPException.Fault.SYSTEM_ERROR))
+        .when(mockRespondentDataRepo)
+        .writeCaseUpdate(any());
 
-    CTPException thrown =
-        assertThrows(CTPException.class, () -> target.acceptCaseEvent(caseEvent));
+    CTPException thrown = assertThrows(CTPException.class, () -> target.acceptCaseEvent(caseEvent));
 
     assertEquals(CTPException.Fault.SYSTEM_ERROR, thrown.getFault());
-    assertEquals("Non Specific Error", thrown.getMessage());
   }
 }

@@ -34,8 +34,8 @@ import uk.gov.ons.ctp.common.event.model.CaseEvent;
 import uk.gov.ons.ctp.common.event.model.Header;
 import uk.gov.ons.ctp.common.utility.ParallelTestLocks;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
-import uk.gov.ons.ctp.integration.rhsvc.event.impl.AcceptableEventFilter;
 import uk.gov.ons.ctp.integration.rhsvc.event.impl.CaseEventReceiverImpl;
+import uk.gov.ons.ctp.integration.rhsvc.event.impl.EventFilter;
 import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentDataRepositoryImpl;
 
 /** Spring Integration test of flow received from Response Management */
@@ -51,7 +51,7 @@ public class CaseEventReceiverImplIT_Test {
   @Autowired private PubSubInboundChannelAdapter caseEventInbound;
   @MockBean private RespondentDataRepositoryImpl respondentDataRepo;
   @MockBean private PubSubTemplate pubSubTemplate;
-  @MockBean private AcceptableEventFilter acceptableEventFilter;
+  @MockBean private EventFilter eventFilter;
 
   @BeforeEach
   public void initMocks() {
@@ -69,7 +69,7 @@ public class CaseEventReceiverImplIT_Test {
     // Construct message
     Message<CaseEvent> message = new GenericMessage<>(caseEvent, new HashMap<>());
 
-    when(acceptableEventFilter.filterAcceptedEvents(any(), any(), any(), any())).thenReturn(true);
+    when(eventFilter.isValidEvent(any(), any(), any(), any())).thenReturn(true);
 
     // Send message to container
     caseEventInbound.getOutputChannel().send(message);
@@ -92,7 +92,7 @@ public class CaseEventReceiverImplIT_Test {
     // Construct message
     Message<CaseEvent> message = new GenericMessage<>(caseEvent, new HashMap<>());
 
-    when(acceptableEventFilter.filterAcceptedEvents(any(), any(), any(), any())).thenReturn(false);
+    when(eventFilter.isValidEvent(any(), any(), any(), any())).thenReturn(false);
 
     // Send message to container
     caseEventInbound.getOutputChannel().send(message);
@@ -120,7 +120,7 @@ public class CaseEventReceiverImplIT_Test {
     // Construct message
     Message<CaseEvent> message = new GenericMessage<>(caseEvent, new HashMap<>());
 
-    when(acceptableEventFilter.filterAcceptedEvents(any(), any(), any(), any())).thenReturn(true);
+    when(eventFilter.isValidEvent(any(), any(), any(), any())).thenReturn(true);
 
     // Send message to container
     caseEventInbound.getOutputChannel().send(message);

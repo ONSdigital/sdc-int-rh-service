@@ -27,7 +27,7 @@ import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
 public class CaseEventReceiverImpl implements CaseEventReceiver {
   @Autowired private RespondentDataRepository respondentDataRepo;
 
-  @Autowired private AcceptableEventFilter acceptableEventFilter;
+  @Autowired private EventFilter eventFilter;
 
   /**
    * Message end point for events from Response Management.
@@ -46,7 +46,7 @@ public class CaseEventReceiverImpl implements CaseEventReceiver {
         kv("messageId", caseMessageId),
         kv("caseId", caseUpdate.getCaseId()));
     try {
-      if (acceptableEventFilter.filterAcceptedEvents(
+      if (eventFilter.isValidEvent(
           caseUpdate.getSurveyId(),
           caseUpdate.getCollectionExerciseId(),
           caseUpdate.getCaseId(),

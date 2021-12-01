@@ -8,9 +8,9 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.config.InboundEventIntegrationConfig;
-import uk.gov.ons.ctp.integration.rhsvc.event.impl.AcceptableEventFilter;
 import uk.gov.ons.ctp.integration.rhsvc.event.impl.CaseEventReceiverImpl;
 import uk.gov.ons.ctp.integration.rhsvc.event.impl.CollectionExerciseEventReceiverImpl;
+import uk.gov.ons.ctp.integration.rhsvc.event.impl.EventFilter;
 import uk.gov.ons.ctp.integration.rhsvc.event.impl.SurveyEventReceiverImpl;
 import uk.gov.ons.ctp.integration.rhsvc.event.impl.UACEventReceiverImpl;
 
@@ -21,9 +21,9 @@ public class MessageIT_Config {
 
   /** Spy on Service Activator Message End point */
   @Bean
-  public CaseEventReceiverImpl caseEventReceiver() {
+  public CaseEventReceiverImpl caseEventReceiver(EventFilter eventFilter) {
     CaseEventReceiverImpl receiver = new CaseEventReceiverImpl();
-    ReflectionTestUtils.setField(receiver, "acceptableEventFilter", new AcceptableEventFilter());
+    ReflectionTestUtils.setField(receiver, "eventFilter", eventFilter);
     return Mockito.spy(receiver);
   }
 
