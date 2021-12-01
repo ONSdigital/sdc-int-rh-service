@@ -147,6 +147,9 @@ public class UacEventReceiverImplIT_Test {
     uac.setActive(true);
     uac.setQid(qid);
     uac.setCaseId("c45de4dc-3c3b-11e9-b210-d663bd873d93");
+    uac.setSurveyId("d45de4dc-3c3b-11e9-b210-d663bd873d93");
+    uac.setCollectionExerciseId("e45de4dc-3c3b-11e9-b210-d663bd873d93");
+    uac.setCollectionInstrumentUrl("url");
     Header header = new Header();
     header.setTopic(topic);
     header.setMessageId(UUID.fromString("c45de4dc-3c3b-11e9-b210-d663bd873d93"));

@@ -1,11 +1,15 @@
 package uk.gov.ons.ctp.integration.rhsvc.message.impl;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Date;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -15,8 +19,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
+import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.EventTopic;
+import uk.gov.ons.ctp.common.event.model.CaseEvent;
 import uk.gov.ons.ctp.common.event.model.Header;
 import uk.gov.ons.ctp.common.event.model.UacEvent;
 import uk.gov.ons.ctp.common.event.model.UacPayload;
@@ -132,5 +138,35 @@ public class UacEventReceiverImplUnit_Test {
     when(acceptableEventFilter.filterAcceptedEvents(any(), any(), any(), any())).thenReturn(false);
     prepareAndAcceptEvent(RespondentHomeFixture.QID_01, EventTopic.UAC_UPDATE);
     verify(mockRespondentDataRepo, never()).writeUAC(uacFixture);
+  }
+
+  @Test
+  public void testExceptionThrown() throws CTPException {
+    UacEvent uacEvent = createUAC(RespondentHomeFixture.QID_01, EventTopic.UAC_UPDATE);
+    when(acceptableEventFilter.filterAcceptedEvents(any(), any(), any(), any())).thenReturn(true);
+    doThrow(new CTPException(CTPException.Fault.SYSTEM_ERROR)).when(mockRespondentDataRepo).writeUAC(uacEvent.getPayload().getUacUpdate());
+
+    CTPException thrown =
+        assertThrows(CTPException.class, () -> target.acceptUACEvent(uacEvent));
+
+    assertEquals(CTPException.Fault.SYSTEM_ERROR, thrown.getFault());
+    assertEquals("Non Specific Error", thrown.getMessage());
+  }
+
+  private UacEvent createUAC(String qid, EventTopic topic) {
+    // Construct UacEvent
+    UacEvent UacEvent = new UacEvent();
+    UacPayload uacPayload = UacEvent.getPayload();
+    UacUpdate uac = uacPayload.getUacUpdate();
+    uac.setUacHash("999999999");
+    uac.setActive(true);
+    uac.setQid(qid);
+    uac.setCaseId("c45de4dc-3c3b-11e9-b210-d663bd873d93");
+    Header header = new Header();
+    header.setTopic(topic);
+    header.setMessageId(UUID.fromString("c45de4dc-3c3b-11e9-b210-d663bd873d93"));
+    header.setDateTime(new Date());
+    UacEvent.setHeader(header);
+    return UacEvent;
   }
 }

@@ -1,6 +1,9 @@
 package uk.gov.ons.ctp.integration.rhsvc.message.impl;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -11,10 +14,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.ons.ctp.common.FixtureHelper;
+import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.model.CaseEvent;
 import uk.gov.ons.ctp.integration.rhsvc.event.impl.AcceptableEventFilter;
 import uk.gov.ons.ctp.integration.rhsvc.event.impl.CaseEventReceiverImpl;
 import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
+
+import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 public class CaseEventReceiverImplUnit_Test {
@@ -44,5 +50,18 @@ public class CaseEventReceiverImplUnit_Test {
 
     verify(mockRespondentDataRepo, times(0))
         .writeCaseUpdate(caseEvent.getPayload().getCaseUpdate());
+  }
+
+  @Test
+  public void testExceptionThrown() throws CTPException {
+    CaseEvent caseEvent = FixtureHelper.loadPackageFixtures(CaseEvent[].class).get(0);
+    when(acceptableEventFilter.filterAcceptedEvents(any(), any(), any(), any())).thenReturn(true);
+    doThrow(new CTPException(CTPException.Fault.SYSTEM_ERROR)).when(mockRespondentDataRepo).writeCaseUpdate(any());
+
+    CTPException thrown =
+        assertThrows(CTPException.class, () -> target.acceptCaseEvent(caseEvent));
+
+    assertEquals(CTPException.Fault.SYSTEM_ERROR, thrown.getFault());
+    assertEquals("Non Specific Error", thrown.getMessage());
   }
 }
