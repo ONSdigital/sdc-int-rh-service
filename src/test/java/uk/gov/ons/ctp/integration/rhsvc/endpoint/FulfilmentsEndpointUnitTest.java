@@ -26,7 +26,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.error.RestExceptionHandler;
 import uk.gov.ons.ctp.common.jackson.CustomObjectMapper;
-import uk.gov.ons.ctp.integration.rhsvc.representation.ProductDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.OldProductDTO;
 import uk.gov.ons.ctp.integration.rhsvc.service.FulfilmentsService;
 
 /**
@@ -41,8 +41,8 @@ public final class FulfilmentsEndpointUnitTest {
 
   private MockMvc mockMvc;
 
-  private List<ProductDTO> productDTO;
-  private ProductDTO product;
+  private List<OldProductDTO> productDTO;
+  private OldProductDTO product;
 
   /**
    * Set up of tests
@@ -56,7 +56,7 @@ public final class FulfilmentsEndpointUnitTest {
             .setHandlerExceptionResolvers(mockAdviceFor(RestExceptionHandler.class))
             .setMessageConverters(new MappingJackson2HttpMessageConverter(new CustomObjectMapper()))
             .build();
-    this.productDTO = FixtureHelper.loadClassFixtures(ProductDTO[].class);
+    this.productDTO = FixtureHelper.loadClassFixtures(OldProductDTO[].class);
     this.product = productDTO.get(0);
   }
 
