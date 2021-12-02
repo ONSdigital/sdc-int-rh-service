@@ -5,17 +5,16 @@ import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.wildfly.common.Assert.assertTrue;
 
 import com.google.cloud.spring.pubsub.core.PubSubTemplate;
 import com.google.cloud.spring.pubsub.integration.inbound.PubSubInboundChannelAdapter;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
-import java.util.UUID;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,14 +31,13 @@ import org.springframework.messaging.support.GenericMessage;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.event.EventTopic;
-import uk.gov.ons.ctp.common.event.model.Header;
 import uk.gov.ons.ctp.common.event.model.UacEvent;
-import uk.gov.ons.ctp.common.event.model.UacPayload;
-import uk.gov.ons.ctp.common.event.model.UacUpdate;
 import uk.gov.ons.ctp.common.utility.ParallelTestLocks;
 import uk.gov.ons.ctp.integration.rhsvc.RespondentHomeFixture;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
+import uk.gov.ons.ctp.integration.rhsvc.event.impl.EventFilter;
 import uk.gov.ons.ctp.integration.rhsvc.event.impl.UACEventReceiverImpl;
 import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentDataRepositoryImpl;
 
@@ -57,6 +55,7 @@ public class UacEventReceiverImplIT_Test {
   @Autowired private UACEventReceiverImpl receiver;
   @MockBean private PubSubTemplate pubSubTemplate;
   @MockBean private RespondentDataRepositoryImpl respondentDataRepo;
+  @MockBean private EventFilter eventFilter;
 
   @BeforeEach
   public void initMocks() {
@@ -65,17 +64,21 @@ public class UacEventReceiverImplIT_Test {
 
   @SneakyThrows
   private void UacEventFlow(EventTopic topic) {
-    UacEvent UacEvent = createUAC(RespondentHomeFixture.A_QID, topic);
+    UacEvent uacEvent = FixtureHelper.loadPackageFixtures(UacEvent[].class).get(0);
+    uacEvent.getPayload().getUacUpdate().setQid(RespondentHomeFixture.A_QID);
 
     // Construct message
-    Message<UacEvent> message = new GenericMessage<>(UacEvent, new HashMap<>());
+    Message<UacEvent> message = new GenericMessage<>(uacEvent, new HashMap<>());
+
+    when(eventFilter.isValidEvent(any(), any(), any(), any())).thenReturn(true);
+
     // Send message to container
     uacEventInbound.getOutputChannel().send(message);
 
     // Capture and check Service Activator argument
     ArgumentCaptor<UacEvent> captur = ArgumentCaptor.forClass(UacEvent.class);
     verify(receiver).acceptUACEvent(captur.capture());
-    assertTrue(captur.getValue().getPayload().equals(UacEvent.getPayload()));
+    assertTrue(captur.getValue().getPayload().equals(uacEvent.getPayload()));
     verify(respondentDataRepo).writeUAC(any());
   }
 
@@ -89,17 +92,21 @@ public class UacEventReceiverImplIT_Test {
   public void shouldFilterUacEventWithContinuationFormQid() throws Exception {
 
     appConfig.getQueueConfig().setQidFilterPrefixes(Set.of("12"));
-    UacEvent UacEvent = createUAC(RespondentHomeFixture.QID_12, EventTopic.UAC_UPDATE);
+    UacEvent uacEvent = FixtureHelper.loadPackageFixtures(UacEvent[].class).get(0);
+    uacEvent.getPayload().getUacUpdate().setQid(RespondentHomeFixture.QID_12);
 
     // Construct message
-    Message<UacEvent> message = new GenericMessage<>(UacEvent, new HashMap<>());
+    Message<UacEvent> message = new GenericMessage<>(uacEvent, new HashMap<>());
+
+    when(eventFilter.isValidEvent(any(), any(), any(), any())).thenReturn(true);
+
     // Send message to container
     uacEventInbound.getOutputChannel().send(message);
 
     // Capture and check Service Activator argument
     ArgumentCaptor<UacEvent> captur = ArgumentCaptor.forClass(UacEvent.class);
     verify(receiver).acceptUACEvent(captur.capture());
-    assertTrue(captur.getValue().getPayload().equals(UacEvent.getPayload()));
+    assertTrue(captur.getValue().getPayload().equals(uacEvent.getPayload()));
     verify(respondentDataRepo, never()).writeUAC(any());
     verify(respondentDataRepo, never()).writeUAC(any());
   }
@@ -108,13 +115,16 @@ public class UacEventReceiverImplIT_Test {
   public void UacEventReceivedWithoutMillisecondsTest() throws Exception {
 
     // Create a UAC with a timestamp. Note that the milliseconds are not specified
-    UacEvent UacEvent = createUAC(RespondentHomeFixture.A_QID, EventTopic.UAC_UPDATE);
+    UacEvent uacEvent = FixtureHelper.loadPackageFixtures(UacEvent[].class).get(0);
+    uacEvent.getPayload().getUacUpdate().setQid(RespondentHomeFixture.A_QID);
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.ENGLISH);
     sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-    UacEvent.getHeader().setDateTime(sdf.parse("2011-08-12T20:17:46Z"));
+    uacEvent.getHeader().setDateTime(sdf.parse("2011-08-12T20:17:46Z"));
 
     // Construct message
-    Message<UacEvent> message = new GenericMessage<>(UacEvent, new HashMap<>());
+    Message<UacEvent> message = new GenericMessage<>(uacEvent, new HashMap<>());
+
+    when(eventFilter.isValidEvent(any(), any(), any(), any())).thenReturn(true);
     // Send message to container
     uacEventInbound.getOutputChannel().send(message);
 
@@ -122,25 +132,8 @@ public class UacEventReceiverImplIT_Test {
     ArgumentCaptor<UacEvent> captur = ArgumentCaptor.forClass(UacEvent.class);
     verify(receiver).acceptUACEvent(captur.capture());
     assertEquals(sdf.parse("2011-08-12T20:17:46Z"), captur.getValue().getHeader().getDateTime());
-    assertEquals(UacEvent.getHeader(), captur.getValue().getHeader());
-    assertTrue(captur.getValue().getPayload().equals(UacEvent.getPayload()));
+    assertEquals(uacEvent.getHeader(), captur.getValue().getHeader());
+    assertTrue(captur.getValue().getPayload().equals(uacEvent.getPayload()));
     verify(respondentDataRepo).writeUAC(any());
-  }
-
-  private UacEvent createUAC(String qid, EventTopic topic) {
-    // Construct UacEvent
-    UacEvent UacEvent = new UacEvent();
-    UacPayload uacPayload = UacEvent.getPayload();
-    UacUpdate uac = uacPayload.getUacUpdate();
-    uac.setUacHash("999999999");
-    uac.setActive(true);
-    uac.setQid(qid);
-    uac.setCaseId("c45de4dc-3c3b-11e9-b210-d663bd873d93");
-    Header header = new Header();
-    header.setTopic(topic);
-    header.setMessageId(UUID.fromString("c45de4dc-3c3b-11e9-b210-d663bd873d93"));
-    header.setDateTime(new Date());
-    UacEvent.setHeader(header);
-    return UacEvent;
   }
 }

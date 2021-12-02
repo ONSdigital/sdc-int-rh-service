@@ -7,6 +7,7 @@ import lombok.Data;
 public class UniqueAccessCodeDTO {
 
   private String uacHash;
+  private String collectionInstrumentUrl;
   private boolean active;
   private String qid;
   private boolean receiptReceived;

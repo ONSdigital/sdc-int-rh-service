@@ -1,8 +1,13 @@
 package uk.gov.ons.ctp.integration.rhsvc.message.impl;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -13,6 +18,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
+import uk.gov.ons.ctp.common.FixtureHelper;
+import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.EventTopic;
 import uk.gov.ons.ctp.common.event.model.Header;
 import uk.gov.ons.ctp.common.event.model.UacEvent;
@@ -21,6 +28,7 @@ import uk.gov.ons.ctp.common.event.model.UacUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.RespondentHomeFixture;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.config.QueueConfig;
+import uk.gov.ons.ctp.integration.rhsvc.event.impl.EventFilter;
 import uk.gov.ons.ctp.integration.rhsvc.event.impl.UACEventReceiverImpl;
 import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
 import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentDataRepositoryImpl;
@@ -29,6 +37,7 @@ import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentDataRepository
 public class UacEventReceiverImplUnit_Test {
 
   private RespondentDataRepository mockRespondentDataRepo;
+  private EventFilter eventFilter;
   private UACEventReceiverImpl target;
   private UacEvent UacEventFixture;
   private UacUpdate uacFixture;
@@ -42,7 +51,9 @@ public class UacEventReceiverImplUnit_Test {
     appConfig.setQueueConfig(queueConfig);
     ReflectionTestUtils.setField(target, "appConfig", appConfig);
     mockRespondentDataRepo = mock(RespondentDataRepositoryImpl.class);
+    eventFilter = mock(EventFilter.class);
     target.setRespondentDataRepo(mockRespondentDataRepo);
+    target.setEventFilter(eventFilter);
   }
 
   @SneakyThrows
@@ -69,6 +80,7 @@ public class UacEventReceiverImplUnit_Test {
 
   @SneakyThrows
   private void acceptUacEvent(String qid, EventTopic topic) {
+    when(eventFilter.isValidEvent(any(), any(), any(), any())).thenReturn(true);
     prepareAndAcceptEvent(qid, topic);
     verify(mockRespondentDataRepo).writeUAC(uacFixture);
   }
@@ -117,5 +129,27 @@ public class UacEventReceiverImplUnit_Test {
   @Test
   public void shouldAcceptUacCreatedEvent() {
     acceptUacEvent(RespondentHomeFixture.QID_01, EventTopic.UAC_UPDATE);
+  }
+
+  @Test
+  public void shouldRejectUacWhenPrerequisiteEventsDoNotExistInFirestore() throws CTPException {
+    when(eventFilter.isValidEvent(any(), any(), any(), any())).thenReturn(false);
+    prepareAndAcceptEvent(RespondentHomeFixture.QID_01, EventTopic.UAC_UPDATE);
+    verify(mockRespondentDataRepo, never()).writeUAC(uacFixture);
+  }
+
+  @Test
+  public void testExceptionThrown() throws CTPException {
+    UacEvent uacEvent = FixtureHelper.loadPackageFixtures(UacEvent[].class).get(0);
+    uacEvent.getPayload().getUacUpdate().setQid(RespondentHomeFixture.QID_01);
+    when(eventFilter.isValidEvent(any(), any(), any(), any())).thenReturn(true);
+    doThrow(new CTPException(CTPException.Fault.SYSTEM_ERROR))
+        .when(mockRespondentDataRepo)
+        .writeUAC(uacEvent.getPayload().getUacUpdate());
+
+    CTPException thrown = assertThrows(CTPException.class, () -> target.acceptUACEvent(uacEvent));
+
+    assertEquals(CTPException.Fault.SYSTEM_ERROR, thrown.getFault());
+    assertEquals("Non Specific Error", thrown.getMessage());
   }
 }

@@ -30,6 +30,7 @@ import uk.gov.ons.ctp.common.event.model.CollectionExerciseUpdateEvent;
 import uk.gov.ons.ctp.common.utility.ParallelTestLocks;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.event.impl.CollectionExerciseEventReceiverImpl;
+import uk.gov.ons.ctp.integration.rhsvc.event.impl.EventFilter;
 import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentDataRepositoryImpl;
 
 /** Spring Integration test of flow received from Response Management */
@@ -45,6 +46,7 @@ public class CollectionExerciseEventReceiverImplIT_Test {
   @Autowired private PubSubInboundChannelAdapter collectionExerciseEventInbound;
   @MockBean private RespondentDataRepositoryImpl respondentDataRepo;
   @MockBean private PubSubTemplate pubSubTemplate;
+  @MockBean private EventFilter eventFilter;
 
   @BeforeEach
   public void initMocks() {

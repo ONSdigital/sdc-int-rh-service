@@ -1,5 +1,6 @@
 package uk.gov.ons.ctp.integration.rhsvc.config;
 
+import java.util.Set;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
@@ -25,4 +26,5 @@ public class AppConfig {
   private NotifyConfig notify;
   private WebformConfig webform;
   private LoadsheddingConfig loadshedding;
+  private Set<String> surveys;
 }
