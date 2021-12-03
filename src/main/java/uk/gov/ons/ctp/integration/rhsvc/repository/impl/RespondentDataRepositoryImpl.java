@@ -1,13 +1,7 @@
 package uk.gov.ons.ctp.integration.rhsvc.repository.impl;
 
-import static java.util.stream.Collectors.toList;
 import static uk.gov.ons.ctp.common.log.ScopedStructuredArguments.kv;
 
-import com.google.api.core.ApiFuture;
-import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.FirestoreOptions;
-import com.google.cloud.firestore.QueryDocumentSnapshot;
-import com.google.cloud.firestore.QuerySnapshot;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -20,7 +14,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.ons.ctp.common.cloud.CloudDataStore;
 import uk.gov.ons.ctp.common.cloud.RetryableCloudDataStore;
 import uk.gov.ons.ctp.common.error.CTPException;
-import uk.gov.ons.ctp.common.error.CTPException.Fault;
 import uk.gov.ons.ctp.common.event.model.CaseUpdate;
 import uk.gov.ons.ctp.common.event.model.CollectionExercise;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
@@ -159,19 +152,17 @@ public class RespondentDataRepositoryImpl implements RespondentDataRepository {
     retryableCloudDataStore.storeObject(surveySchema, id, surveyUpdate, id);
   }
 
+  /**
+   * List all of the surveys.
+   *
+   * <p>Assumes that this list will never be so large as to be unwieldy.
+   *
+   * @return list of all the surveyUpdate objects
+   * @throws CTPException - if a cloud exception was detected.
+   */
   @Override
   public List<SurveyUpdate> listSurveys() throws CTPException {
-    Firestore firestore = FirestoreOptions.getDefaultInstance().getService();
-    ApiFuture<QuerySnapshot> query = firestore.collection(surveySchema).get();
-
-    QuerySnapshot querySnapshot;
-    try {
-      querySnapshot = query.get();
-      List<QueryDocumentSnapshot> documents = querySnapshot.getDocuments();
-      return documents.stream().map(d -> d.toObject(SurveyUpdate.class)).collect(toList());
-    } catch (Exception e) {
-      throw new CTPException(Fault.SYSTEM_ERROR, e, e.getMessage());
-    }
+    return retryableCloudDataStore.list(SurveyUpdate.class, surveySchema);
   }
 
   /**

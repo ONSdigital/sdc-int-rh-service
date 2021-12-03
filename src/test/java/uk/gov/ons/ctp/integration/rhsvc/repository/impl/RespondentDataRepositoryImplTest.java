@@ -1,6 +1,8 @@
 package uk.gov.ons.ctp.integration.rhsvc.repository.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -17,6 +19,7 @@ import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.cloud.RetryableCloudDataStore;
 import uk.gov.ons.ctp.common.domain.UniquePropertyReferenceNumber;
 import uk.gov.ons.ctp.common.event.model.CaseUpdate;
+import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 
 @ExtendWith(MockitoExtension.class)
 public class RespondentDataRepositoryImplTest {
@@ -78,5 +81,13 @@ public class RespondentDataRepositoryImplTest {
         Optional.of(collectionCase.get(0)),
         target.readCaseUpdateByUprn(UPRN_STRING, false),
         "Expects Latest Item With non HI Address");
+  }
+
+  @Test
+  public void shouldListSurveys() throws Exception {
+    var surveys = FixtureHelper.loadClassFixtures(SurveyUpdate[].class);
+    when(mockCloudDataStore.list(eq(SurveyUpdate.class), any())).thenReturn(surveys);
+    var listedSurveys = target.listSurveys();
+    assertEquals(3, listedSurveys.size());
   }
 }

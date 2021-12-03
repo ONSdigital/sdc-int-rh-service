@@ -9,6 +9,7 @@ public interface SurveyService {
 
   /**
    * Get a list of all the surveys.
+   *
    * @return list of surveys
    * @throws CTPException on error
    */
