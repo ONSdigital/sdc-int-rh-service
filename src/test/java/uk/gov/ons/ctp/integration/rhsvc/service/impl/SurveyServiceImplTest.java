@@ -109,7 +109,7 @@ public class SurveyServiceImplTest {
   @Test
   public void shouldFindNoSurveys() throws Exception {
     when(dataRepo.listSurveys()).thenReturn(Collections.emptyList());
-    List<SurveyDTO> surveys = service.allSurveys();
+    List<SurveyDTO> surveys = service.listSurveys();
     assertTrue(surveys.isEmpty());
   }
 
@@ -117,7 +117,7 @@ public class SurveyServiceImplTest {
   public void shouldFindSurveys() throws Exception {
     var surveyUpdates = FixtureHelper.loadClassFixtures(SurveyUpdate[].class);
     when(dataRepo.listSurveys()).thenReturn(surveyUpdates);
-    List<SurveyDTO> surveys = service.allSurveys();
+    List<SurveyDTO> surveys = service.listSurveys();
     assertEquals(3, surveys.size());
 
     for (int i = 0; i < 3; i++) {

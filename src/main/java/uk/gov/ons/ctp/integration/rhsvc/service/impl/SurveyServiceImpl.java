@@ -28,7 +28,7 @@ public class SurveyServiceImpl implements SurveyService {
   }
 
   @Override
-  public List<SurveyDTO> allSurveys() throws CTPException {
+  public List<SurveyDTO> listSurveys() throws CTPException {
     List<SurveyUpdate> surveys = dataRepo.listSurveys();
     var dtos = surveys.stream().map(this::from).collect(toList());
     return dtos;

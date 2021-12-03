@@ -30,7 +30,7 @@ public class SurveyEndpoint {
   @GetMapping
   public ResponseEntity<List<SurveyDTO>> allSurveys() throws CTPException {
     log.info("Entering GET surveys");
-    List<SurveyDTO> result = surveyService.allSurveys();
+    List<SurveyDTO> result = surveyService.listSurveys();
     return ResponseEntity.ok(result);
   }
 

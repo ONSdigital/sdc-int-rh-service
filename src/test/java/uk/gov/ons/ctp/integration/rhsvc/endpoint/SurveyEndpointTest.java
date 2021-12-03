@@ -52,7 +52,7 @@ public class SurveyEndpointTest {
   @Test
   public void shouldReturnEmptyListWhenNoSurveys() throws Exception {
     List<SurveyDTO> surveys = Collections.emptyList();
-    when(service.allSurveys()).thenReturn(surveys);
+    when(service.listSurveys()).thenReturn(surveys);
     mockMvc
         .perform(get("/surveys"))
         .andExpect(status().isOk())
@@ -63,7 +63,7 @@ public class SurveyEndpointTest {
   @Test
   public void shouldReturnListOfSurveys() throws Exception {
     List<SurveyDTO> surveys = FixtureHelper.loadClassFixtures(SurveyDTO[].class);
-    when(service.allSurveys()).thenReturn(surveys);
+    when(service.listSurveys()).thenReturn(surveys);
     mockMvc
         .perform(get("/surveys"))
         .andExpect(status().isOk())
