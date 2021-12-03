@@ -1,5 +1,7 @@
 package uk.gov.ons.ctp.integration.rhsvc.service.impl;
 
+import static java.util.stream.Collectors.toList;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -26,9 +28,10 @@ public class SurveyServiceImpl implements SurveyService {
   }
 
   @Override
-  public List<SurveyDTO> allSurveys() {
-    // TODO Auto-generated method stub
-    return null;
+  public List<SurveyDTO> allSurveys() throws CTPException {
+    List<SurveyUpdate> surveys = dataRepo.listSurveys();
+    var dtos = surveys.stream().map(this::from).collect(toList());
+    return dtos;
   }
 
   @Override
@@ -42,6 +45,11 @@ public class SurveyServiceImpl implements SurveyService {
                         CTPException.Fault.RESOURCE_NOT_FOUND,
                         "Survey " + surveyId + " Not Found"));
 
+    SurveyDTO dto = from(surveyUpdate);
+    return dto;
+  }
+
+  private SurveyDTO from(SurveyUpdate surveyUpdate) {
     SurveyDTO dto = mapper.map(surveyUpdate, SurveyDTO.class);
     dto.setSurveyType(surveyUpdate.surveyType());
 
@@ -59,6 +67,9 @@ public class SurveyServiceImpl implements SurveyService {
       DeliveryChannel deliveryChannel,
       List<SurveyFulfilment> fulfilments,
       List<ProductDTO> products) {
+    if (fulfilments == null) {
+      return;
+    }
     for (SurveyFulfilment f : fulfilments) {
       ProductDTO product = mapper.map(f, ProductDTO.class);
       product.setDeliveryChannel(deliveryChannel);

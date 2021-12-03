@@ -6,7 +6,7 @@ import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.integration.rhsvc.representation.SurveyDTO;
 
 public interface SurveyService {
-  List<SurveyDTO> allSurveys();
+  List<SurveyDTO> allSurveys() throws CTPException;
 
   SurveyDTO survey(UUID surveyId) throws CTPException;
 }

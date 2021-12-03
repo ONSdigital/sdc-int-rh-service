@@ -28,7 +28,7 @@ public class SurveyEndpoint {
   }
 
   @GetMapping
-  public ResponseEntity<List<SurveyDTO>> allSurveys() {
+  public ResponseEntity<List<SurveyDTO>> allSurveys() throws CTPException {
     log.info("Entering GET surveys");
     List<SurveyDTO> result = surveyService.allSurveys();
     return ResponseEntity.ok(result);

@@ -1,10 +1,12 @@
 package uk.gov.ons.ctp.integration.rhsvc;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.UUID;
 import ma.glasnost.orika.MapperFacade;
@@ -16,11 +18,13 @@ import uk.gov.ons.ctp.common.domain.Region;
 import uk.gov.ons.ctp.common.domain.UniquePropertyReferenceNumber;
 import uk.gov.ons.ctp.common.event.model.CaseUpdate;
 import uk.gov.ons.ctp.common.event.model.CollectionExercise;
+import uk.gov.ons.ctp.common.event.model.SurveyFulfilment;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 import uk.gov.ons.ctp.common.event.model.UacUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.representation.AddressDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CollectionExerciseDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.ProductDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.SurveyLiteDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.UniqueAccessCodeDTO;
 
@@ -99,11 +103,24 @@ public class RHSvcBeanMapperTest {
   }
 
   @Test
-  @DisplayName("SurveyUpdate -> urveyLiteDTO mapping")
+  @DisplayName("SurveyUpdate -> SurveyLiteDTO mapping")
   public void shouldMapSurveyUpdateToSurveyLiteDTO() {
     SurveyLiteDTO dto = mapper.map(surveyUpdate, SurveyLiteDTO.class);
     assertEquals(UUID.fromString("3883af91-0052-4497-9805-3238544fcf8a"), dto.getSurveyId());
     assertEquals("LMS", dto.getName());
+  }
+
+  @Test
+  @DisplayName("SurveyFulfilment -> ProductDTO mapping")
+  public void shouldMapSurveyFulfilmentToProductDTO() {
+    SurveyFulfilment fulfilment = FixtureHelper.loadClassFixtures(SurveyFulfilment[].class).get(0);
+    ProductDTO dto = mapper.map(fulfilment, ProductDTO.class);
+    var metadata = dto.getMetadata();
+    var expectedRegions = Arrays.asList("E", "N");
+    assertAll(
+        () -> assertEquals("replace-uac-en", dto.getPackCode()),
+        () -> assertEquals("Replacement UAC - English", dto.getDescription()),
+        () -> assertEquals(metadata.get("suitableRegions"), expectedRegions));
   }
 
   @Test

@@ -3,9 +3,13 @@ package uk.gov.ons.ctp.integration.rhsvc.service.impl;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -30,6 +34,11 @@ import uk.gov.ons.ctp.integration.rhsvc.representation.SurveyDTO;
 
 @ExtendWith(MockitoExtension.class)
 public class SurveyServiceImplTest {
+  private static final List<String> SURVEY_IDS =
+      Arrays.asList(
+          "3883af91-0052-4497-9805-3238544fcf8a",
+          "7645931e-542d-11ec-b825-4c3275913db5",
+          "90c93916-542d-11ec-9c5e-4c3275913db5");
 
   @Mock private RespondentDataRepository dataRepo;
   @Spy private MapperFacade mapperFacade = new RHSvcBeanMapper();
@@ -43,12 +52,26 @@ public class SurveyServiceImplTest {
   }
 
   @Test
+  public void shouldFindKnownSurveyWithNoFulfilments() throws Exception {
+    SurveyUpdate surveyUpdate = FixtureHelper.loadPackageFixtures(SurveyUpdate[].class).get(0);
+    surveyUpdate.setAllowedEmailFulfilments(null);
+    surveyUpdate.setAllowedSmsFulfilments(null);
+    surveyUpdate.setAllowedPrintFulfilments(new ArrayList<>());
+
+    when(dataRepo.readSurvey(any())).thenReturn(Optional.of(surveyUpdate));
+    SurveyDTO dto = service.survey(UUID.randomUUID());
+    assertNotNull(dto);
+    assertEquals(SURVEY_IDS.get(0), dto.getSurveyId().toString());
+    assertTrue(dto.getAllowedFulfilments().isEmpty());
+  }
+
+  @Test
   public void shouldFindKnownSurvey() throws Exception {
     SurveyUpdate surveyUpdate = FixtureHelper.loadPackageFixtures(SurveyUpdate[].class).get(0);
     when(dataRepo.readSurvey(any())).thenReturn(Optional.of(surveyUpdate));
     SurveyDTO dto = service.survey(UUID.randomUUID());
     assertNotNull(dto);
-    assertEquals("3883af91-0052-4497-9805-3238544fcf8a", dto.getSurveyId().toString());
+    assertEquals(SURVEY_IDS.get(0), dto.getSurveyId().toString());
     assertEquals("LMS", dto.getName());
     assertEquals(SurveyType.SOCIAL, dto.getSurveyType());
     verifyProducts(dto);
@@ -76,12 +99,29 @@ public class SurveyServiceImplTest {
     var meta = prod.getMetadata();
     var regions = meta.get("suitableRegions");
     assertNotNull(regions);
+    assertEquals(regions, Arrays.asList("E", "N"));
   }
 
   private long countInChannel(DeliveryChannel channel, List<ProductDTO> products) {
     return products.stream().filter(p -> p.getDeliveryChannel() == channel).count();
   }
 
-  // WRITEME test for service.allSurveys
+  @Test
+  public void shouldFindNoSurveys() throws Exception {
+    when(dataRepo.listSurveys()).thenReturn(Collections.emptyList());
+    List<SurveyDTO> surveys = service.allSurveys();
+    assertTrue(surveys.isEmpty());
+  }
 
+  @Test
+  public void shouldFindSurveys() throws Exception {
+    var surveyUpdates = FixtureHelper.loadClassFixtures(SurveyUpdate[].class);
+    when(dataRepo.listSurveys()).thenReturn(surveyUpdates);
+    List<SurveyDTO> surveys = service.allSurveys();
+    assertEquals(3, surveys.size());
+
+    for (int i = 0; i < 3; i++) {
+      assertEquals(SURVEY_IDS.get(i), surveys.get(i).getSurveyId().toString());
+    }
+  }
 }
