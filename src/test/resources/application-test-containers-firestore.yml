@@ -1,0 +1,17 @@
+GOOGLE_CLOUD_PROJECT: sdc-rh-test
+
+management:
+  health:
+    pubsub:
+      enabled: false
+  metrics:
+    export:
+      stackdriver:
+        enabled: false
+        
+spring:
+  cloud:
+    gcp:
+      pubsub:
+        enabled: false
+        

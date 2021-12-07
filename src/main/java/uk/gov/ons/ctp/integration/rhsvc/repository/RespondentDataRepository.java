@@ -18,7 +18,7 @@ public interface RespondentDataRepository {
 
   void writeCollectionExercise(CollectionExercise collectionExercise) throws CTPException;
 
-  Optional<UacUpdate> readUAC(String universalAccessCode) throws CTPException;
+  Optional<UacUpdate> readUAC(String universalAccessCodeHash) throws CTPException;
 
   Optional<CaseUpdate> readCaseUpdate(String caseId) throws CTPException;
 

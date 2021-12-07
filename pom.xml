@@ -16,7 +16,7 @@
   <properties>
     <skip.integration.tests>true</skip.integration.tests>
     <skip.dockerfile>true</skip.dockerfile>
-    <powermock-version>2.0.0</powermock-version>
+    <testcontainers.version>1.16.2</testcontainers.version>
   </properties>
 
   <parent>
@@ -210,6 +210,43 @@
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>testcontainers</artifactId>
+      <version>${testcontainers.version}</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <!-- Junit4 mocks allow us to remove the unwanted junit4 transitive dependency
+         introduced by testcontainers in a safe way. It is a minimal library of
+         about 4 or 5 dummy interfaces. This will no longer be needed when
+         testcontainers moves to version 2 -->
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-junit4-mock</artifactId>
+      <version>2.5.0.Final</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>gcloud</artifactId>
+      <version>${testcontainers.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <version>${testcontainers.version}</version>
       <scope>test</scope>
     </dependency>
 
