@@ -226,10 +226,9 @@
       </exclusions>
     </dependency>
 
-    <!-- Junit4 mocks allow us to remove the unwanted junit4 transitive dependency
-         introduced by testcontainers in a safe way. It is a minimal library of
-         about 4 or 5 dummy interfaces. This will no longer be needed when
-         testcontainers moves to version 2 -->
+    <!-- Junit4 mocks allow us to remove the unwanted junit4 transitive dependency introduced by testcontainers
+      in a safe way. It is a minimal library of about 4 or 5 dummy interfaces. This will no longer be needed
+      when testcontainers moves to version 2 -->
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-junit4-mock</artifactId>
@@ -406,6 +405,9 @@
           <argLine>${failsafeArgLine}</argLine>
           <skip>${skip.integration.tests}</skip>
           <classesDirectory>${project.build.outputDirectory}</classesDirectory>
+          <environmentVariables>
+            <GOOGLE_CLOUD_PROJECT>sdc-rh-test</GOOGLE_CLOUD_PROJECT>
+          </environmentVariables>
         </configuration>
         <executions>
           <execution>
