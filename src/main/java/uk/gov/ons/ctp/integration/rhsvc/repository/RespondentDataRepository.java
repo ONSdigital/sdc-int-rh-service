@@ -22,9 +22,9 @@ public interface RespondentDataRepository {
 
   Optional<CaseUpdate> readCaseUpdate(String caseId) throws CTPException;
 
-  Optional<SurveyUpdate> readSurvey(String caseId) throws CTPException;
+  Optional<SurveyUpdate> readSurvey(String surveyId) throws CTPException;
 
-  Optional<CollectionExercise> readCollectionExercise(String caseId) throws CTPException;
+  Optional<CollectionExercise> readCollectionExercise(String collexId) throws CTPException;
 
   Optional<CaseUpdate> readCaseUpdateByUprn(String uprn, boolean onlyValid) throws CTPException;
 
