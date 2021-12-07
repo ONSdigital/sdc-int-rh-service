@@ -1,20 +1,21 @@
 package uk.gov.ons.ctp.integration.rhsvc.representation;
 
-import java.util.List;
+import java.util.Map;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import uk.gov.ons.ctp.integration.common.product.model.Product;
+import lombok.NoArgsConstructor;
+import uk.gov.ons.ctp.common.domain.DeliveryChannel;
+import uk.gov.ons.ctp.common.domain.ProductGroup;
 
 @Data
-/** Representation of a Product omitting fields not needed by the RH UI */
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ProductDTO {
-
-  private String fulfilmentCode;
-  private Product.ProductGroup productGroup;
+  private String packCode;
   private String description;
-  private Product.Language language;
-  private List<Product.CaseType> caseTypes;
-  private Boolean individual;
-  private List<Product.Region> regions;
-  private Product.DeliveryChannel deliveryChannel;
-  private Product.Handler handler;
+  private ProductGroup productGroup;
+  private DeliveryChannel deliveryChannel;
+  private Map<String, Object> metadata;
 }

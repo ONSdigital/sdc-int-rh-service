@@ -3,13 +3,16 @@ package uk.gov.ons.ctp.integration.rhsvc;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.converter.BidirectionalConverter;
 import ma.glasnost.orika.converter.ConverterFactory;
 import ma.glasnost.orika.impl.ConfigurableMapper;
 import ma.glasnost.orika.metadata.Type;
+import org.eclipse.jdt.internal.compiler.SourceElementNotifier;
 import org.springframework.stereotype.Component;
 import uk.gov.ons.ctp.common.domain.EstabType;
 import uk.gov.ons.ctp.common.event.model.Address;
@@ -46,6 +49,7 @@ public class RHSvcBeanMapper extends ConfigurableMapper {
     converterFactory.registerConverter(new StringToUPRNConverter());
     converterFactory.registerConverter(new LocalDateTimeConverter());
     converterFactory.registerConverter(new EstabTypeConverter());
+    converterFactory.registerConverter(new ArrayListConverter());
 
     factory
         .classMap(CaseUpdate.class, CaseDTO.class)
@@ -98,7 +102,6 @@ public class RHSvcBeanMapper extends ConfigurableMapper {
   }
 
   static class LocalDateTimeConverter extends BidirectionalConverter<Date, LocalDateTime> {
-
     @Override
     public LocalDateTime convertTo(
         Date date, Type<LocalDateTime> type, MappingContext mappingContext) {
@@ -109,6 +112,30 @@ public class RHSvcBeanMapper extends ConfigurableMapper {
     public Date convertFrom(
         LocalDateTime localDateTime, Type<Date> type, MappingContext mappingContext) {
       return Date.from(localDateTime.toInstant(ZoneOffset.UTC));
+    }
+  }
+
+  static class ArrayListConverter extends BidirectionalConverter<ArrayList<Object>, Object> {
+    @Override
+    public Object convertTo(
+        ArrayList<Object> source, Type<Object> destinationType, MappingContext mappingContext) {
+      List<String> destination = new ArrayList<>();
+      for (Object sourceElement : source) {
+        if (sourceElement instanceof String) {
+          destination.add((String) sourceElement);
+        } else {
+          throw new UnsupportedOperationException(
+              "Unsupported type found when mapping an an ArrayList: "
+                  + SourceElementNotifier.class.getCanonicalName());
+        }
+      }
+      return destination;
+    }
+
+    @Override
+    public ArrayList<Object> convertFrom(
+        Object source, Type<ArrayList<Object>> destinationType, MappingContext mappingContext) {
+      throw new UnsupportedOperationException("Conversion not implemented");
     }
   }
 }

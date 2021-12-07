@@ -12,7 +12,7 @@ import uk.gov.ons.ctp.integration.common.product.model.Product.CaseType;
 import uk.gov.ons.ctp.integration.common.product.model.Product.DeliveryChannel;
 import uk.gov.ons.ctp.integration.common.product.model.Product.Region;
 import uk.gov.ons.ctp.integration.common.product.model.Product.RequestChannel;
-import uk.gov.ons.ctp.integration.rhsvc.representation.ProductDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.OldProductDTO;
 import uk.gov.ons.ctp.integration.rhsvc.service.FulfilmentsService;
 
 @Service
@@ -23,7 +23,7 @@ public class FulfilmentsServiceImpl implements FulfilmentsService {
   @Autowired MapperFacade mapperFacade;
 
   @Override
-  public List<ProductDTO> getFulfilments(
+  public List<OldProductDTO> getFulfilments(
       List<CaseType> caseTypes,
       Region region,
       DeliveryChannel deliveryChannel,
@@ -40,6 +40,6 @@ public class FulfilmentsServiceImpl implements FulfilmentsService {
     example.setProductGroup(productGroup);
 
     List<Product> products = productReference.searchProducts(example);
-    return mapperFacade.mapAsList(products, ProductDTO.class);
+    return mapperFacade.mapAsList(products, OldProductDTO.class);
   }
 }
