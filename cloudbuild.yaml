@@ -13,7 +13,7 @@ steps:
     id: Maven Package
     env:
       - TZ=Europe/London
-    args: ['-Dmaven.repo.local=/workspace/.m2/repository', 'package']
+    args: ['-Dmaven.repo.local=/workspace/.m2/repository', 'verify']
     entrypoint: mvn
 
   - name: 'gcr.io/cloud-builders/docker'

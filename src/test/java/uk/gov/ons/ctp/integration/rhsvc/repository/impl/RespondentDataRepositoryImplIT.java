@@ -75,6 +75,7 @@ public class RespondentDataRepositoryImplIT {
   @BeforeEach
   public void setup() throws Exception {
     dataStore.deleteObject("sdc-rh-test-case", CASE_ID);
+    dataStore.deleteObject("sdc-rh-test-uac", UAC_HASH);
   }
 
   @Test
