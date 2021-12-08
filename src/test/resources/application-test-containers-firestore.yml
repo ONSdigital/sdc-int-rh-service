@@ -6,6 +6,7 @@ management:
   metrics:
     export:
       stackdriver:
+        project-id: sdc-rh-test
         enabled: false
         
 spring:
