@@ -144,7 +144,7 @@ public class CaseServiceImpl implements CaseService {
       DeliveryChannel deliveryChannel, FulfilmentRequestDTO request, CaseUpdate caseDetails)
       throws CTPException {
     Map<String, Product> map = new HashMap<>();
-    Region region = Region.valueOf(caseDetails.getSample().getRegion());
+    Region region = Region.valueOf(caseDetails.getSample().get("region"));
     for (String fulfilmentCode : new HashSet<>(request.getFulfilmentCodes())) {
       map.put(fulfilmentCode, findProduct(fulfilmentCode, deliveryChannel, region));
     }
@@ -167,7 +167,7 @@ public class CaseServiceImpl implements CaseService {
       for (Product product : products) {
         log.debug("Recording rate-limiting", kv("fulfilmentCode", product.getFulfilmentCode()));
         UniquePropertyReferenceNumber uprn =
-            UniquePropertyReferenceNumber.create(caseDetails.getSample().getUprn());
+            UniquePropertyReferenceNumber.create(caseDetails.getSample().get("uprn"));
         recordRateLimiting(contact, product, ipAddress, uprn);
       }
     } else {

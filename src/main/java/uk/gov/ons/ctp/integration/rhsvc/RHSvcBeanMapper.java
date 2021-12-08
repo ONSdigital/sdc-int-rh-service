@@ -4,18 +4,18 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.Date;
+
+import org.springframework.stereotype.Component;
+
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.MappingContext;
 import ma.glasnost.orika.converter.BidirectionalConverter;
 import ma.glasnost.orika.converter.ConverterFactory;
 import ma.glasnost.orika.impl.ConfigurableMapper;
 import ma.glasnost.orika.metadata.Type;
-import org.springframework.stereotype.Component;
 import uk.gov.ons.ctp.common.domain.EstabType;
 import uk.gov.ons.ctp.common.event.model.Address;
 import uk.gov.ons.ctp.common.event.model.AddressCompact;
-import uk.gov.ons.ctp.common.event.model.CaseUpdate;
-import uk.gov.ons.ctp.common.event.model.CaseUpdateSample;
 import uk.gov.ons.ctp.common.event.model.CollectionExercise;
 import uk.gov.ons.ctp.common.event.model.NewCaseSample;
 import uk.gov.ons.ctp.common.event.model.NewCaseSampleSensitive;
@@ -24,7 +24,6 @@ import uk.gov.ons.ctp.common.event.model.UacUpdate;
 import uk.gov.ons.ctp.common.util.StringToUPRNConverter;
 import uk.gov.ons.ctp.common.util.StringToUUIDConverter;
 import uk.gov.ons.ctp.integration.rhsvc.representation.AddressDTO;
-import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CollectionExerciseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.NewCaseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.SurveyLiteDTO;
@@ -48,18 +47,6 @@ public class RHSvcBeanMapper extends ConfigurableMapper {
     converterFactory.registerConverter(new EstabTypeConverter());
 
     factory
-        .classMap(CaseUpdate.class, CaseDTO.class)
-        .field("sample.region", "address.region")
-        .field("sample.uprn", "address.uprn")
-        .field("sample.addressLine1", "address.addressLine1")
-        .field("sample.addressLine2", "address.addressLine2")
-        .field("sample.addressLine3", "address.addressLine3")
-        .field("sample.townName", "address.townName")
-        .field("sample.postcode", "address.postcode")
-        .byDefault()
-        .register();
-
-    factory
         .classMap(UacUpdate.class, UniqueAccessCodeDTO.class)
         .field("metadata.wave", "wave")
         .byDefault()
@@ -73,8 +60,6 @@ public class RHSvcBeanMapper extends ConfigurableMapper {
         .field("metadata.cohortSchedule", "cohortSchedule")
         .byDefault()
         .register();
-
-    factory.classMap(AddressDTO.class, CaseUpdateSample.class).byDefault().register();
 
     factory.classMap(NewCaseSampleSensitive.class, NewCaseDTO.class).byDefault().register();
     factory.classMap(AddressDTO.class, AddressCompact.class).byDefault().register();

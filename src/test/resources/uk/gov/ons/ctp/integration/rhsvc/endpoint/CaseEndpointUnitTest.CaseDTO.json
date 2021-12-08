@@ -5,7 +5,7 @@
     "collectionExerciseId": "dc4477d1-dd3f-4c69-b182-7ff725dc9fa7",
     "invalid": false,
     "refusalReceived": "HARD_REFUSAL",
-    "address": {
+    "sample": {
       "addressLine1": "1 main street",
       "addressLine2": "upper upperingham",
       "addressLine3": "",
@@ -13,6 +13,9 @@
       "region": "E",
       "postcode": "UP103UP",
       "uprn": "123456"
+    },
+    "sampleSensitive": {
+      "phoneNumber": "REDACTED"
     }
   },
   {
@@ -21,7 +24,7 @@
     "collectionExerciseId": "dc4477d1-dd3f-4c69-b182-7ff725dc9fa7",
     "invalid": false,
     "refusalReceived": "HARD_REFUSAL",
-    "address": {
+    "sample": {
       "addressLine1": "1 main street",
       "addressLine2": "upper upperingham",
       "addressLine3": "",
@@ -29,6 +32,9 @@
       "region": "E",
       "postcode": "UP103UP",
       "uprn": "123456"
+    },
+    "sampleSensitive": {
+      "phoneNumber": "REDACTED"
     }
   }
 ]

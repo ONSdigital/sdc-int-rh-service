@@ -492,7 +492,7 @@ public class CaseServiceImplFulfilmentTest {
   private void verifyRateLimiterCall(
       int numTimes, String phoneNo, String clientIp, CaseUpdate caseDetails) throws Exception {
     UniquePropertyReferenceNumber uprn =
-        UniquePropertyReferenceNumber.create(caseDetails.getSample().getUprn());
+        UniquePropertyReferenceNumber.create(caseDetails.getSample().get("uprn"));
     verify(rateLimiterClient, times(numTimes))
         .checkFulfilmentRateLimit(
             eq(Domain.RH), productCaptor.capture(), eq(clientIp), eq(uprn), eq(phoneNo));

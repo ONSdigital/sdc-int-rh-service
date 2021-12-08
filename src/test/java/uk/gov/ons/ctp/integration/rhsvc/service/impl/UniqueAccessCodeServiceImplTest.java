@@ -14,7 +14,7 @@ import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
-import ma.glasnost.orika.MapperFacade;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -23,9 +23,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import ma.glasnost.orika.MapperFacade;
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.domain.Channel;
-import uk.gov.ons.ctp.common.domain.Region;
 import uk.gov.ons.ctp.common.domain.Source;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.EventPublisher;
@@ -123,25 +124,8 @@ public class UniqueAccessCodeServiceImplTest {
         UUID.fromString(caseTest.getCollectionExerciseId()),
         uacDTO.getCollectionExercise().getCollectionExerciseId());
     assertEquals(caseTest.getCaseRef(), uacDTO.getCollectionCase().getCaseRef());
-    assertEquals(
-        Region.valueOf(caseTest.getSample().getRegion()),
-        uacDTO.getCollectionCase().getAddress().getRegion());
-    assertEquals(
-        caseTest.getSample().getAddressLine1(),
-        uacDTO.getCollectionCase().getAddress().getAddressLine1());
-    assertEquals(
-        caseTest.getSample().getAddressLine2(),
-        uacDTO.getCollectionCase().getAddress().getAddressLine2());
-    assertEquals(
-        caseTest.getSample().getAddressLine3(),
-        uacDTO.getCollectionCase().getAddress().getAddressLine3());
-    assertEquals(
-        caseTest.getSample().getTownName(), uacDTO.getCollectionCase().getAddress().getTownName());
-    assertEquals(
-        caseTest.getSample().getPostcode(), uacDTO.getCollectionCase().getAddress().getPostcode());
-    assertEquals(
-        caseTest.getSample().getUprn(),
-        Long.toString(uacDTO.getCollectionCase().getAddress().getUprn().getValue()));
+    assertEquals(caseTest.getSample(), uacDTO.getCollectionCase().getSample());
+    assertEquals(caseTest.getSampleSensitive(), uacDTO.getCollectionCase().getSampleSensitive());
 
     UacAuthentication payload = uacAuthenticationCaptor.getValue();
     assertEquals(uacDTO.getQid(), payload.getQid());
