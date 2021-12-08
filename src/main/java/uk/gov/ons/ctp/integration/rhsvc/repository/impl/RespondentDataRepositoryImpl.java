@@ -29,7 +29,7 @@ public class RespondentDataRepositoryImpl implements RespondentDataRepository {
   // Cloud data store access for startup checks only
   @Autowired FirestoreDataStore nonRetryableCloudDataStore;
 
-  @Value("${GOOGLE_CLOUD_PROJECT}")
+  @Value("${spring.cloud.gcp.firestore.project-id}")
   private String gcpProject;
 
   @Value("${cloud-storage.case-schema-name}")

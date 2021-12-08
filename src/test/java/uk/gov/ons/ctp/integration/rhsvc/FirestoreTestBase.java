@@ -17,7 +17,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.FirestoreEmulatorContainer;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
@@ -46,13 +47,14 @@ public abstract class FirestoreTestBase {
   @Autowired protected TestCloudDataStore dataStore;
 
   @Container
-  private static final FirestoreEmulatorContainer firestoreEmulator =
-      new FirestoreEmulatorContainer(
+  private static final CustomFirestoreEmulatorContainer firestoreEmulator =
+      new CustomFirestoreEmulatorContainer(
           DockerImageName.parse("gcr.io/google.com/cloudsdktool/cloud-sdk:317.0.0-emulators"));
 
   @DynamicPropertySource
   static void emulatorProperties(DynamicPropertyRegistry registry) {
     registry.add("spring.cloud.gcp.firestore.host-port", firestoreEmulator::getEmulatorEndpoint);
+    registry.add("spring.cloud.gcp.firestore.project-id", () -> GCP_PROJECT);
   }
 
   @TestConfiguration
@@ -70,5 +72,35 @@ public abstract class FirestoreTestBase {
     dataStore.deleteCollection(COLLEX_SCHEMA);
     dataStore.deleteCollection(UAC_SCHEMA);
     dataStore.deleteCollection(CASE_SCHEMA);
+  }
+
+  public static class CustomFirestoreEmulatorContainer
+      extends GenericContainer<CustomFirestoreEmulatorContainer> {
+
+    private static final DockerImageName DEFAULT_IMAGE_NAME =
+        DockerImageName.parse("gcr.io/google.com/cloudsdktool/cloud-sdk");
+
+    private static final String CMD =
+        "gcloud beta emulators firestore start --host-port 0.0.0.0:8080";
+    private static final int PORT = 8080;
+
+    public CustomFirestoreEmulatorContainer(final DockerImageName dockerImageName) {
+      super(dockerImageName);
+
+      dockerImageName.assertCompatibleWith(DEFAULT_IMAGE_NAME);
+
+      withExposedPorts(PORT);
+      setWaitStrategy(new LogMessageWaitStrategy().withRegEx("(?s).*running.*$"));
+      withCommand("/bin/sh", "-c", CMD);
+    }
+
+    /**
+     * @return a <code>host:port</code> pair corresponding to the address on which the emulator is
+     *     reachable from the test host machine. Directly usable as a parameter to the
+     *     com.google.cloud.ServiceOptions.Builder#setHost(java.lang.String) method.
+     */
+    public String getEmulatorEndpoint() {
+      return getContainerIpAddress() + ":" + getMappedPort(8080);
+    }
   }
 }

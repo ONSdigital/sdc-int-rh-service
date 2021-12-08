@@ -405,9 +405,6 @@
           <argLine>${failsafeArgLine}</argLine>
           <skip>${skip.integration.tests}</skip>
           <classesDirectory>${project.build.outputDirectory}</classesDirectory>
-          <environmentVariables>
-            <GOOGLE_CLOUD_PROJECT>sdc-rh-test</GOOGLE_CLOUD_PROJECT>
-          </environmentVariables>
         </configuration>
         <executions>
           <execution>
