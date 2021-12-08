@@ -26,7 +26,7 @@ public interface RespondentDataRepository {
 
   Optional<CollectionExercise> readCollectionExercise(String caseId) throws CTPException;
 
-  Optional<CaseUpdate> readCaseUpdateByUprn(String uprn, boolean onlyValid) throws CTPException;
+  Optional<CaseUpdate> readCaseUpdateBySampleAttribute(final String searchAttributeName, final String searchValue, boolean onlyValid) throws CTPException;
 
   String writeCloudStartupCheckObject() throws Exception;
 }

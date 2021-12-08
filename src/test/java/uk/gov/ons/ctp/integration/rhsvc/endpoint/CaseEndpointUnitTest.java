@@ -13,8 +13,8 @@ import static uk.gov.ons.ctp.common.MvcHelper.postJson;
 import static uk.gov.ons.ctp.common.utility.MockMvcControllerAdviceHelper.mockAdviceFor;
 import static uk.gov.ons.ctp.integration.rhsvc.RespondentHomeFixture.EXPECTED_JSON_CONTENT_TYPE;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,8 +24,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import uk.gov.ons.ctp.common.FixtureHelper;
-import uk.gov.ons.ctp.common.domain.UniquePropertyReferenceNumber;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.error.RestExceptionHandler;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
@@ -66,7 +68,7 @@ public class CaseEndpointUnitTest {
     List<CaseDTO> caseDTO = FixtureHelper.loadClassFixtures(CaseDTO[].class);
     CaseDTO rmCase0 = caseDTO.get(0);
 
-    when(caseService.getLatestValidCaseByUPRN(new UniquePropertyReferenceNumber(UPRN)))
+    when(caseService.searchForLatestValidCase("uprn", UPRN))
         .thenReturn(caseDTO.get(0));
 
     mockMvc
@@ -84,7 +86,7 @@ public class CaseEndpointUnitTest {
   @Test
   public void getCaseByUPRNNotFound() throws Exception {
 
-    when(caseService.getLatestValidCaseByUPRN(new UniquePropertyReferenceNumber(UPRN)))
+    when(caseService.searchForLatestValidCase("uprn", UPRN))
         .thenThrow(new CTPException(CTPException.Fault.RESOURCE_NOT_FOUND, ERROR_MESSAGE));
 
     mockMvc

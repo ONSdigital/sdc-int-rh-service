@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,17 +14,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
+
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.cloud.RetryableCloudDataStore;
-import uk.gov.ons.ctp.common.domain.UniquePropertyReferenceNumber;
 import uk.gov.ons.ctp.common.event.model.CaseUpdate;
 
 @ExtendWith(MockitoExtension.class)
 public class RespondentDataRepositoryImplTest {
 
-  private static final UniquePropertyReferenceNumber UPRN =
-      new UniquePropertyReferenceNumber("123456");
-  private static final String UPRN_STRING = Long.toString(UPRN.getValue());
+  private static final String UPRN = "123456";
 
   @Spy private RetryableCloudDataStore mockCloudDataStore;
 
@@ -45,11 +44,11 @@ public class RespondentDataRepositoryImplTest {
 
     final List<CaseUpdate> emptyList = new ArrayList<>();
     when(mockCloudDataStore.search(
-            CaseUpdate.class, target.caseSchema, searchByUprnPath, UPRN_STRING))
+            CaseUpdate.class, target.caseSchema, searchByUprnPath, UPRN))
         .thenReturn(emptyList);
 
     assertEquals(
-        Optional.empty(), target.readCaseUpdateByUprn(UPRN_STRING, true), "Expects Empty Optional");
+        Optional.empty(), target.readCaseUpdateBySampleAttribute("uprn", UPRN, true), "Expects Empty Optional");
   }
 
   /** Returns Empty Optional where no valid Address cases are returned from repository */
@@ -58,11 +57,11 @@ public class RespondentDataRepositoryImplTest {
 
     collectionCase.forEach(cc -> cc.setInvalid(Boolean.TRUE));
     when(mockCloudDataStore.search(
-            CaseUpdate.class, target.caseSchema, searchByUprnPath, UPRN_STRING))
+            CaseUpdate.class, target.caseSchema, searchByUprnPath, UPRN))
         .thenReturn(collectionCase);
 
     assertEquals(
-        Optional.empty(), target.readCaseUpdateByUprn(UPRN_STRING, true), "Expects Empty Optional");
+        Optional.empty(), target.readCaseUpdateBySampleAttribute("uprn", UPRN, true), "Expects Empty Optional");
   }
 
   /** Test retrieves invalid Address case */
@@ -71,12 +70,12 @@ public class RespondentDataRepositoryImplTest {
 
     collectionCase.get(0).setInvalid(Boolean.TRUE);
     when(mockCloudDataStore.search(
-            CaseUpdate.class, target.caseSchema, searchByUprnPath, UPRN_STRING))
+            CaseUpdate.class, target.caseSchema, searchByUprnPath, UPRN))
         .thenReturn(collectionCase);
 
     assertEquals(
         Optional.of(collectionCase.get(0)),
-        target.readCaseUpdateByUprn(UPRN_STRING, false),
+        target.readCaseUpdateBySampleAttribute("uprn", UPRN, false),
         "Expects Latest Item With non HI Address");
   }
 }

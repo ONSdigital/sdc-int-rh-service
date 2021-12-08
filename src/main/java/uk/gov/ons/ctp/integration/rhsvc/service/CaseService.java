@@ -1,6 +1,5 @@
 package uk.gov.ons.ctp.integration.rhsvc.service;
 
-import uk.gov.ons.ctp.common.domain.UniquePropertyReferenceNumber;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.NewCaseDTO;
@@ -20,7 +19,7 @@ public interface CaseService {
    * @return Case details for address UPRN
    * @throws CTPException if anything went wrong.
    */
-  CaseDTO getLatestValidCaseByUPRN(final UniquePropertyReferenceNumber uprn) throws CTPException;
+  CaseDTO searchForLatestValidCase(final String searchAttributeName, final String searchValue) throws CTPException;
 
   void fulfilmentRequestBySMS(SMSFulfilmentRequestDTO requestBodyDTO) throws CTPException;
 

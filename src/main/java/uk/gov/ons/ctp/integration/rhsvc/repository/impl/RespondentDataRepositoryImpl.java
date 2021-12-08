@@ -49,7 +49,7 @@ public class RespondentDataRepositoryImpl implements RespondentDataRepository {
   private String surveySchema;
   private String collectionExerciseSchema;
 
-  private static final String[] SEARCH_BY_UPRN_PATH = new String[] {"sample", "uprn"};
+  private static final String SEARCH_SAMPLE_PATH = "sample";
 
   @PostConstruct
   public void init() {
@@ -182,17 +182,21 @@ public class RespondentDataRepositoryImpl implements RespondentDataRepository {
   /**
    * Read case objects from cloud based on its uprn. Filter optionally whether the case is valid.
    *
-   * @param uprn - is the uprn that the target case(s) must contain.
+   * @param searchAttributeName - is the name of the field in the sample data to search by.
+   * @param searchValue - is the value that target case(s) must contain.
    * @param onlyValid - true if only valid cases to be returned; false if we don't care
    * @return - Optional containing 1 deserialised version of the stored object. If no matching cases
    *     are found then an empty Optional is returned.
    * @throws CTPException - if a cloud exception was detected.
    */
   @Override
-  public Optional<CaseUpdate> readCaseUpdateByUprn(final String uprn, boolean onlyValid)
+  public Optional<CaseUpdate> readCaseUpdateBySampleAttribute(final String searchAttributeName, final String searchValue, boolean onlyValid)
       throws CTPException {
+    
+    String[] searchPath = { SEARCH_SAMPLE_PATH, searchAttributeName };
+    
     List<CaseUpdate> searchResults =
-        retryableCloudDataStore.search(CaseUpdate.class, caseSchema, SEARCH_BY_UPRN_PATH, uprn);
+        retryableCloudDataStore.search(CaseUpdate.class, caseSchema, searchPath, searchValue);
     return filterValidCaseUpdateSearchResults(searchResults, onlyValid);
   }
 

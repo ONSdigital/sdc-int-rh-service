@@ -10,7 +10,7 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import ma.glasnost.orika.MapperFacade;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,10 +21,11 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
+
+import ma.glasnost.orika.MapperFacade;
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.domain.Channel;
 import uk.gov.ons.ctp.common.domain.Source;
-import uk.gov.ons.ctp.common.domain.UniquePropertyReferenceNumber;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.EventPublisher;
 import uk.gov.ons.ctp.common.event.TopicType;
@@ -41,8 +42,7 @@ import uk.gov.ons.ctp.integration.rhsvc.representation.NewCaseDTO;
 @ExtendWith(MockitoExtension.class)
 public class CaseServiceImplTest {
 
-  private static final UniquePropertyReferenceNumber UPRN =
-      new UniquePropertyReferenceNumber("123456");
+  private static final String UPRN = "123456";
 
   // the actual census id as per the application.yml and also RM
   private static final String COLLECTION_EXERCISE_ID = "34d7f3bb-91c9-45d0-bb2d-90afce4fc790";
@@ -80,12 +80,12 @@ public class CaseServiceImplTest {
   @Test
   public void getCaseByUPRNFound() throws Exception {
 
-    when(dataRepo.readCaseUpdateByUprn(Long.toString(UPRN.getValue()), true))
+    when(dataRepo.readCaseUpdateBySampleAttribute("uprn", UPRN, true))
         .thenReturn(Optional.of(caseUpdate.get(0)));
 
     CaseUpdate caseUpdate = this.caseUpdate.get(0);
 
-    CaseDTO rmCase = caseSvc.getLatestValidCaseByUPRN(UPRN);
+    CaseDTO rmCase = caseSvc.searchForLatestValidCase("uprn", UPRN);
 
     assertNotNull(rmCase);
     assertEquals(caseUpdate.getCaseId(), rmCase.getCaseId().toString());
@@ -100,19 +100,19 @@ public class CaseServiceImplTest {
   /** Test throws a CTPException where no valid Address cases are returned from repository */
   @Test
   public void getInvalidAddressCaseByUPRNOnly() throws Exception {
-    when(dataRepo.readCaseUpdateByUprn(Long.toString(UPRN.getValue()), true))
+    when(dataRepo.readCaseUpdateBySampleAttribute("uprn", UPRN, true))
         .thenThrow(new CTPException(null));
-    assertThrows(CTPException.class, () -> caseSvc.getLatestValidCaseByUPRN(UPRN));
+    assertThrows(CTPException.class, () -> caseSvc.searchForLatestValidCase("uprn", UPRN));
   }
 
   /** Test Test throws a CTPException where no cases returned from repository */
   @Test
   public void getCaseByUPRNNotFound() throws Exception {
 
-    when(dataRepo.readCaseUpdateByUprn(Long.toString(UPRN.getValue()), true))
+    when(dataRepo.readCaseUpdateBySampleAttribute("uprn", UPRN, true))
         .thenReturn(Optional.empty());
 
-    assertThrows(CTPException.class, () -> caseSvc.getLatestValidCaseByUPRN(UPRN));
+    assertThrows(CTPException.class, () -> caseSvc.searchForLatestValidCase("uprn", UPRN));
   }
 
   @Test

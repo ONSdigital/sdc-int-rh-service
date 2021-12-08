@@ -59,20 +59,21 @@ public class CaseServiceImpl implements CaseService {
   private MapperFacade mapper = new RHSvcBeanMapper();
 
   @Override
-  public CaseDTO getLatestValidCaseByUPRN(final UniquePropertyReferenceNumber uprn)
+  public CaseDTO searchForLatestValidCase(final String searchAttributeName, final String searchValue)
       throws CTPException {
 
     Optional<CaseUpdate> caseFound =
-        dataRepo.readCaseUpdateByUprn(Long.toString(uprn.getValue()), true);
+        dataRepo.readCaseUpdateBySampleAttribute(searchAttributeName, searchValue, true);
     if (caseFound.isPresent()) {
       log.debug(
-          "Latest valid case retrieved for UPRN",
+          "Search for latest valid case by attribute value",
           kv("case", caseFound.get().getCaseId()),
-          kv("uprn", uprn));
+          kv("searchAttributeName", searchAttributeName),
+          kv("searchValue", searchValue));
       return mapperFacade.map(caseFound.get(), CaseDTO.class);
     } else {
-      log.warn("No cases returned for uprn", kv("uprn", uprn));
-      throw new CTPException(Fault.RESOURCE_NOT_FOUND, "Failed to retrieve Case");
+      log.warn("No cases returned for uprn", kv("searchAttributeName", searchAttributeName), kv("searchValue", searchValue));
+      throw new CTPException(Fault.RESOURCE_NOT_FOUND, "Failed to retrieve Case(s)");
     }
   }
 
