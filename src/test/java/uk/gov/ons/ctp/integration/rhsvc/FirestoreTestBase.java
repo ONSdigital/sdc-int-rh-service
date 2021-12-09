@@ -19,8 +19,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.test.context.ActiveProfiles;
-import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy;
+import org.testcontainers.containers.FirestoreEmulatorContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
@@ -42,7 +41,16 @@ import uk.gov.ons.ctp.common.utility.ParallelTestLocks;
 @Tag("firestore")
 @Slf4j
 public abstract class FirestoreTestBase {
+  private static final String EMULATOR_IMG =
+      "gcr.io/google.com/cloudsdktool/cloud-sdk:366.0.0-emulators";
+
+  /**
+   * This value must be kept in sync with spring.cloud.gcp.firestore.project-id value in the
+   * application yaml files. It is hard-coded here in order to be picked up statically before the
+   * application context gets created.
+   */
   private static final String GCP_PROJECT = "rh-testcontainers";
+
   protected static final String CASE_SCHEMA = GCP_PROJECT + "-case";
   protected static final String UAC_SCHEMA = GCP_PROJECT + "-uac";
   protected static final String COLLEX_SCHEMA = GCP_PROJECT + "-collection_exercise";
@@ -53,21 +61,31 @@ public abstract class FirestoreTestBase {
   private static TestFirestoreProvider provider;
 
   @Container
-  private static final CustomFirestoreEmulatorContainer firestoreEmulator =
-      new CustomFirestoreEmulatorContainer(
-          DockerImageName.parse("gcr.io/google.com/cloudsdktool/cloud-sdk:317.0.0-emulators"));
+  private static final FirestoreEmulatorContainer firestoreEmulator =
+      new FirestoreEmulatorContainer(DockerImageName.parse(EMULATOR_IMG));
 
+  /**
+   * The dockerised emulator will change its endpoint for each new test class, so therefore
+   * firestore must be reconfigured for each test class that runs.
+   */
   @BeforeAll
   public static void classSetup() {
-    log.info("Initialising test firestoreProvider");
+    log.info(
+        "Initialising test firestoreProvider against emulator: {}",
+        firestoreEmulator.getEmulatorEndpoint());
     if (provider == null) {
       provider = new TestFirestoreProvider();
     }
     provider.init(GCP_PROJECT, firestoreEmulator);
   }
 
+  /**
+   * Configure any firestore provider in our test environment to use the emulator. This
+   * FirestoreProvider bean will be picked up by everywhere using firestore and override the usual
+   * implementation.
+   */
   @TestConfiguration
-  static class EmulatorConfiguration {
+  static class FirestoreConfiguration {
     @Bean
     @Primary
     FirestoreProvider firestoreProvider() {
@@ -82,23 +100,11 @@ public abstract class FirestoreTestBase {
     testDataStore.deleteCollection(CASE_SCHEMA);
   }
 
-  @Slf4j
+  /** An implementation of FirestoreProvider that uses the emulator. */
   public static class TestFirestoreProvider implements FirestoreProvider {
     private Firestore firestore;
 
-    public TestFirestoreProvider() {
-      log.info("Creating new TestFirestoreProvider");
-      System.out.println("CREATING NEW TestFirestoreProvider");
-    }
-
-    public TestFirestoreProvider init(
-        String gcpProject, CustomFirestoreEmulatorContainer emulator) {
-      log.info("Creating emulator firestore instance with projectId {}", gcpProject);
-      System.out.println(
-          "CREATING EMULATOR FIRESTORE: "
-              + gcpProject
-              + " on endpoint: "
-              + emulator.getEmulatorEndpoint());
+    public TestFirestoreProvider init(String gcpProject, FirestoreEmulatorContainer emulator) {
       firestore =
           FirestoreOptions.newBuilder()
               .setProjectId(gcpProject)
@@ -111,41 +117,6 @@ public abstract class FirestoreTestBase {
 
     public Firestore get() {
       return firestore;
-    }
-  }
-
-  @Slf4j
-  public static class CustomFirestoreEmulatorContainer
-      extends GenericContainer<CustomFirestoreEmulatorContainer> {
-
-    private static final DockerImageName DEFAULT_IMAGE_NAME =
-        DockerImageName.parse("gcr.io/google.com/cloudsdktool/cloud-sdk");
-
-    private static final String CMD =
-        "gcloud beta emulators firestore start --host-port 0.0.0.0:8080";
-    private static final int PORT = 8080;
-
-    public CustomFirestoreEmulatorContainer(final DockerImageName dockerImageName) {
-      super(dockerImageName);
-
-      System.out.println("SYSOUT STARTING FIRESTORE EMULATOR !");
-
-      log.info("STARTING FIRESTORE EMULATOR");
-
-      dockerImageName.assertCompatibleWith(DEFAULT_IMAGE_NAME);
-
-      withExposedPorts(PORT);
-      setWaitStrategy(new LogMessageWaitStrategy().withRegEx("(?s).*running.*$"));
-      withCommand("/bin/sh", "-c", CMD);
-    }
-
-    /**
-     * @return a <code>host:port</code> pair corresponding to the address on which the emulator is
-     *     reachable from the test host machine. Directly usable as a parameter to the
-     *     com.google.cloud.ServiceOptions.Builder#setHost(java.lang.String) method.
-     */
-    public String getEmulatorEndpoint() {
-      return getContainerIpAddress() + ":" + getMappedPort(8080);
     }
   }
 }
