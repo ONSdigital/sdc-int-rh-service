@@ -14,7 +14,7 @@ import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
-
+import ma.glasnost.orika.MapperFacade;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -23,8 +23,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import ma.glasnost.orika.MapperFacade;
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.domain.Channel;
 import uk.gov.ons.ctp.common.domain.Source;
@@ -193,7 +191,8 @@ public class UniqueAccessCodeServiceImplTest {
     when(uacDataRepo.readUAC(UAC_HASH)).thenReturn(Optional.of(uacTest));
     when(caseDataRepo.readCaseUpdate(CASE_ID)).thenReturn(Optional.of(caseTest));
     when(surveyDataRepo.readSurvey(SURVEY_ID)).thenReturn(Optional.of(surveyTest));
-    when(collExDataRepo.readCollectionExercise(COLLECTION_EXERCISE_ID)).thenReturn(Optional.empty());
+    when(collExDataRepo.readCollectionExercise(COLLECTION_EXERCISE_ID))
+        .thenReturn(Optional.empty());
 
     CTPException thrown =
         assertThrows(CTPException.class, () -> uacSvc.getAndAuthenticateUAC(UAC_HASH));

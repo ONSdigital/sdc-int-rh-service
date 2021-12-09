@@ -4,10 +4,8 @@ import static uk.gov.ons.ctp.common.log.ScopedStructuredArguments.kv;
 
 import java.util.Optional;
 import java.util.Set;
-
-import org.springframework.stereotype.Component;
-
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.model.CollectionExercise;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
@@ -24,7 +22,10 @@ public class EventFilter {
   private RespondentSurveyRepository respondentSurveyRepo;
   private RespondentCollectionExerciseRepository respondentCollExRepo;
 
-  public EventFilter(AppConfig appConfig, RespondentSurveyRepository respondentSurveyRepo, RespondentCollectionExerciseRepository respondentCollExRepo) {
+  public EventFilter(
+      AppConfig appConfig,
+      RespondentSurveyRepository respondentSurveyRepo,
+      RespondentCollectionExerciseRepository respondentCollExRepo) {
     this.appConfig = appConfig;
     this.respondentSurveyRepo = respondentSurveyRepo;
     this.respondentCollExRepo = respondentCollExRepo;

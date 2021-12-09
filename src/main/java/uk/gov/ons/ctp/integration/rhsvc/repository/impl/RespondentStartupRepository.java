@@ -4,20 +4,20 @@ import static uk.gov.ons.ctp.common.log.ScopedStructuredArguments.kv;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
 import javax.annotation.PostConstruct;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 import uk.gov.ons.ctp.common.cloud.CloudDataStore;
 
-/** This class verifies that RH can get a Firestore connection, by writing an object to the startup collection */
+/**
+ * This class verifies that RH can get a Firestore connection, by writing an object to the startup
+ * collection
+ */
 @Slf4j
 @Service
 public class RespondentStartupRepository {

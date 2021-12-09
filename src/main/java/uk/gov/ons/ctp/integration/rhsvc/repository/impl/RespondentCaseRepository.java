@@ -3,13 +3,10 @@ package uk.gov.ons.ctp.integration.rhsvc.repository.impl;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 import javax.annotation.PostConstruct;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
 import uk.gov.ons.ctp.common.cloud.RetryableCloudDataStore;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.model.CaseUpdate;
