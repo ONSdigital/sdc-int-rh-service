@@ -7,10 +7,10 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
-
+import ma.glasnost.orika.MapperFacade;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,8 +21,6 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
-
-import ma.glasnost.orika.MapperFacade;
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.domain.Channel;
 import uk.gov.ons.ctp.common.domain.Source;
@@ -59,7 +57,7 @@ public class CaseServiceImplTest {
 
   @Spy private AppConfig appConfig = new AppConfig();
 
-  private List<CaseUpdate> caseUpdate;
+  private List<CaseUpdate> caseUpdates;
   @Captor ArgumentCaptor<NewCasePayloadContent> sendEventCaptor;
 
   private List<NewCaseDTO> newCaseDTO;
@@ -67,7 +65,7 @@ public class CaseServiceImplTest {
   /** Setup tests */
   @BeforeEach
   public void setUp() {
-    this.caseUpdate = FixtureHelper.loadClassFixtures(CaseUpdate[].class);
+    this.caseUpdates = FixtureHelper.loadClassFixtures(CaseUpdate[].class);
     this.newCaseDTO = FixtureHelper.loadClassFixtures(NewCaseDTO[].class);
 
     Sis sis = new Sis();
@@ -76,25 +74,44 @@ public class CaseServiceImplTest {
     ReflectionTestUtils.setField(caseSvc, "appConfig", appConfig);
   }
 
-  /** Test returns valid CaseDTO for valid UPRN */
+  /** Test verifies searching which finds only a single results */
   @Test
-  public void getCaseByUPRNFound() throws Exception {
+  public void getCaseFoundWithSingleResult() throws Exception {
 
     when(dataRepo.readCaseUpdateBySampleAttribute("uprn", UPRN, true))
-        .thenReturn(Optional.of(caseUpdate.get(0)));
+        .thenReturn(caseUpdates.subList(0, 1));
 
-    CaseUpdate caseUpdate = this.caseUpdate.get(0);
-
-    CaseDTO rmCase = caseSvc.searchForLatestValidCase("uprn", UPRN);
+    List<CaseDTO> rmCase = caseSvc.searchForLatestValidCase("uprn", UPRN);
 
     assertNotNull(rmCase);
-    assertEquals(caseUpdate.getCaseId(), rmCase.getCaseId().toString());
-    assertEquals(caseUpdate.getSurveyId(), rmCase.getSurveyId().toString());
-    assertEquals(caseUpdate.getCollectionExerciseId(), rmCase.getCollectionExerciseId().toString());
-    assertEquals(caseUpdate.isInvalid(), rmCase.isInvalid());
-    assertEquals(caseUpdate.getRefusalReceived(), rmCase.getRefusalReceived());
-    assertEquals(caseUpdate.getSample(), rmCase.getSample());
-    assertEquals(caseUpdate.getSampleSensitive(), rmCase.getSampleSensitive());
+    assertEquals(1, rmCase.size());
+    verifyCase(caseUpdates.get(0), rmCase.get(0));
+  }
+
+  /** Test verifies searching which finds multiple results */
+  @Test
+  public void getCaseFoundWithMultipleResults() throws Exception {
+
+    when(dataRepo.readCaseUpdateBySampleAttribute("townName", "Upton", true))
+        .thenReturn(caseUpdates);
+
+    List<CaseDTO> rmCase = caseSvc.searchForLatestValidCase("townName", "Upton");
+
+    assertNotNull(rmCase);
+    assertEquals(2, rmCase.size());
+    verifyCase(caseUpdates.get(0), rmCase.get(0));
+    verifyCase(caseUpdates.get(1), rmCase.get(1));
+  }
+
+  private void verifyCase(CaseUpdate expectedCase, CaseDTO actualCase) {
+    assertEquals(expectedCase.getCaseId(), actualCase.getCaseId().toString());
+    assertEquals(expectedCase.getSurveyId(), actualCase.getSurveyId().toString());
+    assertEquals(
+        expectedCase.getCollectionExerciseId(), actualCase.getCollectionExerciseId().toString());
+    assertEquals(expectedCase.isInvalid(), actualCase.isInvalid());
+    assertEquals(expectedCase.getRefusalReceived(), actualCase.getRefusalReceived());
+    assertEquals(expectedCase.getSample(), actualCase.getSample());
+    assertEquals(expectedCase.getSampleSensitive(), actualCase.getSampleSensitive());
   }
 
   /** Test throws a CTPException where no valid Address cases are returned from repository */
@@ -105,14 +122,15 @@ public class CaseServiceImplTest {
     assertThrows(CTPException.class, () -> caseSvc.searchForLatestValidCase("uprn", UPRN));
   }
 
-  /** Test Test throws a CTPException where no cases returned from repository */
+  /** Test throws a CTPException where no cases returned from repository */
   @Test
   public void getCaseByUPRNNotFound() throws Exception {
 
-    when(dataRepo.readCaseUpdateBySampleAttribute("uprn", UPRN, true))
-        .thenReturn(Optional.empty());
+    when(dataRepo.readCaseUpdateBySampleAttribute("doorNumber", "898123", true))
+        .thenReturn(new ArrayList<>());
 
-    assertThrows(CTPException.class, () -> caseSvc.searchForLatestValidCase("uprn", UPRN));
+    assertThrows(
+        CTPException.class, () -> caseSvc.searchForLatestValidCase("doorNumber", "898123"));
   }
 
   @Test

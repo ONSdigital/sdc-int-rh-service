@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import ma.glasnost.orika.MapperFacade;
@@ -59,20 +58,23 @@ public class CaseServiceImpl implements CaseService {
   private MapperFacade mapper = new RHSvcBeanMapper();
 
   @Override
-  public CaseDTO searchForLatestValidCase(final String searchAttributeName, final String searchValue)
-      throws CTPException {
+  public List<CaseDTO> searchForLatestValidCase(
+      final String searchAttributeName, final String searchValue) throws CTPException {
 
-    Optional<CaseUpdate> caseFound =
+    List<CaseUpdate> foundCases =
         dataRepo.readCaseUpdateBySampleAttribute(searchAttributeName, searchValue, true);
-    if (caseFound.isPresent()) {
+    if (!foundCases.isEmpty()) {
       log.debug(
           "Search for latest valid case by attribute value",
-          kv("case", caseFound.get().getCaseId()),
+          kv("numberFoundCase", foundCases.size()),
           kv("searchAttributeName", searchAttributeName),
           kv("searchValue", searchValue));
-      return mapperFacade.map(caseFound.get(), CaseDTO.class);
+      return mapperFacade.mapAsList(foundCases, CaseDTO.class);
     } else {
-      log.warn("No cases returned for uprn", kv("searchAttributeName", searchAttributeName), kv("searchValue", searchValue));
+      log.warn(
+          "No cases found",
+          kv("searchAttributeName", searchAttributeName),
+          kv("searchValue", searchValue));
       throw new CTPException(Fault.RESOURCE_NOT_FOUND, "Failed to retrieve Case(s)");
     }
   }

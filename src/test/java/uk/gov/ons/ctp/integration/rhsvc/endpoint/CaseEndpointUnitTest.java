@@ -13,8 +13,8 @@ import static uk.gov.ons.ctp.common.MvcHelper.postJson;
 import static uk.gov.ons.ctp.common.utility.MockMvcControllerAdviceHelper.mockAdviceFor;
 import static uk.gov.ons.ctp.integration.rhsvc.RespondentHomeFixture.EXPECTED_JSON_CONTENT_TYPE;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,9 +24,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.error.RestExceptionHandler;
@@ -41,11 +38,8 @@ import uk.gov.ons.ctp.integration.rhsvc.service.CaseService;
 public class CaseEndpointUnitTest {
 
   private static final String UPRN = "123456";
-  private static final String INVALID_UPRN = "q23456";
   private static final String INCONSISTENT_CASEID = "ff9999f9-ff9f-9f99-f999-9ff999ff9ff9";
   private static final String ERROR_MESSAGE = "Failed to retrieve UPRN";
-  private static final String INVALID_CODE = "VALIDATION_FAILED";
-  private static final String INVALID_MESSAGE = "Provided json is incorrect.";
 
   @InjectMocks private CaseEndpoint caseEndpoint;
 
@@ -67,19 +61,25 @@ public class CaseEndpointUnitTest {
   public void getCaseByUPRNFound() throws Exception {
     List<CaseDTO> caseDTO = FixtureHelper.loadClassFixtures(CaseDTO[].class);
     CaseDTO rmCase0 = caseDTO.get(0);
+    CaseDTO rmCase1 = caseDTO.get(1);
 
-    when(caseService.searchForLatestValidCase("uprn", UPRN))
-        .thenReturn(caseDTO.get(0));
+    when(caseService.searchForLatestValidCase("uprn", UPRN)).thenReturn(caseDTO);
 
     mockMvc
         .perform(get("/cases/uprn/{uprn}", UPRN))
         .andExpect(status().isOk())
         .andExpect(content().contentType(EXPECTED_JSON_CONTENT_TYPE))
-        // .andExpect(jsonPath("$", hasSize(1)))
-        .andExpect(jsonPath("$.caseId", is(rmCase0.getCaseId().toString())))
-        .andExpect(jsonPath("$.sample.addressLine1", is(rmCase0.getSample().get("addressLine1"))))
-        .andExpect(jsonPath("$.sample.townName", is(rmCase0.getSample().get("townName"))))
-        .andExpect(jsonPath("$.sample.postcode", is(rmCase0.getSample().get("postcode"))));
+        .andExpect(jsonPath("$.length()", is(2)))
+        .andExpect(jsonPath("$[0].caseId", is(rmCase0.getCaseId().toString())))
+        .andExpect(
+            jsonPath("$[0].sample.addressLine1", is(rmCase0.getSample().get("addressLine1"))))
+        .andExpect(jsonPath("$[0].sample.townName", is(rmCase0.getSample().get("townName"))))
+        .andExpect(jsonPath("$[0].sample.postcode", is(rmCase0.getSample().get("postcode"))))
+        .andExpect(jsonPath("$[1].caseId", is(rmCase1.getCaseId().toString())))
+        .andExpect(
+            jsonPath("$[1].sample.addressLine1", is(rmCase1.getSample().get("addressLine1"))))
+        .andExpect(jsonPath("$[1].sample.townName", is(rmCase1.getSample().get("townName"))))
+        .andExpect(jsonPath("$[1].sample.postcode", is(rmCase1.getSample().get("postcode"))));
   }
 
   /** Test returns resource not found for non-existent UPRN */
@@ -94,17 +94,6 @@ public class CaseEndpointUnitTest {
         .andExpect(status().isNotFound())
         .andExpect(jsonPath("$.error.code", is(CTPException.Fault.RESOURCE_NOT_FOUND.toString())))
         .andExpect(jsonPath("$.error.message", is(ERROR_MESSAGE)));
-  }
-
-  /** Test returns bad request for invalid UPRN */
-  @Test
-  public void getCaseByUPRNBadRequest() throws Exception {
-
-    mockMvc
-        .perform(get("/cases/uprn/{uprn}", INVALID_UPRN))
-        .andExpect(status().isBadRequest())
-        .andExpect(jsonPath("$.error.code", is(INVALID_CODE)))
-        .andExpect(jsonPath("$.error.message", is(INVALID_MESSAGE)));
   }
 
   @Test

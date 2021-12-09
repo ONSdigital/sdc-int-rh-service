@@ -1,5 +1,6 @@
 package uk.gov.ons.ctp.integration.rhsvc.repository;
 
+import java.util.List;
 import java.util.Optional;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.model.CaseUpdate;
@@ -26,7 +27,9 @@ public interface RespondentDataRepository {
 
   Optional<CollectionExercise> readCollectionExercise(String caseId) throws CTPException;
 
-  Optional<CaseUpdate> readCaseUpdateBySampleAttribute(final String searchAttributeName, final String searchValue, boolean onlyValid) throws CTPException;
+  List<CaseUpdate> readCaseUpdateBySampleAttribute(
+      final String searchAttributeName, final String searchValue, boolean onlyValid)
+      throws CTPException;
 
   String writeCloudStartupCheckObject() throws Exception;
 }

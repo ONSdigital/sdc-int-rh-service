@@ -2,7 +2,6 @@ package uk.gov.ons.ctp.integration.rhsvc.representation;
 
 import java.util.Map;
 import java.util.UUID;
-
 import lombok.Data;
 
 /** Representation of a Case */

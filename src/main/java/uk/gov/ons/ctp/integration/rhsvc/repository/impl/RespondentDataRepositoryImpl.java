@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -185,16 +186,17 @@ public class RespondentDataRepositoryImpl implements RespondentDataRepository {
    * @param searchAttributeName - is the name of the field in the sample data to search by.
    * @param searchValue - is the value that target case(s) must contain.
    * @param onlyValid - true if only valid cases to be returned; false if we don't care
-   * @return - Optional containing 1 deserialised version of the stored object. If no matching cases
-   *     are found then an empty Optional is returned.
+   * @return - a List containing the deserialised version of all matching stored objects. If no
+   *     matching cases are found then the list will be empty.
    * @throws CTPException - if a cloud exception was detected.
    */
   @Override
-  public Optional<CaseUpdate> readCaseUpdateBySampleAttribute(final String searchAttributeName, final String searchValue, boolean onlyValid)
+  public List<CaseUpdate> readCaseUpdateBySampleAttribute(
+      final String searchAttributeName, final String searchValue, boolean onlyValid)
       throws CTPException {
-    
-    String[] searchPath = { SEARCH_SAMPLE_PATH, searchAttributeName };
-    
+
+    String[] searchPath = {SEARCH_SAMPLE_PATH, searchAttributeName};
+
     List<CaseUpdate> searchResults =
         retryableCloudDataStore.search(CaseUpdate.class, caseSchema, searchPath, searchValue);
     return filterValidCaseUpdateSearchResults(searchResults, onlyValid);
@@ -205,14 +207,16 @@ public class RespondentDataRepositoryImpl implements RespondentDataRepository {
    *
    * @param searchResults - Search results found in dataStore by searching by uprn
    * @param onlyValid - true if only valid cases to be returned; false if we don't care
-   * @return Optional of the resulting collection case or Empty
+   * @return List of Optional of the resulting collection case or Empty
    */
   // TODO Used to filter on Non HI cases using CaseCreationDate to return the latest valid Non HI
   // case,
   // CaseCreatedDate may need to be added back if we receive duplicate cases
-  private Optional<CaseUpdate> filterValidCaseUpdateSearchResults(
+  private List<CaseUpdate> filterValidCaseUpdateSearchResults(
       final List<CaseUpdate> searchResults, boolean onlyValid) {
-    return searchResults.stream().filter(c -> !onlyValid || !c.isInvalid()).findFirst();
+    return searchResults.stream()
+        .filter(c -> !onlyValid || !c.isInvalid())
+        .collect(Collectors.toList());
   }
 
   private void runCloudStartupCheck() throws Throwable {
