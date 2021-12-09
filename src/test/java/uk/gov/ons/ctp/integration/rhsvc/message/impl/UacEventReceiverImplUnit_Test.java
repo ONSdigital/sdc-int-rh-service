@@ -12,12 +12,14 @@ import static org.mockito.Mockito.when;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import lombok.SneakyThrows;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
+
+import lombok.SneakyThrows;
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.EventTopic;
@@ -30,13 +32,12 @@ import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.config.QueueConfig;
 import uk.gov.ons.ctp.integration.rhsvc.event.impl.EventFilter;
 import uk.gov.ons.ctp.integration.rhsvc.event.impl.UACEventReceiverImpl;
-import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
 import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentDataRepositoryImpl;
 
 @ExtendWith(MockitoExtension.class)
 public class UacEventReceiverImplUnit_Test {
 
-  private RespondentDataRepository mockRespondentDataRepo;
+  private RespondentDataRepositoryImpl mockRespondentDataRepo;
   private EventFilter eventFilter;
   private UACEventReceiverImpl target;
   private UacEvent UacEventFixture;

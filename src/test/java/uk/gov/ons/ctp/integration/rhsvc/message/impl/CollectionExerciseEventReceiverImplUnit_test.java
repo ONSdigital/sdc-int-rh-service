@@ -9,16 +9,17 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.model.CollectionExerciseUpdateEvent;
 import uk.gov.ons.ctp.integration.rhsvc.event.impl.CollectionExerciseEventReceiverImpl;
-import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentDataRepositoryImpl;
 
 @ExtendWith(MockitoExtension.class)
 public class CollectionExerciseEventReceiverImplUnit_test {
 
-  @Mock private RespondentDataRepository mockRespondentDataRepo;
+  @Mock private RespondentDataRepositoryImpl mockRespondentDataRepo;
 
   @InjectMocks private CollectionExerciseEventReceiverImpl target;
 

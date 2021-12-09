@@ -2,18 +2,19 @@ package uk.gov.ons.ctp.integration.rhsvc.event.impl;
 
 import static uk.gov.ons.ctp.common.log.ScopedStructuredArguments.kv;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.integration.annotation.MessageEndpoint;
+import org.springframework.integration.annotation.ServiceActivator;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.integration.annotation.MessageEndpoint;
-import org.springframework.integration.annotation.ServiceActivator;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdateEvent;
 import uk.gov.ons.ctp.integration.rhsvc.event.SurveyEventReceiver;
-import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentDataRepositoryImpl;
 
 /** Service implementation responsible for receipt of Survey Events. */
 @Slf4j
@@ -22,7 +23,7 @@ import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
 @AllArgsConstructor
 @MessageEndpoint
 public class SurveyEventReceiverImpl implements SurveyEventReceiver {
-  @Autowired private RespondentDataRepository respondentDataRepo;
+  @Autowired private RespondentDataRepositoryImpl respondentDataRepo;
 
   /**
    * Message end point for events from Response Management.

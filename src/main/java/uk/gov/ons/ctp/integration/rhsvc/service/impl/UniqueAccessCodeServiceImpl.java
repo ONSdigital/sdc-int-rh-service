@@ -3,11 +3,13 @@ package uk.gov.ons.ctp.integration.rhsvc.service.impl;
 import static uk.gov.ons.ctp.common.log.ScopedStructuredArguments.kv;
 
 import java.util.UUID;
-import lombok.extern.slf4j.Slf4j;
-import ma.glasnost.orika.MapperFacade;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import lombok.extern.slf4j.Slf4j;
+import ma.glasnost.orika.MapperFacade;
 import uk.gov.ons.ctp.common.domain.Channel;
 import uk.gov.ons.ctp.common.domain.Source;
 import uk.gov.ons.ctp.common.error.CTPException;
@@ -18,7 +20,7 @@ import uk.gov.ons.ctp.common.event.model.CollectionExercise;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 import uk.gov.ons.ctp.common.event.model.UacAuthentication;
 import uk.gov.ons.ctp.common.event.model.UacUpdate;
-import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentDataRepositoryImpl;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CollectionExerciseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.SurveyLiteDTO;
@@ -29,7 +31,7 @@ import uk.gov.ons.ctp.integration.rhsvc.service.UniqueAccessCodeService;
 @Slf4j
 @Service
 public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
-  @Autowired private RespondentDataRepository dataRepo;
+  @Autowired private RespondentDataRepositoryImpl dataRepo;
   @Autowired private EventPublisher eventPublisher;
   @Autowired private MapperFacade mapperFacade;
 

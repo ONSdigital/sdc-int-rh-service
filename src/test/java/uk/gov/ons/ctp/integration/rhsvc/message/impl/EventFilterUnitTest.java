@@ -7,16 +7,18 @@ import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 import java.util.Set;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import uk.gov.ons.ctp.common.event.model.CollectionExercise;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.event.impl.EventFilter;
-import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentDataRepositoryImpl;
 
 @ExtendWith(MockitoExtension.class)
 public class EventFilterUnitTest {
@@ -27,7 +29,7 @@ public class EventFilterUnitTest {
   private static final String COLLEX_ID = "c45de4dc-3c3b-11e9-b210-d663bd873d93";
   private static final String MESSAGE_ID = "c45de4dc-3c3b-11e9-b210-d663bd873d93";
   @Mock AppConfig appConfig;
-  @Mock RespondentDataRepository mockRespondentDataRepo;
+  @Mock RespondentDataRepositoryImpl mockRespondentDataRepo;
   @InjectMocks EventFilter eventFilter;
 
   @Test

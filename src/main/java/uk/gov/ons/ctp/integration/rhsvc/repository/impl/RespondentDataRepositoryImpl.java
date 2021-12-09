@@ -7,11 +7,14 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
 import javax.annotation.PostConstruct;
-import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.ons.ctp.common.cloud.CloudDataStore;
 import uk.gov.ons.ctp.common.cloud.RetryableCloudDataStore;
 import uk.gov.ons.ctp.common.error.CTPException;
@@ -19,12 +22,11 @@ import uk.gov.ons.ctp.common.event.model.CaseUpdate;
 import uk.gov.ons.ctp.common.event.model.CollectionExercise;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 import uk.gov.ons.ctp.common.event.model.UacUpdate;
-import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
 
 /** A RespondentDataRepository implementation for CRUD operations on Respondent data entities */
 @Slf4j
 @Service
-public class RespondentDataRepositoryImpl implements RespondentDataRepository {
+public class RespondentDataRepositoryImpl {
   private RetryableCloudDataStore retryableCloudDataStore;
 
   // Cloud data store access for startup checks only
@@ -87,7 +89,6 @@ public class RespondentDataRepositoryImpl implements RespondentDataRepository {
    * @param uac - object to be stored in the cloud
    * @throws CTPException - if a cloud exception was detected.
    */
-  @Override
   public void writeUAC(final UacUpdate uac) throws CTPException {
     retryableCloudDataStore.storeObject(uacSchema, uac.getUacHash(), uac, uac.getCaseId());
   }
@@ -99,7 +100,6 @@ public class RespondentDataRepositoryImpl implements RespondentDataRepository {
    * @return - deserialised version of the stored object
    * @throws CTPException - if a cloud exception was detected.
    */
-  @Override
   public Optional<UacUpdate> readUAC(final String universalAccessCodeHash) throws CTPException {
     return retryableCloudDataStore.retrieveObject(
         UacUpdate.class, uacSchema, universalAccessCodeHash);
@@ -111,7 +111,6 @@ public class RespondentDataRepositoryImpl implements RespondentDataRepository {
    * @param caseUpdate - is the case to be stored in the cloud.
    * @throws CTPException - if a cloud exception was detected.
    */
-  @Override
   public void writeCaseUpdate(final CaseUpdate caseUpdate) throws CTPException {
     String id = caseUpdate.getCaseId();
     retryableCloudDataStore.storeObject(caseSchema, id, caseUpdate, id);
@@ -124,7 +123,6 @@ public class RespondentDataRepositoryImpl implements RespondentDataRepository {
    * @return - deserialised version of the stored object
    * @throws CTPException - if a cloud exception was detected.
    */
-  @Override
   public Optional<CaseUpdate> readCaseUpdate(final String caseId) throws CTPException {
     return retryableCloudDataStore.retrieveObject(CaseUpdate.class, caseSchema, caseId);
   }
@@ -136,7 +134,6 @@ public class RespondentDataRepositoryImpl implements RespondentDataRepository {
    * @return - deserialised version of the stored object
    * @throws CTPException - if a cloud exception was detected.
    */
-  @Override
   public Optional<SurveyUpdate> readSurvey(final String surveyId) throws CTPException {
     return retryableCloudDataStore.retrieveObject(SurveyUpdate.class, surveySchema, surveyId);
   }
@@ -147,7 +144,6 @@ public class RespondentDataRepositoryImpl implements RespondentDataRepository {
    * @param surveyUpdate - is the survey to be stored in the cloud.
    * @throws CTPException - if a cloud exception was detected.
    */
-  @Override
   public void writeSurvey(final SurveyUpdate surveyUpdate) throws CTPException {
     String id = surveyUpdate.getSurveyId();
     retryableCloudDataStore.storeObject(surveySchema, id, surveyUpdate, id);
@@ -160,7 +156,6 @@ public class RespondentDataRepositoryImpl implements RespondentDataRepository {
    * @return - deserialised version of the stored object
    * @throws CTPException - if a cloud exception was detected.
    */
-  @Override
   public Optional<CollectionExercise> readCollectionExercise(final String collectionExerciseId)
       throws CTPException {
     return retryableCloudDataStore.retrieveObject(
@@ -173,7 +168,6 @@ public class RespondentDataRepositoryImpl implements RespondentDataRepository {
    * @param collectionExercise - is the case to be stored in the cloud.
    * @throws CTPException - if a cloud exception was detected.
    */
-  @Override
   public void writeCollectionExercise(final CollectionExercise collectionExercise)
       throws CTPException {
     String id = collectionExercise.getCollectionExerciseId();
@@ -190,7 +184,6 @@ public class RespondentDataRepositoryImpl implements RespondentDataRepository {
    *     matching cases are found then the list will be empty.
    * @throws CTPException - if a cloud exception was detected.
    */
-  @Override
   public List<CaseUpdate> readCaseUpdateBySampleAttribute(
       final String searchAttributeName, final String searchValue, boolean onlyValid)
       throws CTPException {
@@ -245,7 +238,6 @@ public class RespondentDataRepositoryImpl implements RespondentDataRepository {
    * @return String containing the primary key for the datastore check.
    * @throws Exception - if a cloud exception was detected.
    */
-  @Override
   public String writeCloudStartupCheckObject() throws Exception {
     String hostname = System.getenv("HOSTNAME");
     if (hostname == null) {

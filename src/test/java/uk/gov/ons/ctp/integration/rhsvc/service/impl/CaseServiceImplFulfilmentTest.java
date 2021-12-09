@@ -19,7 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import ma.glasnost.orika.MapperFacade;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,6 +34,8 @@ import org.springframework.boot.autoconfigure.validation.ValidationAutoConfigura
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.web.server.ResponseStatusException;
+
+import ma.glasnost.orika.MapperFacade;
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.domain.Channel;
 import uk.gov.ons.ctp.common.domain.Source;
@@ -53,7 +55,7 @@ import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient.Domain;
 import uk.gov.ons.ctp.integration.rhsvc.RHSvcBeanMapper;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.config.RateLimiterConfig;
-import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentDataRepositoryImpl;
 import uk.gov.ons.ctp.integration.rhsvc.representation.PostalFulfilmentRequestDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.SMSFulfilmentRequestDTO;
 
@@ -66,7 +68,7 @@ public class CaseServiceImplFulfilmentTest {
 
   @Mock private AppConfig appConfig;
 
-  @Mock private RespondentDataRepository dataRepo;
+  @Mock private RespondentDataRepositoryImpl dataRepo;
 
   @Mock private EventPublisher eventPublisher;
 

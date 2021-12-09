@@ -13,17 +13,18 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.model.CaseEvent;
 import uk.gov.ons.ctp.integration.rhsvc.event.impl.CaseEventReceiverImpl;
 import uk.gov.ons.ctp.integration.rhsvc.event.impl.EventFilter;
-import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentDataRepositoryImpl;
 
 @ExtendWith(MockitoExtension.class)
 public class CaseEventReceiverImplUnit_Test {
 
-  @Mock private RespondentDataRepository mockRespondentDataRepo;
+  @Mock private RespondentDataRepositoryImpl mockRespondentDataRepo;
 
   @Mock private EventFilter eventFilter;
 

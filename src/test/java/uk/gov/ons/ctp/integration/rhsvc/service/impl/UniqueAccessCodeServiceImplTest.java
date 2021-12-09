@@ -14,7 +14,7 @@ import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
-import ma.glasnost.orika.MapperFacade;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -23,6 +23,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import ma.glasnost.orika.MapperFacade;
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.domain.Channel;
 import uk.gov.ons.ctp.common.domain.Source;
@@ -36,7 +38,7 @@ import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 import uk.gov.ons.ctp.common.event.model.UacAuthentication;
 import uk.gov.ons.ctp.common.event.model.UacUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.RHSvcBeanMapper;
-import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentDataRepositoryImpl;
 import uk.gov.ons.ctp.integration.rhsvc.representation.UniqueAccessCodeDTO;
 
 // ** Unit tests of the Unique Access Code Service */
@@ -51,7 +53,7 @@ public class UniqueAccessCodeServiceImplTest {
 
   @InjectMocks private UniqueAccessCodeServiceImpl uacSvc;
 
-  @Mock private RespondentDataRepository dataRepo;
+  @Mock private RespondentDataRepositoryImpl dataRepo;
 
   @Mock private EventPublisher eventPublisher;
 

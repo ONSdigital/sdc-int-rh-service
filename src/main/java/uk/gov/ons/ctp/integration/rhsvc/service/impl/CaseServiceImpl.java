@@ -9,11 +9,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import lombok.extern.slf4j.Slf4j;
-import ma.glasnost.orika.MapperFacade;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import lombok.extern.slf4j.Slf4j;
+import ma.glasnost.orika.MapperFacade;
 import uk.gov.ons.ctp.common.domain.Channel;
 import uk.gov.ons.ctp.common.domain.Source;
 import uk.gov.ons.ctp.common.domain.UniquePropertyReferenceNumber;
@@ -36,7 +38,7 @@ import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient;
 import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient.Domain;
 import uk.gov.ons.ctp.integration.rhsvc.RHSvcBeanMapper;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
-import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentDataRepositoryImpl;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.FulfilmentRequestDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.NewCaseDTO;
@@ -49,7 +51,7 @@ import uk.gov.ons.ctp.integration.rhsvc.service.CaseService;
 @Service
 public class CaseServiceImpl implements CaseService {
   @Autowired private AppConfig appConfig;
-  @Autowired private RespondentDataRepository dataRepo;
+  @Autowired private RespondentDataRepositoryImpl dataRepo;
   @Autowired private MapperFacade mapperFacade;
   @Autowired private EventPublisher eventPublisher;
   @Autowired private ProductReference productReference;
