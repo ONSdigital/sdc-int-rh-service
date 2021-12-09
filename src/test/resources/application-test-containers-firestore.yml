@@ -6,14 +6,14 @@ management:
   metrics:
     export:
       stackdriver:
-        project-id: sdc-rh-test
+        project-id: rh-testcontainers
         enabled: false
         
 spring:
   cloud:
     gcp:
       firestore:
-        project-id: sdc-rh-test
+        project-id: rh-testcontainers
       pubsub:
         enabled: false
         
