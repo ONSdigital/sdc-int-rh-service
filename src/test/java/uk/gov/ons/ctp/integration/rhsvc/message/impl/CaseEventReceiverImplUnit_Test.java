@@ -19,12 +19,12 @@ import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.model.CaseEvent;
 import uk.gov.ons.ctp.integration.rhsvc.event.impl.CaseEventReceiverImpl;
 import uk.gov.ons.ctp.integration.rhsvc.event.impl.EventFilter;
-import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentDataRepositoryImpl;
+import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentCaseRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class CaseEventReceiverImplUnit_Test {
 
-  @Mock private RespondentDataRepositoryImpl mockRespondentDataRepo;
+  @Mock private RespondentCaseRepository mockRespondentCaseRepo;
 
   @Mock private EventFilter eventFilter;
 
@@ -37,7 +37,7 @@ public class CaseEventReceiverImplUnit_Test {
 
     target.acceptCaseEvent(caseEvent);
 
-    verify(mockRespondentDataRepo).writeCaseUpdate(caseEvent.getPayload().getCaseUpdate());
+    verify(mockRespondentCaseRepo).writeCaseUpdate(caseEvent.getPayload().getCaseUpdate());
   }
 
   @Test
@@ -47,7 +47,7 @@ public class CaseEventReceiverImplUnit_Test {
 
     target.acceptCaseEvent(caseEvent);
 
-    verify(mockRespondentDataRepo, times(0))
+    verify(mockRespondentCaseRepo, times(0))
         .writeCaseUpdate(caseEvent.getPayload().getCaseUpdate());
   }
 
@@ -56,7 +56,7 @@ public class CaseEventReceiverImplUnit_Test {
     CaseEvent caseEvent = FixtureHelper.loadPackageFixtures(CaseEvent[].class).get(0);
     when(eventFilter.isValidEvent(any(), any(), any(), any())).thenReturn(true);
     doThrow(new CTPException(CTPException.Fault.SYSTEM_ERROR))
-        .when(mockRespondentDataRepo)
+        .when(mockRespondentCaseRepo)
         .writeCaseUpdate(any());
 
     CTPException thrown = assertThrows(CTPException.class, () -> target.acceptCaseEvent(caseEvent));

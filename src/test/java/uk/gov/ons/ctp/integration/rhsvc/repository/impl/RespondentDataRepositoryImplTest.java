@@ -24,7 +24,7 @@ public class RespondentDataRepositoryImplTest {
 
   @Spy private RetryableCloudDataStore mockCloudDataStore;
 
-  @InjectMocks private RespondentDataRepositoryImpl target;
+  @InjectMocks private RespondentCaseRepository target;
 
   private List<CaseUpdate> collectionCase;
   private final String[] searchByUprnPath = new String[] {"sample", "uprn"};

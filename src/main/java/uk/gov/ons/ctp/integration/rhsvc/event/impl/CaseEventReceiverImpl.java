@@ -14,7 +14,7 @@ import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.model.CaseEvent;
 import uk.gov.ons.ctp.common.event.model.CaseUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.event.CaseEventReceiver;
-import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentDataRepositoryImpl;
+import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentCaseRepository;
 
 /**
  * Service implementation responsible for receipt of Case Events. See Spring Integration flow for
@@ -26,7 +26,7 @@ import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentDataRepository
 @AllArgsConstructor
 @MessageEndpoint
 public class CaseEventReceiverImpl implements CaseEventReceiver {
-  @Autowired private RespondentDataRepositoryImpl respondentDataRepo;
+  @Autowired private RespondentCaseRepository respondentCaseRepo;
 
   @Autowired private EventFilter eventFilter;
 
@@ -52,7 +52,7 @@ public class CaseEventReceiverImpl implements CaseEventReceiver {
           caseUpdate.getCollectionExerciseId(),
           caseUpdate.getCaseId(),
           caseMessageId)) {
-        respondentDataRepo.writeCaseUpdate(caseUpdate);
+        respondentCaseRepo.writeCaseUpdate(caseUpdate);
       }
     } catch (CTPException ctpEx) {
       log.error("Case Event processing failed", kv("messageId", caseMessageId), ctpEx);

@@ -18,7 +18,8 @@ import uk.gov.ons.ctp.common.event.model.CollectionExercise;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.event.impl.EventFilter;
-import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentDataRepositoryImpl;
+import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentCollectionExerciseRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentSurveyRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class EventFilterUnitTest {
@@ -29,7 +30,8 @@ public class EventFilterUnitTest {
   private static final String COLLEX_ID = "c45de4dc-3c3b-11e9-b210-d663bd873d93";
   private static final String MESSAGE_ID = "c45de4dc-3c3b-11e9-b210-d663bd873d93";
   @Mock AppConfig appConfig;
-  @Mock RespondentDataRepositoryImpl mockRespondentDataRepo;
+  @Mock RespondentSurveyRepository mockRespondentSurveyRepo;
+  @Mock RespondentCollectionExerciseRepository mockRespondentCollExRepo;
   @InjectMocks EventFilter eventFilter;
 
   @Test
@@ -40,9 +42,9 @@ public class EventFilterUnitTest {
     surveyUpdate.setSampleDefinitionUrl("test/social.json");
     CollectionExercise collectionExercise = new CollectionExercise();
     collectionExercise.setCollectionExerciseId(COLLEX_ID);
-    when(mockRespondentDataRepo.readCollectionExercise(any()))
+    when(mockRespondentCollExRepo.readCollectionExercise(any()))
         .thenReturn(Optional.of(collectionExercise));
-    when(mockRespondentDataRepo.readSurvey(any())).thenReturn(Optional.of(surveyUpdate));
+    when(mockRespondentSurveyRepo.readSurvey(any())).thenReturn(Optional.of(surveyUpdate));
     assertTrue(eventFilter.isValidEvent(SURVEY_ID, COLLEX_ID, CASE_ID, MESSAGE_ID));
   }
 
@@ -52,7 +54,7 @@ public class EventFilterUnitTest {
     SurveyUpdate surveyUpdate = new SurveyUpdate();
     surveyUpdate.setSurveyId(SURVEY_ID);
     surveyUpdate.setSampleDefinitionUrl("test/socialnot.json");
-    when(mockRespondentDataRepo.readSurvey(any())).thenReturn(Optional.of(surveyUpdate));
+    when(mockRespondentSurveyRepo.readSurvey(any())).thenReturn(Optional.of(surveyUpdate));
     assertFalse(eventFilter.isValidEvent(SURVEY_ID, COLLEX_ID, CASE_ID, MESSAGE_ID));
   }
 
@@ -62,14 +64,14 @@ public class EventFilterUnitTest {
     SurveyUpdate surveyUpdate = new SurveyUpdate();
     surveyUpdate.setSurveyId(SURVEY_ID);
     surveyUpdate.setSampleDefinitionUrl("test/test.json");
-    when(mockRespondentDataRepo.readCollectionExercise(any())).thenReturn(Optional.empty());
-    when(mockRespondentDataRepo.readSurvey(any())).thenReturn(Optional.of(surveyUpdate));
+    when(mockRespondentCollExRepo.readCollectionExercise(any())).thenReturn(Optional.empty());
+    when(mockRespondentSurveyRepo.readSurvey(any())).thenReturn(Optional.of(surveyUpdate));
     assertFalse(eventFilter.isValidEvent(SURVEY_ID, COLLEX_ID, CASE_ID, MESSAGE_ID));
   }
 
   @Test
   public void test_acceptCaseEvent_missingSurvey() throws Exception {
-    when(mockRespondentDataRepo.readSurvey(any())).thenReturn(Optional.empty());
+    when(mockRespondentSurveyRepo.readSurvey(any())).thenReturn(Optional.empty());
     assertFalse(eventFilter.isValidEvent(SURVEY_ID, COLLEX_ID, CASE_ID, MESSAGE_ID));
   }
 }

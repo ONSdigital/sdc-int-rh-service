@@ -55,7 +55,7 @@ import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient.Domain;
 import uk.gov.ons.ctp.integration.rhsvc.RHSvcBeanMapper;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.config.RateLimiterConfig;
-import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentDataRepositoryImpl;
+import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentCaseRepository;
 import uk.gov.ons.ctp.integration.rhsvc.representation.PostalFulfilmentRequestDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.SMSFulfilmentRequestDTO;
 
@@ -68,7 +68,7 @@ public class CaseServiceImplFulfilmentTest {
 
   @Mock private AppConfig appConfig;
 
-  @Mock private RespondentDataRepositoryImpl dataRepo;
+  @Mock private RespondentCaseRepository dataRepo;
 
   @Mock private EventPublisher eventPublisher;
 

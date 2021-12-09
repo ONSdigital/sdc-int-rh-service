@@ -32,12 +32,12 @@ import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.config.QueueConfig;
 import uk.gov.ons.ctp.integration.rhsvc.event.impl.EventFilter;
 import uk.gov.ons.ctp.integration.rhsvc.event.impl.UACEventReceiverImpl;
-import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentDataRepositoryImpl;
+import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentUacRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class UacEventReceiverImplUnit_Test {
 
-  private RespondentDataRepositoryImpl mockRespondentDataRepo;
+  private RespondentUacRepository mockRespondentUacRepo;
   private EventFilter eventFilter;
   private UACEventReceiverImpl target;
   private UacEvent UacEventFixture;
@@ -51,9 +51,9 @@ public class UacEventReceiverImplUnit_Test {
     queueConfig.setQidFilterPrefixes(Stream.of("11", "12", "13", "14").collect(Collectors.toSet()));
     appConfig.setQueueConfig(queueConfig);
     ReflectionTestUtils.setField(target, "appConfig", appConfig);
-    mockRespondentDataRepo = mock(RespondentDataRepositoryImpl.class);
+    mockRespondentUacRepo = mock(RespondentUacRepository.class);
     eventFilter = mock(EventFilter.class);
-    target.setRespondentDataRepo(mockRespondentDataRepo);
+    target.setRespondentUacRepo(mockRespondentUacRepo);
     target.setEventFilter(eventFilter);
   }
 
@@ -83,13 +83,13 @@ public class UacEventReceiverImplUnit_Test {
   private void acceptUacEvent(String qid, EventTopic topic) {
     when(eventFilter.isValidEvent(any(), any(), any(), any())).thenReturn(true);
     prepareAndAcceptEvent(qid, topic);
-    verify(mockRespondentDataRepo).writeUAC(uacFixture);
+    verify(mockRespondentUacRepo).writeUAC(uacFixture);
   }
 
   @SneakyThrows
   private void filterUacEvent(String qid) {
     prepareAndAcceptEvent(qid, EventTopic.UAC_UPDATE);
-    verify(mockRespondentDataRepo, never()).writeUAC(uacFixture);
+    verify(mockRespondentUacRepo, never()).writeUAC(uacFixture);
   }
 
   @Test
@@ -136,7 +136,7 @@ public class UacEventReceiverImplUnit_Test {
   public void shouldRejectUacWhenPrerequisiteEventsDoNotExistInFirestore() throws CTPException {
     when(eventFilter.isValidEvent(any(), any(), any(), any())).thenReturn(false);
     prepareAndAcceptEvent(RespondentHomeFixture.QID_01, EventTopic.UAC_UPDATE);
-    verify(mockRespondentDataRepo, never()).writeUAC(uacFixture);
+    verify(mockRespondentUacRepo, never()).writeUAC(uacFixture);
   }
 
   @Test
@@ -145,7 +145,7 @@ public class UacEventReceiverImplUnit_Test {
     uacEvent.getPayload().getUacUpdate().setQid(RespondentHomeFixture.QID_01);
     when(eventFilter.isValidEvent(any(), any(), any(), any())).thenReturn(true);
     doThrow(new CTPException(CTPException.Fault.SYSTEM_ERROR))
-        .when(mockRespondentDataRepo)
+        .when(mockRespondentUacRepo)
         .writeUAC(uacEvent.getPayload().getUacUpdate());
 
     CTPException thrown = assertThrows(CTPException.class, () -> target.acceptUACEvent(uacEvent));

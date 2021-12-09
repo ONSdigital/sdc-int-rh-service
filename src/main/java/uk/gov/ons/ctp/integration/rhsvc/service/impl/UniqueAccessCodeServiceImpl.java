@@ -20,7 +20,10 @@ import uk.gov.ons.ctp.common.event.model.CollectionExercise;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 import uk.gov.ons.ctp.common.event.model.UacAuthentication;
 import uk.gov.ons.ctp.common.event.model.UacUpdate;
-import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentDataRepositoryImpl;
+import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentCaseRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentCollectionExerciseRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentSurveyRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentUacRepository;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CollectionExerciseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.SurveyLiteDTO;
@@ -31,7 +34,10 @@ import uk.gov.ons.ctp.integration.rhsvc.service.UniqueAccessCodeService;
 @Slf4j
 @Service
 public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
-  @Autowired private RespondentDataRepositoryImpl dataRepo;
+  @Autowired private RespondentSurveyRepository surveyDataRepo;
+  @Autowired private RespondentCollectionExerciseRepository collExDataRepo;
+  @Autowired private RespondentCaseRepository caseDataRepo;
+  @Autowired private RespondentUacRepository uacDataRepo;
   @Autowired private EventPublisher eventPublisher;
   @Autowired private MapperFacade mapperFacade;
 
@@ -43,7 +49,7 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
 
     UniqueAccessCodeDTO data;
     UacUpdate uac =
-        dataRepo
+        uacDataRepo
             .readUAC(uacHash)
             .orElseThrow(
                 () ->
@@ -53,17 +59,17 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
     if (!StringUtils.isEmpty(caseId)) {
       // UAC has a caseId
       CaseUpdate caseUpdate =
-          dataRepo
+          caseDataRepo
               .readCaseUpdate(caseId)
               .orElseThrow(
                   () -> new CTPException(CTPException.Fault.SYSTEM_ERROR, "Case Not Found"));
       SurveyUpdate survey =
-          dataRepo
+          surveyDataRepo
               .readSurvey(caseUpdate.getSurveyId())
               .orElseThrow(
                   () -> new CTPException(CTPException.Fault.SYSTEM_ERROR, "Survey Not Found"));
       CollectionExercise collex =
-          dataRepo
+          collExDataRepo
               .readCollectionExercise(caseUpdate.getCollectionExerciseId())
               .orElseThrow(
                   () ->

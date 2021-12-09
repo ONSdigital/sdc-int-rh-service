@@ -38,7 +38,7 @@ import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient;
 import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient.Domain;
 import uk.gov.ons.ctp.integration.rhsvc.RHSvcBeanMapper;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
-import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentDataRepositoryImpl;
+import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentCaseRepository;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.FulfilmentRequestDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.NewCaseDTO;
@@ -51,7 +51,7 @@ import uk.gov.ons.ctp.integration.rhsvc.service.CaseService;
 @Service
 public class CaseServiceImpl implements CaseService {
   @Autowired private AppConfig appConfig;
-  @Autowired private RespondentDataRepositoryImpl dataRepo;
+  @Autowired private RespondentCaseRepository dataRepo;
   @Autowired private MapperFacade mapperFacade;
   @Autowired private EventPublisher eventPublisher;
   @Autowired private ProductReference productReference;

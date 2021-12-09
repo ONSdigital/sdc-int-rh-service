@@ -14,12 +14,12 @@ import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdateEvent;
 import uk.gov.ons.ctp.integration.rhsvc.event.impl.SurveyEventReceiverImpl;
-import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentDataRepositoryImpl;
+import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentSurveyRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class SurveyUpdateEventReceiverImplUnit_test {
 
-  @Mock private RespondentDataRepositoryImpl mockRespondentDataRepo;
+  @Mock private RespondentSurveyRepository mockRespondentSurveyRepo;
 
   @InjectMocks private SurveyEventReceiverImpl target;
 
@@ -28,7 +28,7 @@ public class SurveyUpdateEventReceiverImplUnit_test {
     SurveyUpdateEvent surveyUpdateEvent =
         FixtureHelper.loadPackageFixtures(SurveyUpdateEvent[].class).get(0);
     target.acceptSurveyUpdateEvent(surveyUpdateEvent);
-    verify(mockRespondentDataRepo).writeSurvey(surveyUpdateEvent.getPayload().getSurveyUpdate());
+    verify(mockRespondentSurveyRepo).writeSurvey(surveyUpdateEvent.getPayload().getSurveyUpdate());
   }
 
   @Test
@@ -36,7 +36,7 @@ public class SurveyUpdateEventReceiverImplUnit_test {
     SurveyUpdateEvent surveyUpdateEvent =
         FixtureHelper.loadPackageFixtures(SurveyUpdateEvent[].class).get(0);
     Mockito.doThrow(new CTPException(CTPException.Fault.RESOURCE_NOT_FOUND))
-        .when(mockRespondentDataRepo)
+        .when(mockRespondentSurveyRepo)
         .writeSurvey(surveyUpdateEvent.getPayload().getSurveyUpdate());
     assertThrows(CTPException.class, () -> target.acceptSurveyUpdateEvent(surveyUpdateEvent));
   }

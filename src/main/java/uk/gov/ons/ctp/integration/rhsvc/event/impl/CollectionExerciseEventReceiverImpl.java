@@ -13,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.model.CollectionExercise;
 import uk.gov.ons.ctp.common.event.model.CollectionExerciseUpdateEvent;
-import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentDataRepositoryImpl;
+import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentCollectionExerciseRepository;
 
 /** Service implementation responsible for receipt of Collection Exercise Events. */
 @Slf4j
@@ -22,7 +22,7 @@ import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentDataRepository
 @AllArgsConstructor
 @MessageEndpoint
 public class CollectionExerciseEventReceiverImpl {
-  @Autowired private RespondentDataRepositoryImpl respondentDataRepo;
+  @Autowired private RespondentCollectionExerciseRepository respondentCollExRepo;
 
   /**
    * Message end point for events from Response Management.
@@ -45,7 +45,7 @@ public class CollectionExerciseEventReceiverImpl {
         kv("collectionExerciseId", collectionExercise.getCollectionExerciseId()));
 
     try {
-      respondentDataRepo.writeCollectionExercise(collectionExercise);
+      respondentCollExRepo.writeCollectionExercise(collectionExercise);
     } catch (CTPException ctpEx) {
       log.error(
           "Collection Exercise Event processing failed",

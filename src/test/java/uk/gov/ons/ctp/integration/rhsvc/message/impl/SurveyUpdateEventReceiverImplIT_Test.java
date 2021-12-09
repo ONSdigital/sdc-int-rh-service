@@ -4,12 +4,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
 import static org.mockito.Mockito.verify;
 
-import com.google.cloud.spring.pubsub.core.PubSubTemplate;
-import com.google.cloud.spring.pubsub.integration.inbound.PubSubInboundChannelAdapter;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.TimeZone;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,13 +24,20 @@ import org.springframework.messaging.support.GenericMessage;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import com.google.cloud.spring.pubsub.core.PubSubTemplate;
+import com.google.cloud.spring.pubsub.integration.inbound.PubSubInboundChannelAdapter;
+
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdateEvent;
 import uk.gov.ons.ctp.common.utility.ParallelTestLocks;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.event.impl.EventFilter;
 import uk.gov.ons.ctp.integration.rhsvc.event.impl.SurveyEventReceiverImpl;
-import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentDataRepositoryImpl;
+import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentCaseRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentCollectionExerciseRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentSurveyRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentUacRepository;
 
 /** Spring Integration test of flow received from Response Management */
 @SpringBootTest
@@ -44,7 +50,10 @@ public class SurveyUpdateEventReceiverImplIT_Test {
 
   @Autowired private SurveyEventReceiverImpl receiver;
   @Autowired private PubSubInboundChannelAdapter surveyEventInbound;
-  @MockBean private RespondentDataRepositoryImpl respondentDataRepo;
+  @MockBean private RespondentSurveyRepository respondentSurveyRepo;
+  @MockBean private RespondentCollectionExerciseRepository respondentCollExRepo;
+  @MockBean private RespondentCaseRepository respondentCaseRepo;
+  @MockBean private RespondentUacRepository respondentUacRepo;
   @MockBean private PubSubTemplate pubSubTemplate;
   @MockBean private EventFilter eventFilter;
 
