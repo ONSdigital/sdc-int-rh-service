@@ -81,7 +81,7 @@ public class CaseServiceImplTest {
     when(dataRepo.readCaseUpdateBySampleAttribute("uprn", UPRN, true))
         .thenReturn(caseUpdates.subList(0, 1));
 
-    List<CaseDTO> rmCase = caseSvc.searchForLatestValidCase("uprn", UPRN);
+    List<CaseDTO> rmCase = caseSvc.readCaseUpdateBySampleAttribute("uprn", UPRN);
 
     assertNotNull(rmCase);
     assertEquals(1, rmCase.size());
@@ -95,7 +95,7 @@ public class CaseServiceImplTest {
     when(dataRepo.readCaseUpdateBySampleAttribute("townName", "Upton", true))
         .thenReturn(caseUpdates);
 
-    List<CaseDTO> rmCase = caseSvc.searchForLatestValidCase("townName", "Upton");
+    List<CaseDTO> rmCase = caseSvc.readCaseUpdateBySampleAttribute("townName", "Upton");
 
     assertNotNull(rmCase);
     assertEquals(2, rmCase.size());
@@ -119,7 +119,7 @@ public class CaseServiceImplTest {
   public void getInvalidAddressCaseByUPRNOnly() throws Exception {
     when(dataRepo.readCaseUpdateBySampleAttribute("uprn", UPRN, true))
         .thenThrow(new CTPException(null));
-    assertThrows(CTPException.class, () -> caseSvc.searchForLatestValidCase("uprn", UPRN));
+    assertThrows(CTPException.class, () -> caseSvc.readCaseUpdateBySampleAttribute("uprn", UPRN));
   }
 
   /** Test throws a CTPException where no cases returned from repository */
@@ -130,7 +130,7 @@ public class CaseServiceImplTest {
         .thenReturn(new ArrayList<>());
 
     assertThrows(
-        CTPException.class, () -> caseSvc.searchForLatestValidCase("doorNumber", "898123"));
+        CTPException.class, () -> caseSvc.readCaseUpdateBySampleAttribute("doorNumber", "898123"));
   }
 
   @Test

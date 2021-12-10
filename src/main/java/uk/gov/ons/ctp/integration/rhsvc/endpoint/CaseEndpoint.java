@@ -36,26 +36,27 @@ public class CaseEndpoint {
    * the GET end point to return latest valid Case which matches the supplied sample attribute
    * name/value.
    *
-   * @param searchAttributeName - is the name of the field in the sample data to search by.
-   * @param searchValue - is the value that target case(s) must contain.
+   * @param attributeKey - is the name of the field in the sample data to search by.
+   * @param attributeValue - is the value that target case(s) must contain.
    * @return Returned latest Non HI case with valid address for the UPRN
    * @throws CTPException something went wrong - thrown by case service
    */
-  @RequestMapping(value = "{searchAttributeName}/{searchValue}", method = RequestMethod.GET)
-  public ResponseEntity<List<CaseDTO>> getCaseBySampleAttribute(
-      @PathVariable(value = "searchAttributeName") final String searchAttributeName,
-      @PathVariable(value = "searchValue") final String searchValue)
+  @RequestMapping(value = "attribute/{attributeKey}/{attributeValue}", method = RequestMethod.GET)
+  public ResponseEntity<List<CaseDTO>> getCaseByAttribute(
+      @PathVariable(value = "attributeKey") final String attributeKey,
+      @PathVariable(value = "attributeValue") final String attributeValue)
       throws CTPException {
     log.info(
-        "Entering GET getLatestValidNonHICaseByUPRN",
-        kv("searchAttributeName", searchAttributeName),
-        kv("searchValue", searchValue));
+        "Entering GET getCaseByAttribute",
+        kv("attributeKey", attributeKey),
+        kv("attributeValue", attributeValue));
 
-    List<CaseDTO> result = caseService.searchForLatestValidCase(searchAttributeName, searchValue);
+    List<CaseDTO> result =
+        caseService.readCaseUpdateBySampleAttribute(attributeKey, attributeValue);
     log.debug(
-        "Exit GET getLatestValidNonHICaseByUPRN",
-        kv("searchAttributeName", searchAttributeName),
-        kv("searchValue", searchValue));
+        "Exit GET getCaseByAttribute",
+        kv("attributeName", attributeKey),
+        kv("attributeValue", attributeValue));
     return ResponseEntity.ok(result);
   }
 

@@ -82,9 +82,10 @@ public class RespondentCaseRepository {
   /**
    * Filter search results returning valid case
    *
-   * @param searchResults - Search results found in dataStore by searching by uprn
+   * @param searchResults - Search results found in dataStore by searching by sample attribute
+   *     name/value.
    * @param onlyValid - true if only valid cases to be returned; false if we don't care
-   * @return List of Optional of the resulting collection case or Empty
+   * @return List of the cases after filtering. List will be empty if there are no resulting cases.
    */
   // TODO Used to filter on Non HI cases using CaseCreationDate to return the latest valid Non HI
   // case,

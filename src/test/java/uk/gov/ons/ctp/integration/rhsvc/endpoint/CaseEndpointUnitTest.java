@@ -63,10 +63,10 @@ public class CaseEndpointUnitTest {
     CaseDTO rmCase0 = caseDTO.get(0);
     CaseDTO rmCase1 = caseDTO.get(1);
 
-    when(caseService.searchForLatestValidCase("uprn", UPRN)).thenReturn(caseDTO);
+    when(caseService.readCaseUpdateBySampleAttribute("uprn", UPRN)).thenReturn(caseDTO);
 
     mockMvc
-        .perform(get("/cases/uprn/{uprn}", UPRN))
+        .perform(get("/cases/attribute/uprn/{uprn}", UPRN))
         .andExpect(status().isOk())
         .andExpect(content().contentType(EXPECTED_JSON_CONTENT_TYPE))
         .andExpect(jsonPath("$.length()", is(2)))
@@ -86,11 +86,11 @@ public class CaseEndpointUnitTest {
   @Test
   public void getCaseByUPRNNotFound() throws Exception {
 
-    when(caseService.searchForLatestValidCase("uprn", UPRN))
+    when(caseService.readCaseUpdateBySampleAttribute("uprn", UPRN))
         .thenThrow(new CTPException(CTPException.Fault.RESOURCE_NOT_FOUND, ERROR_MESSAGE));
 
     mockMvc
-        .perform(get("/cases/uprn/{uprn}", UPRN))
+        .perform(get("/cases/attribute/uprn/{uprn}", UPRN))
         .andExpect(status().isNotFound())
         .andExpect(jsonPath("$.error.code", is(CTPException.Fault.RESOURCE_NOT_FOUND.toString())))
         .andExpect(jsonPath("$.error.message", is(ERROR_MESSAGE)));

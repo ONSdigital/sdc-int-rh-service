@@ -58,23 +58,23 @@ public class CaseServiceImpl implements CaseService {
   private MapperFacade mapper = new RHSvcBeanMapper();
 
   @Override
-  public List<CaseDTO> searchForLatestValidCase(
-      final String searchAttributeName, final String searchValue) throws CTPException {
+  public List<CaseDTO> readCaseUpdateBySampleAttribute(
+      final String attributeKey, final String attributeValue) throws CTPException {
 
     List<CaseUpdate> foundCases =
-        dataRepo.readCaseUpdateBySampleAttribute(searchAttributeName, searchValue, true);
+        dataRepo.readCaseUpdateBySampleAttribute(attributeKey, attributeValue, true);
     if (!foundCases.isEmpty()) {
       log.debug(
-          "Search for latest valid case by attribute value",
+          "Search for cases by attribute value",
           kv("numberFoundCase", foundCases.size()),
-          kv("searchAttributeName", searchAttributeName),
-          kv("searchValue", searchValue));
+          kv("searchAttributeName", attributeKey),
+          kv("searchValue", attributeValue));
       return mapperFacade.mapAsList(foundCases, CaseDTO.class);
     } else {
       log.warn(
           "No cases found",
-          kv("searchAttributeName", searchAttributeName),
-          kv("searchValue", searchValue));
+          kv("searchAttributeName", attributeKey),
+          kv("searchValue", attributeValue));
       throw new CTPException(Fault.RESOURCE_NOT_FOUND, "Failed to retrieve Case(s)");
     }
   }

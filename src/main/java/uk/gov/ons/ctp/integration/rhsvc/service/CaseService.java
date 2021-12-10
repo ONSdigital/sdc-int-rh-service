@@ -14,14 +14,16 @@ import uk.gov.ons.ctp.integration.rhsvc.representation.SMSFulfilmentRequestDTO;
 public interface CaseService {
 
   /**
-   * Retrieve the data relating to non-HI latest valid Case by address UPRN
+   * Retrieve case(s) which have a sample attribute matching the supplied key/value.
    *
-   * @param uprn of address for which latest valid case details are requested
-   * @return Case details for address UPRN
+   * @param attributeKey is the name of the attribute to search on.
+   * @param attributeValue is the value that the search attribute must equal for a case to be
+   *     returned.
+   * @return a List containing matching cases. If no cases then the list will be empty.
    * @throws CTPException if anything went wrong.
    */
-  List<CaseDTO> searchForLatestValidCase(final String searchAttributeName, final String searchValue)
-      throws CTPException;
+  List<CaseDTO> readCaseUpdateBySampleAttribute(
+      final String attributeKey, final String attributeValue) throws CTPException;
 
   void fulfilmentRequestBySMS(SMSFulfilmentRequestDTO requestBodyDTO) throws CTPException;
 
