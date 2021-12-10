@@ -3,9 +3,9 @@ package uk.gov.ons.ctp.integration.rhsvc.event.impl;
 import static uk.gov.ons.ctp.common.log.ScopedStructuredArguments.kv;
 
 import java.util.Optional;
-import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import uk.gov.ons.ctp.common.domain.SurveyType;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.model.CollectionExercise;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
@@ -37,7 +37,7 @@ public class EventFilter {
     Optional<SurveyUpdate> surveyUpdateOpt = respondentSurveyRepo.readSurvey(surveyId);
     if (surveyUpdateOpt.isPresent()) {
       SurveyUpdate surveyUpdate = surveyUpdateOpt.get();
-      if (isAcceptedSurveyType(surveyUpdate.getSampleDefinitionUrl())) {
+      if (isAcceptedSurveyType(surveyUpdate.surveyType())) {
         Optional<CollectionExercise> collectionExercise =
             respondentCollExRepo.readCollectionExercise(collexId);
         if (collectionExercise.isPresent()) {
@@ -65,13 +65,7 @@ public class EventFilter {
     return false;
   }
 
-  private boolean isAcceptedSurveyType(String sampleDefinitionUrl) {
-    Set<String> surveys = appConfig.getSurveys();
-    for (String survey : surveys) {
-      if (sampleDefinitionUrl.endsWith(survey + ".json")) {
-        return true;
-      }
-    }
-    return false;
+  private boolean isAcceptedSurveyType(SurveyType type) {
+    return type != null && appConfig.getSurveys().contains(type.getBasename());
   }
 }

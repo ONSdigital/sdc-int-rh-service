@@ -1,0 +1,32 @@
+[
+  {
+    "surveyId": "91b32904-5360-11ec-b6f8-4c3275913db5",
+    "name": "how-rich-are-you",
+    "allowedFulfilments": [
+      {
+        "packCode": "replace-uac-en",
+        "description": "English UAC thing",
+        "productGroup": "UAC",
+        "deliveryChannel": "SMS",
+        "metadata": {
+          "abc": "def",
+          "valid": true
+        }
+      }
+    ],
+    "surveyType": "SOCIAL"
+  },
+  {
+    "surveyId": "c552e4b6-5360-11ec-a2e7-4c3275913db5",
+    "name": "handbag-preferences",
+    "allowedFulfilments": [
+      {
+        "packCode": "pc1"
+      },
+      {
+        "packCode": "pc2"
+      }
+    ],
+    "surveyType": "SIS"
+  }
+]

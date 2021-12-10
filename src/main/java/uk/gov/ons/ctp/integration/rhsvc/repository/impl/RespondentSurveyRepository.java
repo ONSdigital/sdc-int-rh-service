@@ -1,5 +1,6 @@
 package uk.gov.ons.ctp.integration.rhsvc.repository.impl;
 
+import java.util.List;
 import java.util.Optional;
 import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,5 +53,17 @@ public class RespondentSurveyRepository {
   public void writeSurvey(final SurveyUpdate surveyUpdate) throws CTPException {
     String id = surveyUpdate.getSurveyId();
     retryableCloudDataStore.storeObject(surveySchema, id, surveyUpdate, id);
+  }
+
+  /**
+   * List all of the surveys.
+   *
+   * <p>Assumes that this list will never be so large as to be unwieldy.
+   *
+   * @return list of all the surveyUpdate objects
+   * @throws CTPException - if a cloud exception was detected.
+   */
+  public List<SurveyUpdate> listSurveys() throws CTPException {
+    return retryableCloudDataStore.list(SurveyUpdate.class, surveySchema);
   }
 }

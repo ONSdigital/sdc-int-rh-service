@@ -1,0 +1,10 @@
+{
+  "packCode": "replace-uac-en",
+  "description": "Replacement UAC - English",
+  "metadata": {
+    "suitableRegions": [
+      "E",
+      "N"
+    ]
+  }
+}

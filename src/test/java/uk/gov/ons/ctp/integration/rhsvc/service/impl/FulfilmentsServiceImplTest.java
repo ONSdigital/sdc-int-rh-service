@@ -24,7 +24,7 @@ import uk.gov.ons.ctp.integration.common.product.model.Product.DeliveryChannel;
 import uk.gov.ons.ctp.integration.common.product.model.Product.Region;
 import uk.gov.ons.ctp.integration.common.product.model.Product.RequestChannel;
 import uk.gov.ons.ctp.integration.rhsvc.RHSvcBeanMapper;
-import uk.gov.ons.ctp.integration.rhsvc.representation.ProductDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.OldProductDTO;
 
 @ExtendWith(MockitoExtension.class)
 public class FulfilmentsServiceImplTest {
@@ -54,7 +54,7 @@ public class FulfilmentsServiceImplTest {
     Mockito.when(productReference.searchProducts(any())).thenReturn(mockedResults);
 
     // Invoke the method under test
-    List<ProductDTO> products =
+    List<OldProductDTO> products =
         fulfilmentsService.getFulfilments(
             Arrays.asList(CaseType.HH),
             Region.E,
@@ -87,7 +87,7 @@ public class FulfilmentsServiceImplTest {
     // ACTUALLY verify that getFulfilments() returns the value it got from the ProductReference
     // search
     assertEquals(1, products.size());
-    ProductDTO theResult = products.get(0);
+    OldProductDTO theResult = products.get(0);
 
     assertEquals(product.getIndividual(), theResult.getIndividual());
     assertEquals(product.getCaseTypes(), theResult.getCaseTypes());

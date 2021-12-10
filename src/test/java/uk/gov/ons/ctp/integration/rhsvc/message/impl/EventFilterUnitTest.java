@@ -48,7 +48,6 @@ public class EventFilterUnitTest {
 
   @Test
   public void test_InvalidSurveyType() throws Exception {
-    when(appConfig.getSurveys()).thenReturn(ACCEPTED_SURVEYS);
     SurveyUpdate surveyUpdate = new SurveyUpdate();
     surveyUpdate.setSurveyId(SURVEY_ID);
     surveyUpdate.setSampleDefinitionUrl("test/socialnot.json");
@@ -61,7 +60,7 @@ public class EventFilterUnitTest {
     when(appConfig.getSurveys()).thenReturn(ACCEPTED_SURVEYS);
     SurveyUpdate surveyUpdate = new SurveyUpdate();
     surveyUpdate.setSurveyId(SURVEY_ID);
-    surveyUpdate.setSampleDefinitionUrl("test/test.json");
+    surveyUpdate.setSampleDefinitionUrl("test/social.json");
     when(mockRespondentCollExRepo.readCollectionExercise(any())).thenReturn(Optional.empty());
     when(mockRespondentSurveyRepo.readSurvey(any())).thenReturn(Optional.of(surveyUpdate));
     assertFalse(eventFilter.isValidEvent(SURVEY_ID, COLLEX_ID, CASE_ID, MESSAGE_ID));
