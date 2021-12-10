@@ -63,20 +63,12 @@ public class CaseServiceImpl implements CaseService {
 
     List<CaseUpdate> foundCases =
         dataRepo.readCaseUpdateBySampleAttribute(attributeKey, attributeValue, true);
-    if (!foundCases.isEmpty()) {
-      log.debug(
-          "Search for cases by attribute value",
-          kv("numberFoundCase", foundCases.size()),
-          kv("searchAttributeName", attributeKey),
-          kv("searchValue", attributeValue));
-      return mapperFacade.mapAsList(foundCases, CaseDTO.class);
-    } else {
-      log.warn(
-          "No cases found",
-          kv("searchAttributeName", attributeKey),
-          kv("searchValue", attributeValue));
-      throw new CTPException(Fault.RESOURCE_NOT_FOUND, "Failed to retrieve Case(s)");
-    }
+    log.debug(
+        "Search for cases by attribute value",
+        kv("numberFoundCase", foundCases.size()),
+        kv("searchAttributeName", attributeKey),
+        kv("searchValue", attributeValue));
+    return mapperFacade.mapAsList(foundCases, CaseDTO.class);
   }
 
   /**

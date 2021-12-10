@@ -3,6 +3,7 @@ package uk.gov.ons.ctp.integration.rhsvc.service.impl;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -122,15 +123,15 @@ public class CaseServiceImplTest {
     assertThrows(CTPException.class, () -> caseSvc.readCaseUpdateBySampleAttribute("uprn", UPRN));
   }
 
-  /** Test throws a CTPException where no cases returned from repository */
+  /** Test for an empty result set when no cases returned from repository */
   @Test
   public void getCaseByUPRNNotFound() throws Exception {
 
     when(dataRepo.readCaseUpdateBySampleAttribute("doorNumber", "898123", true))
         .thenReturn(new ArrayList<>());
 
-    assertThrows(
-        CTPException.class, () -> caseSvc.readCaseUpdateBySampleAttribute("doorNumber", "898123"));
+    List<CaseDTO> foundCases = caseSvc.readCaseUpdateBySampleAttribute("doorNumber", "898123");
+    assertTrue(foundCases.isEmpty());
   }
 
   @Test
