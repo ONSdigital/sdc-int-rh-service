@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-class DatastoreStartupCheckDataxx {
+class DatastoreStartupCheckData {
   private String timestamp;
   private String hostname;
 }

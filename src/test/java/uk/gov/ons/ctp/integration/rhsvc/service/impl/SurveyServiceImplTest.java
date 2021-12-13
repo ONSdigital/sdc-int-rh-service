@@ -13,13 +13,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import ma.glasnost.orika.MapperFacade;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import ma.glasnost.orika.MapperFacade;
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.domain.DeliveryChannel;
 import uk.gov.ons.ctp.common.domain.ProductGroup;
@@ -28,7 +30,7 @@ import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.error.CTPException.Fault;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.RHSvcBeanMapper;
-import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentSurveyRepository;
 import uk.gov.ons.ctp.integration.rhsvc.representation.ProductDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.SurveyDTO;
 
@@ -40,7 +42,7 @@ public class SurveyServiceImplTest {
           "7645931e-542d-11ec-b825-4c3275913db5",
           "90c93916-542d-11ec-9c5e-4c3275913db5");
 
-  @Mock private RespondentDataRepository dataRepo;
+  @Mock private RespondentSurveyRepository dataRepo;
   @Spy private MapperFacade mapperFacade = new RHSvcBeanMapper();
   @InjectMocks private SurveyServiceImpl service;
 
