@@ -153,6 +153,19 @@ public class RespondentDataRepositoryImpl implements RespondentDataRepository {
   }
 
   /**
+   * List all of the surveys.
+   *
+   * <p>Assumes that this list will never be so large as to be unwieldy.
+   *
+   * @return list of all the surveyUpdate objects
+   * @throws CTPException - if a cloud exception was detected.
+   */
+  @Override
+  public List<SurveyUpdate> listSurveys() throws CTPException {
+    return retryableCloudDataStore.list(SurveyUpdate.class, surveySchema);
+  }
+
+  /**
    * Read a CollectionExercise object from cloud.
    *
    * @param collectionExerciseId - the unique id of the object stored

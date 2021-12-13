@@ -20,7 +20,7 @@ import uk.gov.ons.ctp.integration.common.product.model.Product;
 import uk.gov.ons.ctp.integration.common.product.model.Product.CaseType;
 import uk.gov.ons.ctp.integration.common.product.model.Product.DeliveryChannel;
 import uk.gov.ons.ctp.integration.common.product.model.Product.Region;
-import uk.gov.ons.ctp.integration.rhsvc.representation.ProductDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.OldProductDTO;
 import uk.gov.ons.ctp.integration.rhsvc.service.FulfilmentsService;
 
 /** The REST controller for the RH Fulfilment end points */
@@ -53,7 +53,7 @@ public final class FulfilmentsEndpoint implements CTPEndpoint {
    * @throws CTPException if something went wrong.
    */
   @RequestMapping(value = "/fulfilments", method = RequestMethod.GET)
-  public ResponseEntity<List<ProductDTO>> getFulfilments(
+  public ResponseEntity<List<OldProductDTO>> getFulfilments(
       @RequestParam(required = false) CaseType caseType,
       @RequestParam(required = false) Region region,
       @RequestParam(required = false) DeliveryChannel deliveryChannel,
@@ -69,12 +69,12 @@ public final class FulfilmentsEndpoint implements CTPEndpoint {
         kv("requestParam.individual", individual),
         kv("requestParam.productGroup", productGroup));
     List<CaseType> caseTypes = caseType == null ? Collections.emptyList() : Arrays.asList(caseType);
-    List<ProductDTO> fulfilments =
+    List<OldProductDTO> fulfilments =
         fulfilmentsService.getFulfilments(
             caseTypes, region, deliveryChannel, productGroup, individual);
 
     List<String> fulfilmentCodes =
-        fulfilments.stream().map(ProductDTO::getFulfilmentCode).collect(Collectors.toList());
+        fulfilments.stream().map(OldProductDTO::getFulfilmentCode).collect(Collectors.toList());
     log.info(
         "Found fulfilment(s)", kv("size", fulfilments.size()), kv("fulfilments", fulfilmentCodes));
 
