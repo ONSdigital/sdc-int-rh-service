@@ -251,7 +251,7 @@ public class UniqueAccessCodeServiceImplTest {
   }
 
   private SurveyUpdate getSurvey() {
-    return FixtureHelper.loadClassFixtures(SurveyUpdate[].class).get(0);
+    return FixtureHelper.loadPackageFixtures(SurveyUpdate[].class).get(0);
   }
 
   private CollectionExercise getCollex() {

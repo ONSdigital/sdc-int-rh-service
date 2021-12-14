@@ -4,15 +4,18 @@ import static uk.gov.ons.ctp.common.log.ScopedStructuredArguments.kv;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
 import javax.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import uk.gov.ons.ctp.common.cloud.CloudDataStore;
+import uk.gov.ons.ctp.common.cloud.FirestoreDataStore;
 
 /**
  * This class verifies that RH can get a Firestore connection, by writing an object to the startup
@@ -22,9 +25,10 @@ import uk.gov.ons.ctp.common.cloud.CloudDataStore;
 @Service
 public class RespondentStartupRepository {
 
-  @Autowired CloudDataStore nonRetryableCloudDataStore;
+  // Cloud data store access for startup checks only
+  @Autowired FirestoreDataStore nonRetryableCloudDataStore;
 
-  @Value("${GOOGLE_CLOUD_PROJECT}")
+  @Value("${spring.cloud.gcp.firestore.project-id}")
   private String gcpProject;
 
   @Data

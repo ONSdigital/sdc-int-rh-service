@@ -1,4 +1,4 @@
-package uk.gov.ons.ctp.integration.rhsvc.message.impl;
+package uk.gov.ons.ctp.integration.rhsvc.event.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
@@ -8,14 +8,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.wildfly.common.Assert.assertTrue;
 
-import com.google.cloud.spring.pubsub.core.PubSubTemplate;
-import com.google.cloud.spring.pubsub.integration.inbound.PubSubInboundChannelAdapter;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
-import lombok.SneakyThrows;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,14 +29,17 @@ import org.springframework.messaging.support.GenericMessage;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import com.google.cloud.spring.pubsub.core.PubSubTemplate;
+import com.google.cloud.spring.pubsub.integration.inbound.PubSubInboundChannelAdapter;
+
+import lombok.SneakyThrows;
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.event.EventTopic;
 import uk.gov.ons.ctp.common.event.model.UacEvent;
 import uk.gov.ons.ctp.common.utility.ParallelTestLocks;
 import uk.gov.ons.ctp.integration.rhsvc.RespondentHomeFixture;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
-import uk.gov.ons.ctp.integration.rhsvc.event.impl.EventFilter;
-import uk.gov.ons.ctp.integration.rhsvc.event.impl.UACEventReceiverImpl;
 import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentCaseRepository;
 import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentCollectionExerciseRepository;
 import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentSurveyRepository;
@@ -47,11 +48,11 @@ import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentUacRepository;
 /** Spring Integration test of flow received from Response Management */
 @SpringBootTest
 @EnableConfigurationProperties
-@ContextConfiguration(classes = {AppConfig.class, MessageIT_Config.class})
+@ContextConfiguration(classes = {AppConfig.class, MessageSpringConfig.class})
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("mocked-connection-factory")
 @ResourceLock(value = ParallelTestLocks.SPRING_TEST, mode = READ_WRITE)
-public class UacEventReceiverImplIT_Test {
+public class UacEventReceiverImplSpringTest {
 
   @Autowired private PubSubInboundChannelAdapter uacEventInbound;
   @Autowired private AppConfig appConfig;

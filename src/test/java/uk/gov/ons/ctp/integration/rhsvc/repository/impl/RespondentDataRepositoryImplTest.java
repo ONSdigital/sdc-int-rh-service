@@ -36,7 +36,7 @@ public class RespondentDataRepositoryImplTest {
   /** Setup tests */
   @BeforeEach
   public void setUp() throws Exception {
-    this.collectionCase = FixtureHelper.loadClassFixtures(CaseUpdate[].class);
+    this.collectionCase = FixtureHelper.loadPackageFixtures(CaseUpdate[].class);
     ReflectionTestUtils.setField(caseRepo, "caseSchema", "SCHEMA");
   }
 

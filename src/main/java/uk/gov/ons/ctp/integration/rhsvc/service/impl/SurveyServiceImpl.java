@@ -5,9 +5,7 @@ import static java.util.stream.Collectors.toList;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
 import org.springframework.stereotype.Service;
-
 import uk.gov.ons.ctp.common.domain.DeliveryChannel;
 import uk.gov.ons.ctp.common.domain.ProductGroup;
 import uk.gov.ons.ctp.common.error.CTPException;

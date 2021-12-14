@@ -14,7 +14,7 @@ import uk.gov.ons.ctp.common.event.model.CollectionExercise;
 public class RespondentCollectionExerciseRepository {
   private RetryableCloudDataStore retryableCloudDataStore;
 
-  @Value("${GOOGLE_CLOUD_PROJECT}")
+  @Value("${spring.cloud.gcp.firestore.project-id}")
   private String gcpProject;
 
   @Value("${cloud-storage.collection-exercise-schema-name}")

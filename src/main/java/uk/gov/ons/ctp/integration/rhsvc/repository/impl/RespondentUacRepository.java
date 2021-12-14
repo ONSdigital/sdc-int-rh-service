@@ -12,9 +12,10 @@ import uk.gov.ons.ctp.common.event.model.UacUpdate;
 /** A Repository implementation for CRUD operations on UAC data entities */
 @Service
 public class RespondentUacRepository {
+
   private RetryableCloudDataStore retryableCloudDataStore;
 
-  @Value("${GOOGLE_CLOUD_PROJECT}")
+  @Value("${spring.cloud.gcp.firestore.project-id}")
   private String gcpProject;
 
   @Value("${cloud-storage.uac-schema-name}")

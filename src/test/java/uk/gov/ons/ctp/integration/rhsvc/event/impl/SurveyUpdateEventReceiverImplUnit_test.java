@@ -1,4 +1,4 @@
-package uk.gov.ons.ctp.integration.rhsvc.message.impl;
+package uk.gov.ons.ctp.integration.rhsvc.event.impl;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
@@ -9,10 +9,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdateEvent;
-import uk.gov.ons.ctp.integration.rhsvc.event.impl.SurveyEventReceiverImpl;
 import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentSurveyRepository;
 
 @ExtendWith(MockitoExtension.class)

@@ -1,5 +1,5 @@
 [![codecov](https://codecov.io/gh/ONSdigital/sdc-int-rh-service/branch/main/graph/badge.svg?token=LTKekdoBFG)](https://codecov.io/gh/ONSdigital/sdc-int-rh-service)
- 
+
 # Respondent Home Data Service
 This repository contains the Respondent Data service. This microservice is a RESTful web service implemented using [Spring Boot](http://projects.spring.io/spring-boot/). It manages respondent data, where a Respondent Data object represents an expected response from the Respondent Data service, which provides all the data that is required by Respondent Home in order for it to verify the respondent's UAC code and connect them to the relevant EQ questionnaire.
 
@@ -53,7 +53,7 @@ export GOOGLE_CLOUD_PROJECT="<name of your project>" e.g. export GOOGLE_CLOUD_PR
 
 To run locally, either through terminal or through an IDE, you must set your profile to local so that the `application-local.yml` is picked up.
 
-Make sure you run RH with the VM argument: 
+Make sure you run RH with the VM argument:
 
     -Dspring.profiles.active=local
 
@@ -75,9 +75,40 @@ There are several ways of running this service
 This will create the JAR file in the Target directory. You can then right-click on the JAR file (in Intellij) and choose 'Run'.
 
 You will need to complete the PubSub setup steps detailed in [PUBSUB.md](docs/PUBSUB.md) and the first step in the [Manual Testing](#manual-testing) section.
-Messages that are published to either the `event_case-update` or `event_uac-update` topic will be received by sdc-int-rh-service and stored in either the case_schema or the uac_schema (as appropriate) of the relevant Google Firestore datastore.
 
 The project to use is given by the Application Default Credentials (These are the credential associated with the service account that your app engine app runs as - to set these up please follow the steps given in the previous section).
+
+## Running the junit driven tests
+There are unit tests and integration tests that can be run from maven (or an IDE of your choice). Some of the integration tests make use of [TestContainers](https://www.testcontainers.org/) which can be used for testing against a firestore emulator, for example.
+Since TestContainers relies on a docker environment, then docker should be available to the environment that the integration tests are run.
+Following normal maven conventions, the unit test classes are suffixed with **Test** and the integration test classes are suffixed with **IT**.
+
+### Running both unit and integration tests using maven
+Any of the following methods will run both sets of tests:
+```sh
+  mvn clean install
+  mvn clean install -Dskip.integration.tests=false
+  mvn clean verify
+```
+
+### Running just the unit tests using maven
+Any of the following methods will run the unit tests without running the integration tests:
+```sh
+  mvn clean install -Dskip.integration.tests=true
+  mvn clean install -DskipITs
+  mvn clean test
+```
+
+### Running just the integration tests using maven
+Any of the following methods will run the integration tests without running the unit tests:
+```sh
+  mvn clean verify -Dtest=SomePatternThatDoesntMatchAnything -DfailIfNoTests=false
+  mvn failsafe:integration-test
+```
+
+### Excluding the database integration tests when running from an IDE
+Configure your test run in your IDE, such that Junit5 excludes the following tag: "firestore".
+
 
 ## PubSub
 
@@ -92,13 +123,13 @@ More details about RH Firestore can be found in [FIRESTORE.md](docs/FIRESTORE.md
 ## Manual Testing
 
 Instructions for testing the sending and receiving of events can be found in [MANUAL_TESTING.md](docs/MANUAL_TESTING.md)
-    
+
 ## Docker image build
 
 Is switched off by default for clean deploy. Switch on with;
 
 * mvn dockerfile:build -Dskip.dockerfile=false
 
-    
+
 ## Copyright
 Copyright (C) 2019 Crown Copyright (Office for National Statistics)
