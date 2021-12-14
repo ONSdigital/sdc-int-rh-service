@@ -4,11 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Optional;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.FirestoreTestBase;
@@ -17,7 +15,7 @@ public class RespondentSurveyRepositoryIT extends FirestoreTestBase {
   private static final String SURVEY_ID = "3883af91-0052-4497-9805-3238544fcf8a";
 
   @Autowired private RespondentSurveyRepository surveyRepo;
-  
+
   @BeforeEach
   public void setup() throws Exception {
     deleteAllCollections();

@@ -5,11 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.domain.UniquePropertyReferenceNumber;
 import uk.gov.ons.ctp.common.event.model.CaseUpdate;
@@ -55,7 +53,8 @@ public class CaseServiceIT extends FirestoreTestBase {
     CaseUpdate caze = FixtureHelper.loadPackageFixtures(CaseUpdate[].class).get(0);
     createCase(caze, uprn);
 
-    List<CaseDTO> dto = service.readCaseUpdateBySampleAttribute("uprn", Long.toString(uprn.getValue()));
+    List<CaseDTO> dto =
+        service.readCaseUpdateBySampleAttribute("uprn", Long.toString(uprn.getValue()));
     assertNotNull(dto);
     assertEquals(caze.getCaseId(), dto.get(0).getCaseId().toString());
     assertEquals(caze.getCaseRef(), dto.get(0).getCaseRef());
@@ -66,7 +65,8 @@ public class CaseServiceIT extends FirestoreTestBase {
   @Test
   public void shouldNotFindCaseForUnknownUprn() throws Exception {
     UniquePropertyReferenceNumber uprn = UniquePropertyReferenceNumber.create("1000666");
-    List<CaseDTO> cases = service.readCaseUpdateBySampleAttribute("uprn", Long.toString(uprn.getValue()));
+    List<CaseDTO> cases =
+        service.readCaseUpdateBySampleAttribute("uprn", Long.toString(uprn.getValue()));
     assertTrue(cases.isEmpty());
   }
 }
