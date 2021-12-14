@@ -1,13 +1,12 @@
-package uk.gov.ons.ctp.integration.rhsvc.repository.impl;
+package uk.gov.ons.ctp.integration.rhsvc.repository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,20 +14,19 @@ import org.mockito.InjectMocks;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
+
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.cloud.RetryableCloudDataStore;
 import uk.gov.ons.ctp.common.event.model.CaseUpdate;
-import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 
 @ExtendWith(MockitoExtension.class)
-public class RespondentDataRepositoryImplTest {
+public class RespondentCaseRepositoryTest {
 
   private static final String UPRN = "123456";
 
   @Spy private RetryableCloudDataStore mockCloudDataStore;
 
   @InjectMocks private RespondentCaseRepository caseRepo;
-  @InjectMocks private RespondentSurveyRepository surveyRepo;
 
   private List<CaseUpdate> collectionCase;
   private final String[] searchByUprnPath = new String[] {"sample", "uprn"};
@@ -98,13 +96,5 @@ public class RespondentDataRepositoryImplTest {
         collectionCase,
         caseRepo.readCaseUpdateBySampleAttribute("uprn", UPRN, false),
         "Expects all cases, valid or not");
-  }
-
-  @Test
-  public void shouldListSurveys() throws Exception {
-    var surveys = FixtureHelper.loadClassFixtures(SurveyUpdate[].class);
-    when(mockCloudDataStore.list(eq(SurveyUpdate.class), any())).thenReturn(surveys);
-    var listedSurveys = surveyRepo.listSurveys();
-    assertEquals(3, listedSurveys.size());
   }
 }

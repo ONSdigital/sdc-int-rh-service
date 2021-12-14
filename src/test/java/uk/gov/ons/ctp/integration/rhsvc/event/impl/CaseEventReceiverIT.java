@@ -17,9 +17,9 @@ import uk.gov.ons.ctp.common.event.model.CollectionExercise;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.FirestoreTestBase;
 import uk.gov.ons.ctp.integration.rhsvc.event.CaseEventReceiver;
-import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentCaseRepository;
-import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentCollectionExerciseRepository;
-import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentSurveyRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentCaseRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentCollectionExerciseRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentSurveyRepository;
 
 public class CaseEventReceiverIT extends FirestoreTestBase {
   @Autowired private CaseEventReceiver receiver;

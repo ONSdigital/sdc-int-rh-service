@@ -38,10 +38,10 @@ import uk.gov.ons.ctp.common.event.model.Header;
 import uk.gov.ons.ctp.common.utility.ParallelTestLocks;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.event.CaseEventReceiver;
-import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentCaseRepository;
-import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentCollectionExerciseRepository;
-import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentSurveyRepository;
-import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentUacRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentCaseRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentCollectionExerciseRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentSurveyRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentUacRepository;
 
 /** Spring Integration test of flow received from Response Management */
 @SpringBootTest

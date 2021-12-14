@@ -36,7 +36,7 @@ import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient;
 import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient.Domain;
 import uk.gov.ons.ctp.integration.rhsvc.RHSvcBeanMapper;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
-import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentCaseRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentCaseRepository;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.FulfilmentRequestDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.NewCaseDTO;

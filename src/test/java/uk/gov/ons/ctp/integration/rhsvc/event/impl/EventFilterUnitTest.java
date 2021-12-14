@@ -17,8 +17,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.ons.ctp.common.event.model.CollectionExercise;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
-import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentCollectionExerciseRepository;
-import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentSurveyRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentCollectionExerciseRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentSurveyRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class EventFilterUnitTest {

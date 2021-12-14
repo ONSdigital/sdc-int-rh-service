@@ -34,7 +34,7 @@ import uk.gov.ons.ctp.integration.common.product.ProductReference;
 import uk.gov.ons.ctp.integration.rhsvc.RHSvcBeanMapper;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.config.Sis;
-import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentCaseRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentCaseRepository;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.NewCaseDTO;
 

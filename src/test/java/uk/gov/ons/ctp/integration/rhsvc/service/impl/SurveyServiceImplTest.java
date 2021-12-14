@@ -28,7 +28,7 @@ import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.error.CTPException.Fault;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.RHSvcBeanMapper;
-import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentSurveyRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentSurveyRepository;
 import uk.gov.ons.ctp.integration.rhsvc.representation.ProductDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.SurveyDTO;
 

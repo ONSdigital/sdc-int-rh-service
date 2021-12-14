@@ -1,4 +1,4 @@
-package uk.gov.ons.ctp.integration.rhsvc.repository.impl;
+package uk.gov.ons.ctp.integration.rhsvc.repository;
 
 import java.util.List;
 import java.util.Optional;

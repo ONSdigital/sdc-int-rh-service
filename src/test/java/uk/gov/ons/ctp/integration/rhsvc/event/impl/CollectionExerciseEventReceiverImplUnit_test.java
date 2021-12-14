@@ -13,7 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.model.CollectionExerciseUpdateEvent;
-import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentCollectionExerciseRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentCollectionExerciseRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class CollectionExerciseEventReceiverImplUnit_test {

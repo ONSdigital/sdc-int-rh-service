@@ -12,7 +12,7 @@ import org.springframework.integration.annotation.ServiceActivator;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.model.CollectionExercise;
 import uk.gov.ons.ctp.common.event.model.CollectionExerciseUpdateEvent;
-import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentCollectionExerciseRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentCollectionExerciseRepository;
 
 /** Service implementation responsible for receipt of Collection Exercise Events. */
 @Slf4j

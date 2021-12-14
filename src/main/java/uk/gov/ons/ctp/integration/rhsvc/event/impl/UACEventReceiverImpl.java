@@ -13,7 +13,7 @@ import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.model.UacEvent;
 import uk.gov.ons.ctp.common.event.model.UacUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
-import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentUacRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentUacRepository;
 
 /**
  * Service implementation responsible for receipt of UAC Events. See Spring Integration flow for

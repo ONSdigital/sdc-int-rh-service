@@ -17,7 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.model.CaseEvent;
-import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentCaseRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentCaseRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class CaseEventReceiverImplUnit_Test {

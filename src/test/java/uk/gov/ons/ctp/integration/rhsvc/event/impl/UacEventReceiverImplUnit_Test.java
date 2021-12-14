@@ -30,7 +30,7 @@ import uk.gov.ons.ctp.common.event.model.UacUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.RespondentHomeFixture;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.config.QueueConfig;
-import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentUacRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentUacRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class UacEventReceiverImplUnit_Test {

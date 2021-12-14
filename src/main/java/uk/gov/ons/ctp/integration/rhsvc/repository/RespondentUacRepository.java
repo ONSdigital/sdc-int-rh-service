@@ -1,4 +1,4 @@
-package uk.gov.ons.ctp.integration.rhsvc.repository.impl;
+package uk.gov.ons.ctp.integration.rhsvc.repository;
 
 import java.util.Optional;
 import javax.annotation.PostConstruct;

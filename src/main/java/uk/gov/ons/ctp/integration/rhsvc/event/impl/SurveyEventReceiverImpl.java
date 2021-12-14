@@ -13,7 +13,7 @@ import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdateEvent;
 import uk.gov.ons.ctp.integration.rhsvc.event.SurveyEventReceiver;
-import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentSurveyRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentSurveyRepository;
 
 /** Service implementation responsible for receipt of Survey Events. */
 @Slf4j

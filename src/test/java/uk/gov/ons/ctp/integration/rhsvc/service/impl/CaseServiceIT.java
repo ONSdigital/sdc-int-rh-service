@@ -16,9 +16,9 @@ import uk.gov.ons.ctp.common.event.model.CaseUpdate;
 import uk.gov.ons.ctp.common.event.model.CollectionExercise;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.FirestoreTestBase;
-import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentCaseRepository;
-import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentCollectionExerciseRepository;
-import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentSurveyRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentCaseRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentCollectionExerciseRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentSurveyRepository;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.service.CaseService;
 
