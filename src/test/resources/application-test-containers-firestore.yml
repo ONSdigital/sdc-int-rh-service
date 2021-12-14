@@ -1,0 +1,19 @@
+
+management:
+  health:
+    pubsub:
+      enabled: false
+  metrics:
+    export:
+      stackdriver:
+        project-id: rh-testcontainers
+        enabled: false
+        
+spring:
+  cloud:
+    gcp:
+      firestore:
+        project-id: rh-testcontainers
+      pubsub:
+        enabled: false
+        

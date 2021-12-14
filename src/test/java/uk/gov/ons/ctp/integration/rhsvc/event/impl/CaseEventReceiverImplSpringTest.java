@@ -1,4 +1,4 @@
-package uk.gov.ons.ctp.integration.rhsvc.message.impl;
+package uk.gov.ons.ctp.integration.rhsvc.event.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
@@ -34,22 +34,21 @@ import uk.gov.ons.ctp.common.event.model.CaseEvent;
 import uk.gov.ons.ctp.common.event.model.Header;
 import uk.gov.ons.ctp.common.utility.ParallelTestLocks;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
-import uk.gov.ons.ctp.integration.rhsvc.event.impl.CaseEventReceiverImpl;
-import uk.gov.ons.ctp.integration.rhsvc.event.impl.EventFilter;
-import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentDataRepositoryImpl;
+import uk.gov.ons.ctp.integration.rhsvc.event.CaseEventReceiver;
+import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
 
 /** Spring Integration test of flow received from Response Management */
 @SpringBootTest
 @EnableConfigurationProperties
-@ContextConfiguration(classes = {AppConfig.class, MessageIT_Config.class})
+@ContextConfiguration(classes = {AppConfig.class, MessageSpringConfig.class})
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("mocked-connection-factory")
 @ResourceLock(value = ParallelTestLocks.SPRING_TEST, mode = READ_WRITE)
-public class CaseEventReceiverImplIT_Test {
+public class CaseEventReceiverImplSpringTest {
 
-  @Autowired private CaseEventReceiverImpl receiver;
+  @Autowired private CaseEventReceiver receiver;
   @Autowired private PubSubInboundChannelAdapter caseEventInbound;
-  @MockBean private RespondentDataRepositoryImpl respondentDataRepo;
+  @MockBean private RespondentDataRepository respondentDataRepo;
   @MockBean private PubSubTemplate pubSubTemplate;
   @MockBean private EventFilter eventFilter;
 

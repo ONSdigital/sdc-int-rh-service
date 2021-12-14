@@ -84,7 +84,7 @@ public class CaseServiceImplFulfilmentTest {
 
   @BeforeEach
   public void setUp() throws Exception {
-    this.caseUpdate = FixtureHelper.loadClassFixtures(CaseUpdate[].class);
+    this.caseUpdate = FixtureHelper.loadPackageFixtures(CaseUpdate[].class);
     this.smsRequest = FixtureHelper.loadClassFixtures(SMSFulfilmentRequestDTO[].class).get(0);
     this.postalRequest = FixtureHelper.loadClassFixtures(PostalFulfilmentRequestDTO[].class).get(0);
     lenient().when(appConfig.getRateLimiter()).thenReturn(rateLimiterConfig(true));

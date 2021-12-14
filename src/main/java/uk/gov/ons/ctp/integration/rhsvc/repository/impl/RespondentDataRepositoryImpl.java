@@ -11,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import uk.gov.ons.ctp.common.cloud.CloudDataStore;
+import uk.gov.ons.ctp.common.cloud.FirestoreDataStore;
 import uk.gov.ons.ctp.common.cloud.RetryableCloudDataStore;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.model.CaseUpdate;
@@ -27,9 +27,9 @@ public class RespondentDataRepositoryImpl implements RespondentDataRepository {
   private RetryableCloudDataStore retryableCloudDataStore;
 
   // Cloud data store access for startup checks only
-  @Autowired CloudDataStore nonRetryableCloudDataStore;
+  @Autowired FirestoreDataStore nonRetryableCloudDataStore;
 
-  @Value("${GOOGLE_CLOUD_PROJECT}")
+  @Value("${spring.cloud.gcp.firestore.project-id}")
   private String gcpProject;
 
   @Value("${cloud-storage.case-schema-name}")
