@@ -12,7 +12,7 @@ import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 
 /** A Repository implementation for CRUD operations on Survey data entities */
 @Service
-public class RespondentSurveyRepository {
+public class SurveyRepository {
 
   private RetryableCloudDataStore retryableCloudDataStore;
 
@@ -30,7 +30,7 @@ public class RespondentSurveyRepository {
   }
 
   @Autowired
-  public RespondentSurveyRepository(RetryableCloudDataStore retryableCloudDataStore) {
+  public SurveyRepository(RetryableCloudDataStore retryableCloudDataStore) {
     this.retryableCloudDataStore = retryableCloudDataStore;
   }
 

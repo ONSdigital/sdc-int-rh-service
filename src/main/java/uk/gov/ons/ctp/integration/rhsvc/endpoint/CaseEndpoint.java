@@ -38,11 +38,12 @@ public class CaseEndpoint {
    *
    * @param attributeKey - is the name of the field in the sample data to search by.
    * @param attributeValue - is the value that target case(s) must contain.
-   * @return Returned latest Non HI case with valid address for the UPRN
+   * @return all valid cases which have a sample field which matches the supplied
+   *     attributeKey/Value.
    * @throws CTPException something went wrong - thrown by case service
    */
   @RequestMapping(value = "attribute/{attributeKey}/{attributeValue}", method = RequestMethod.GET)
-  public ResponseEntity<List<CaseDTO>> getCaseByAttribute(
+  public ResponseEntity<List<CaseDTO>> findCasesByAttribute(
       @PathVariable(value = "attributeKey") final String attributeKey,
       @PathVariable(value = "attributeValue") final String attributeValue)
       throws CTPException {
@@ -51,8 +52,7 @@ public class CaseEndpoint {
         kv("attributeKey", attributeKey),
         kv("attributeValue", attributeValue));
 
-    List<CaseDTO> result =
-        caseService.readCaseUpdateBySampleAttribute(attributeKey, attributeValue);
+    List<CaseDTO> result = caseService.findCasesBySampleAttribute(attributeKey, attributeValue);
     log.debug(
         "Exit GET getCaseByAttribute",
         kv("attributeName", attributeKey),

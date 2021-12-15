@@ -11,10 +11,10 @@ import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.FirestoreTestBase;
 
-public class RespondentSurveyRepositoryIT extends FirestoreTestBase {
+public class SurveyRepositoryIT extends FirestoreTestBase {
   private static final String SURVEY_ID = "3883af91-0052-4497-9805-3238544fcf8a";
 
-  @Autowired private RespondentSurveyRepository surveyRepo;
+  @Autowired private SurveyRepository surveyRepo;
 
   @BeforeEach
   public void setup() throws Exception {

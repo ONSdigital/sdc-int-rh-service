@@ -13,7 +13,7 @@ import uk.gov.ons.ctp.common.event.model.CaseUpdate;
 
 /** A Repository implementation for CRUD operations on Case data entities */
 @Service
-public class RespondentCaseRepository {
+public class CaseRepository {
   private RetryableCloudDataStore retryableCloudDataStore;
 
   @Value("${spring.cloud.gcp.firestore.project-id}")
@@ -32,7 +32,7 @@ public class RespondentCaseRepository {
   }
 
   @Autowired
-  public RespondentCaseRepository(RetryableCloudDataStore retryableCloudDataStore) {
+  public CaseRepository(RetryableCloudDataStore retryableCloudDataStore) {
     this.retryableCloudDataStore = retryableCloudDataStore;
   }
 
@@ -59,7 +59,8 @@ public class RespondentCaseRepository {
   }
 
   /**
-   * Read case objects from cloud based on its uprn. Filter optionally whether the case is valid.
+   * Searches for case update objects from cloud based on an attribute name/value. Filter optionally
+   * whether the case is valid.
    *
    * @param searchAttributeName - is the name of the field in the sample data to search by.
    * @param searchValue - is the value that target case(s) must contain.
@@ -68,7 +69,7 @@ public class RespondentCaseRepository {
    *     matching cases are found then the list will be empty.
    * @throws CTPException - if a cloud exception was detected.
    */
-  public List<CaseUpdate> readCaseUpdateBySampleAttribute(
+  public List<CaseUpdate> findCaseUpdatesBySampleAttribute(
       final String searchAttributeName, final String searchValue, boolean onlyValid)
       throws CTPException {
 
@@ -87,9 +88,6 @@ public class RespondentCaseRepository {
    * @param onlyValid - true if only valid cases to be returned; false if we don't care
    * @return List of the cases after filtering. List will be empty if there are no resulting cases.
    */
-  // TODO Used to filter on Non HI cases using CaseCreationDate to return the latest valid Non HI
-  // case,
-  // CaseCreatedDate may need to be added back if we receive duplicate cases
   private List<CaseUpdate> filterValidCaseUpdateSearchResults(
       final List<CaseUpdate> searchResults, boolean onlyValid) {
     return searchResults.stream()

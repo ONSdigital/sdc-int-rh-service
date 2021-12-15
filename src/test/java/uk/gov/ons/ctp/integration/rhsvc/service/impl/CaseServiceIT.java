@@ -14,16 +14,16 @@ import uk.gov.ons.ctp.common.event.model.CaseUpdate;
 import uk.gov.ons.ctp.common.event.model.CollectionExercise;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.FirestoreTestBase;
-import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentCaseRepository;
-import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentCollectionExerciseRepository;
-import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentSurveyRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.CaseRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.CollectionExerciseRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.SurveyRepository;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.service.CaseService;
 
 public class CaseServiceIT extends FirestoreTestBase {
-  @Autowired private RespondentSurveyRepository surveyRepo;
-  @Autowired private RespondentCollectionExerciseRepository collExRepo;
-  @Autowired private RespondentCaseRepository caseRepo;
+  @Autowired private SurveyRepository surveyRepo;
+  @Autowired private CollectionExerciseRepository collExRepo;
+  @Autowired private CaseRepository caseRepo;
   @Autowired private CaseService service;
 
   @BeforeEach
@@ -53,8 +53,7 @@ public class CaseServiceIT extends FirestoreTestBase {
     CaseUpdate caze = FixtureHelper.loadPackageFixtures(CaseUpdate[].class).get(0);
     createCase(caze, uprn);
 
-    List<CaseDTO> dto =
-        service.readCaseUpdateBySampleAttribute("uprn", Long.toString(uprn.getValue()));
+    List<CaseDTO> dto = service.findCasesBySampleAttribute("uprn", Long.toString(uprn.getValue()));
     assertNotNull(dto);
     assertEquals(caze.getCaseId(), dto.get(0).getCaseId().toString());
     assertEquals(caze.getCaseRef(), dto.get(0).getCaseRef());
@@ -66,7 +65,7 @@ public class CaseServiceIT extends FirestoreTestBase {
   public void shouldNotFindCaseForUnknownUprn() throws Exception {
     UniquePropertyReferenceNumber uprn = UniquePropertyReferenceNumber.create("1000666");
     List<CaseDTO> cases =
-        service.readCaseUpdateBySampleAttribute("uprn", Long.toString(uprn.getValue()));
+        service.findCasesBySampleAttribute("uprn", Long.toString(uprn.getValue()));
     assertTrue(cases.isEmpty());
   }
 }

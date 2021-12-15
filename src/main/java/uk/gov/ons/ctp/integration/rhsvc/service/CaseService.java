@@ -22,8 +22,8 @@ public interface CaseService {
    * @return a List containing matching cases. If no cases then the list will be empty.
    * @throws CTPException if anything went wrong.
    */
-  List<CaseDTO> readCaseUpdateBySampleAttribute(
-      final String attributeKey, final String attributeValue) throws CTPException;
+  List<CaseDTO> findCasesBySampleAttribute(final String attributeKey, final String attributeValue)
+      throws CTPException;
 
   void fulfilmentRequestBySMS(SMSFulfilmentRequestDTO requestBodyDTO) throws CTPException;
 

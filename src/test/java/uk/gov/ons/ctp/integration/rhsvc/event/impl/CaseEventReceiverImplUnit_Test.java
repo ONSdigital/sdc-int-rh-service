@@ -16,12 +16,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.model.CaseEvent;
-import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentCaseRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.CaseRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class CaseEventReceiverImplUnit_Test {
 
-  @Mock private RespondentCaseRepository mockRespondentCaseRepo;
+  @Mock private CaseRepository mockRespondentCaseRepo;
 
   @Mock private EventFilter eventFilter;
 

@@ -36,7 +36,7 @@ import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient;
 import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient.Domain;
 import uk.gov.ons.ctp.integration.rhsvc.RHSvcBeanMapper;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
-import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentCaseRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.CaseRepository;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.FulfilmentRequestDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.NewCaseDTO;
@@ -49,7 +49,7 @@ import uk.gov.ons.ctp.integration.rhsvc.service.CaseService;
 @Service
 public class CaseServiceImpl implements CaseService {
   @Autowired private AppConfig appConfig;
-  @Autowired private RespondentCaseRepository dataRepo;
+  @Autowired private CaseRepository dataRepo;
   @Autowired private MapperFacade mapperFacade;
   @Autowired private EventPublisher eventPublisher;
   @Autowired private ProductReference productReference;
@@ -58,11 +58,11 @@ public class CaseServiceImpl implements CaseService {
   private MapperFacade mapper = new RHSvcBeanMapper();
 
   @Override
-  public List<CaseDTO> readCaseUpdateBySampleAttribute(
+  public List<CaseDTO> findCasesBySampleAttribute(
       final String attributeKey, final String attributeValue) throws CTPException {
 
     List<CaseUpdate> foundCases =
-        dataRepo.readCaseUpdateBySampleAttribute(attributeKey, attributeValue, true);
+        dataRepo.findCaseUpdatesBySampleAttribute(attributeKey, attributeValue, true);
     log.debug(
         "Search for cases by attribute value",
         kv("numberFoundCase", foundCases.size()),
@@ -162,7 +162,8 @@ public class CaseServiceImpl implements CaseService {
       for (Product product : products) {
         log.debug("Recording rate-limiting", kv("fulfilmentCode", product.getFulfilmentCode()));
         UniquePropertyReferenceNumber uprn =
-            UniquePropertyReferenceNumber.create(caseDetails.getSample().get("uprn"));
+            UniquePropertyReferenceNumber.create(
+                caseDetails.getSample().get(CaseUpdate.ATTRIBUTE_UPRN));
         recordRateLimiting(contact, product, ipAddress, uprn);
       }
     } else {

@@ -36,10 +36,10 @@ import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 import uk.gov.ons.ctp.common.event.model.UacAuthentication;
 import uk.gov.ons.ctp.common.event.model.UacUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.RHSvcBeanMapper;
-import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentCaseRepository;
-import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentCollectionExerciseRepository;
-import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentSurveyRepository;
-import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentUacRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.CaseRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.CollectionExerciseRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.SurveyRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.UacRepository;
 import uk.gov.ons.ctp.integration.rhsvc.representation.UniqueAccessCodeDTO;
 
 // ** Unit tests of the Unique Access Code Service */
@@ -54,10 +54,10 @@ public class UniqueAccessCodeServiceImplTest {
 
   @InjectMocks private UniqueAccessCodeServiceImpl uacSvc;
 
-  @Mock private RespondentSurveyRepository surveyDataRepo;
-  @Mock private RespondentCollectionExerciseRepository collExDataRepo;
-  @Mock private RespondentCaseRepository caseDataRepo;
-  @Mock private RespondentUacRepository uacDataRepo;
+  @Mock private SurveyRepository surveyDataRepo;
+  @Mock private CollectionExerciseRepository collExDataRepo;
+  @Mock private CaseRepository caseDataRepo;
+  @Mock private UacRepository uacDataRepo;
 
   @Mock private EventPublisher eventPublisher;
 

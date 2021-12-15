@@ -15,11 +15,11 @@ import uk.gov.ons.ctp.common.cloud.RetryableCloudDataStore;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 
 @ExtendWith(MockitoExtension.class)
-public class RespondentSurveyRepositoryTest {
+public class SurveyRepositoryTest {
 
   @Spy private RetryableCloudDataStore mockCloudDataStore;
 
-  @InjectMocks private RespondentSurveyRepository surveyRepo;
+  @InjectMocks private SurveyRepository surveyRepo;
 
   @Test
   public void shouldListSurveys() throws Exception {

@@ -18,16 +18,18 @@ import uk.gov.ons.ctp.common.cloud.RetryableCloudDataStore;
 import uk.gov.ons.ctp.common.event.model.CaseUpdate;
 
 @ExtendWith(MockitoExtension.class)
-public class RespondentCaseRepositoryTest {
+public class CaseRepositoryTest {
 
   private static final String UPRN = "123456";
+  private static final String POSTCODE = "UP103UP";
 
   @Spy private RetryableCloudDataStore mockCloudDataStore;
 
-  @InjectMocks private RespondentCaseRepository caseRepo;
+  @InjectMocks private CaseRepository caseRepo;
 
   private List<CaseUpdate> collectionCase;
   private final String[] searchByUprnPath = new String[] {"sample", "uprn"};
+  private final String[] searchByPostcodePath = new String[] {"sample", "postcode"};
 
   /** Setup tests */
   @BeforeEach
@@ -46,7 +48,7 @@ public class RespondentCaseRepositoryTest {
 
     assertEquals(
         new ArrayList<>(),
-        caseRepo.readCaseUpdateBySampleAttribute("uprn", UPRN, true),
+        caseRepo.findCaseUpdatesBySampleAttribute("uprn", UPRN, true),
         "Expects Empty Optional");
   }
 
@@ -60,13 +62,13 @@ public class RespondentCaseRepositoryTest {
 
     assertEquals(
         new ArrayList<>(),
-        caseRepo.readCaseUpdateBySampleAttribute("uprn", UPRN, true),
+        caseRepo.findCaseUpdatesBySampleAttribute("uprn", UPRN, true),
         "Expects Empty Optional");
   }
 
   /** Test retrieves only valid cases */
   @Test
-  public void getOnlyValidCasesByUprn() throws Exception {
+  public void getOnlyValidCases() throws Exception {
 
     collectionCase.get(0).setInvalid(true);
     collectionCase.get(1).setInvalid(false); // ie, it's valid
@@ -76,23 +78,24 @@ public class RespondentCaseRepositoryTest {
 
     assertEquals(
         Arrays.asList(collectionCase.get(1)),
-        caseRepo.readCaseUpdateBySampleAttribute("uprn", UPRN, true),
+        caseRepo.findCaseUpdatesBySampleAttribute("uprn", UPRN, true),
         "Expects only 1 valid case");
   }
 
   /** Test retrieves invalid Address case */
   @Test
-  public void getValidAndInvalidCasesByUprn() throws Exception {
+  public void getValidAndInvalidCases() throws Exception {
 
     collectionCase.get(0).setInvalid(true);
     collectionCase.get(1).setInvalid(false);
     collectionCase.get(2).setInvalid(true);
-    when(mockCloudDataStore.search(CaseUpdate.class, caseRepo.caseSchema, searchByUprnPath, UPRN))
+    when(mockCloudDataStore.search(
+            CaseUpdate.class, caseRepo.caseSchema, searchByPostcodePath, POSTCODE))
         .thenReturn(collectionCase);
 
     assertEquals(
         collectionCase,
-        caseRepo.readCaseUpdateBySampleAttribute("uprn", UPRN, false),
+        caseRepo.findCaseUpdatesBySampleAttribute("postcode", POSTCODE, false),
         "Expects all cases, valid or not");
   }
 }

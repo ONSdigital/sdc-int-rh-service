@@ -10,8 +10,8 @@ import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.model.CollectionExercise;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
-import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentCollectionExerciseRepository;
-import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentSurveyRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.CollectionExerciseRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.SurveyRepository;
 
 @Slf4j
 @Component
@@ -19,13 +19,13 @@ public class EventFilter {
 
   private AppConfig appConfig;
 
-  private RespondentSurveyRepository respondentSurveyRepo;
-  private RespondentCollectionExerciseRepository respondentCollExRepo;
+  private SurveyRepository respondentSurveyRepo;
+  private CollectionExerciseRepository respondentCollExRepo;
 
   public EventFilter(
       AppConfig appConfig,
-      RespondentSurveyRepository respondentSurveyRepo,
-      RespondentCollectionExerciseRepository respondentCollExRepo) {
+      SurveyRepository respondentSurveyRepo,
+      CollectionExerciseRepository respondentCollExRepo) {
     this.appConfig = appConfig;
     this.respondentSurveyRepo = respondentSurveyRepo;
     this.respondentCollExRepo = respondentCollExRepo;

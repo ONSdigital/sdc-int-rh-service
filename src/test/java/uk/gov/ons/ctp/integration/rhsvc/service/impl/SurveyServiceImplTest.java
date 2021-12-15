@@ -28,7 +28,7 @@ import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.error.CTPException.Fault;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.RHSvcBeanMapper;
-import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentSurveyRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.SurveyRepository;
 import uk.gov.ons.ctp.integration.rhsvc.representation.ProductDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.SurveyDTO;
 
@@ -40,7 +40,7 @@ public class SurveyServiceImplTest {
           "7645931e-542d-11ec-b825-4c3275913db5",
           "90c93916-542d-11ec-9c5e-4c3275913db5");
 
-  @Mock private RespondentSurveyRepository dataRepo;
+  @Mock private SurveyRepository dataRepo;
   @Spy private MapperFacade mapperFacade = new RHSvcBeanMapper();
   @InjectMocks private SurveyServiceImpl service;
 

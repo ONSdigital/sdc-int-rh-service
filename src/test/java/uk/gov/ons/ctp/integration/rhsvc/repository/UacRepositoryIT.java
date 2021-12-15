@@ -11,11 +11,11 @@ import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.event.model.UacUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.FirestoreTestBase;
 
-public class RespondentUacRepositoryIT extends FirestoreTestBase {
+public class UacRepositoryIT extends FirestoreTestBase {
   private static final String UAC_HASH =
       "8a9d5db4bbee34fd16e40aa2aaae52cfbdf1842559023614c30edb480ec252b4";
 
-  @Autowired private RespondentUacRepository uacRepo;
+  @Autowired private UacRepository uacRepo;
 
   @BeforeEach
   public void setup() throws Exception {

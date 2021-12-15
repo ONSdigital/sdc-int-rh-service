@@ -13,7 +13,7 @@ import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.model.UacEvent;
 import uk.gov.ons.ctp.common.event.model.UacUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
-import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentUacRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.UacRepository;
 
 /**
  * Service implementation responsible for receipt of UAC Events. See Spring Integration flow for
@@ -25,7 +25,7 @@ import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentUacRepository;
 @AllArgsConstructor
 @MessageEndpoint
 public class UACEventReceiverImpl {
-  @Autowired private RespondentUacRepository respondentUacRepo;
+  @Autowired private UacRepository respondentUacRepo;
   @Autowired private AppConfig appConfig;
   @Autowired private EventFilter eventFilter;
 

@@ -11,7 +11,7 @@ import uk.gov.ons.ctp.common.event.model.UacUpdate;
 
 /** A Repository implementation for CRUD operations on UAC data entities */
 @Service
-public class RespondentUacRepository {
+public class UacRepository {
 
   private RetryableCloudDataStore retryableCloudDataStore;
 
@@ -29,7 +29,7 @@ public class RespondentUacRepository {
   }
 
   @Autowired
-  public RespondentUacRepository(RetryableCloudDataStore retryableCloudDataStore) {
+  public UacRepository(RetryableCloudDataStore retryableCloudDataStore) {
     this.retryableCloudDataStore = retryableCloudDataStore;
   }
 

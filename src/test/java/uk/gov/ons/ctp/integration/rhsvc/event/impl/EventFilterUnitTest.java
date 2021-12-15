@@ -15,8 +15,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.ons.ctp.common.event.model.CollectionExercise;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
-import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentCollectionExerciseRepository;
-import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentSurveyRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.CollectionExerciseRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.SurveyRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class EventFilterUnitTest {
@@ -27,8 +27,8 @@ public class EventFilterUnitTest {
   private static final String COLLEX_ID = "c45de4dc-3c3b-11e9-b210-d663bd873d93";
   private static final String MESSAGE_ID = "c45de4dc-3c3b-11e9-b210-d663bd873d93";
   @Mock AppConfig appConfig;
-  @Mock RespondentSurveyRepository mockRespondentSurveyRepo;
-  @Mock RespondentCollectionExerciseRepository mockRespondentCollExRepo;
+  @Mock SurveyRepository mockRespondentSurveyRepo;
+  @Mock CollectionExerciseRepository mockRespondentCollExRepo;
   @InjectMocks EventFilter eventFilter;
 
   @Test

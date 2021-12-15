@@ -20,7 +20,7 @@ import uk.gov.ons.ctp.common.cloud.FirestoreDataStore;
  */
 @Slf4j
 @Service
-public class RespondentStartupRepository {
+public class StartupRepository {
 
   // Cloud data store access for startup checks only
   @Autowired FirestoreDataStore nonRetryableCloudDataStore;

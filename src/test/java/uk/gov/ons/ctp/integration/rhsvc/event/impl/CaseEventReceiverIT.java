@@ -15,15 +15,15 @@ import uk.gov.ons.ctp.common.event.model.CollectionExercise;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.FirestoreTestBase;
 import uk.gov.ons.ctp.integration.rhsvc.event.CaseEventReceiver;
-import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentCaseRepository;
-import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentCollectionExerciseRepository;
-import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentSurveyRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.CaseRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.CollectionExerciseRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.SurveyRepository;
 
 public class CaseEventReceiverIT extends FirestoreTestBase {
   @Autowired private CaseEventReceiver receiver;
-  @Autowired private RespondentSurveyRepository surveyRepo;
-  @Autowired private RespondentCollectionExerciseRepository collExRepo;
-  @Autowired private RespondentCaseRepository caseRepo;
+  @Autowired private SurveyRepository surveyRepo;
+  @Autowired private CollectionExerciseRepository collExRepo;
+  @Autowired private CaseRepository caseRepo;
 
   @BeforeEach
   public void setup() {

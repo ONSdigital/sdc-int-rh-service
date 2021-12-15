@@ -28,12 +28,12 @@ import uk.gov.ons.ctp.common.event.model.UacUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.RespondentHomeFixture;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.config.QueueConfig;
-import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentUacRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.UacRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class UacEventReceiverImplUnit_Test {
 
-  private RespondentUacRepository mockRespondentUacRepo;
+  private UacRepository mockRespondentUacRepo;
   private EventFilter eventFilter;
   private UACEventReceiverImpl target;
   private UacEvent UacEventFixture;
@@ -47,7 +47,7 @@ public class UacEventReceiverImplUnit_Test {
     queueConfig.setQidFilterPrefixes(Stream.of("11", "12", "13", "14").collect(Collectors.toSet()));
     appConfig.setQueueConfig(queueConfig);
     ReflectionTestUtils.setField(target, "appConfig", appConfig);
-    mockRespondentUacRepo = mock(RespondentUacRepository.class);
+    mockRespondentUacRepo = mock(UacRepository.class);
     eventFilter = mock(EventFilter.class);
     target.setRespondentUacRepo(mockRespondentUacRepo);
     target.setEventFilter(eventFilter);

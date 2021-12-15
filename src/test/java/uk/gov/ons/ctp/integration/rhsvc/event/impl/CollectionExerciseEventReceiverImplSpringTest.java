@@ -29,10 +29,10 @@ import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.event.model.CollectionExerciseUpdateEvent;
 import uk.gov.ons.ctp.common.utility.ParallelTestLocks;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
-import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentCaseRepository;
-import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentCollectionExerciseRepository;
-import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentSurveyRepository;
-import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentUacRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.CaseRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.CollectionExerciseRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.SurveyRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.UacRepository;
 
 /** Spring Integration test of flow received from Response Management */
 @SpringBootTest
@@ -45,10 +45,10 @@ public class CollectionExerciseEventReceiverImplSpringTest {
 
   @Autowired private CollectionExerciseEventReceiverImpl receiver;
   @Autowired private PubSubInboundChannelAdapter collectionExerciseEventInbound;
-  @MockBean private RespondentSurveyRepository respondentSurveyRepo;
-  @MockBean private RespondentCollectionExerciseRepository respondentCollExRepo;
-  @MockBean private RespondentCaseRepository respondentCaseRepo;
-  @MockBean private RespondentUacRepository respondentUacRepo;
+  @MockBean private SurveyRepository respondentSurveyRepo;
+  @MockBean private CollectionExerciseRepository respondentCollExRepo;
+  @MockBean private CaseRepository respondentCaseRepo;
+  @MockBean private UacRepository respondentUacRepo;
   @MockBean private PubSubTemplate pubSubTemplate;
   @MockBean private EventFilter eventFilter;
 

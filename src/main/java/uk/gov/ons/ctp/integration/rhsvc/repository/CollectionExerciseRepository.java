@@ -11,7 +11,7 @@ import uk.gov.ons.ctp.common.event.model.CollectionExercise;
 
 /** A repository implementation for CRUD operations on CollectionExercise data entities */
 @Service
-public class RespondentCollectionExerciseRepository {
+public class CollectionExerciseRepository {
   private RetryableCloudDataStore retryableCloudDataStore;
 
   @Value("${spring.cloud.gcp.firestore.project-id}")
@@ -28,7 +28,7 @@ public class RespondentCollectionExerciseRepository {
   }
 
   @Autowired
-  public RespondentCollectionExerciseRepository(RetryableCloudDataStore retryableCloudDataStore) {
+  public CollectionExerciseRepository(RetryableCloudDataStore retryableCloudDataStore) {
     this.retryableCloudDataStore = retryableCloudDataStore;
   }
 

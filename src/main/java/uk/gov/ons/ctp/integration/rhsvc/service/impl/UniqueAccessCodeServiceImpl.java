@@ -18,10 +18,10 @@ import uk.gov.ons.ctp.common.event.model.CollectionExercise;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 import uk.gov.ons.ctp.common.event.model.UacAuthentication;
 import uk.gov.ons.ctp.common.event.model.UacUpdate;
-import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentCaseRepository;
-import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentCollectionExerciseRepository;
-import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentSurveyRepository;
-import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentUacRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.CaseRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.CollectionExerciseRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.SurveyRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.UacRepository;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CollectionExerciseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.SurveyLiteDTO;
@@ -32,10 +32,10 @@ import uk.gov.ons.ctp.integration.rhsvc.service.UniqueAccessCodeService;
 @Slf4j
 @Service
 public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
-  @Autowired private RespondentSurveyRepository surveyDataRepo;
-  @Autowired private RespondentCollectionExerciseRepository collExDataRepo;
-  @Autowired private RespondentCaseRepository caseDataRepo;
-  @Autowired private RespondentUacRepository uacDataRepo;
+  @Autowired private SurveyRepository surveyDataRepo;
+  @Autowired private CollectionExerciseRepository collExDataRepo;
+  @Autowired private CaseRepository caseDataRepo;
+  @Autowired private UacRepository uacDataRepo;
   @Autowired private EventPublisher eventPublisher;
   @Autowired private MapperFacade mapperFacade;
 

@@ -12,12 +12,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.model.CollectionExerciseUpdateEvent;
-import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentCollectionExerciseRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.CollectionExerciseRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class CollectionExerciseEventReceiverImplUnit_test {
 
-  @Mock private RespondentCollectionExerciseRepository mockRespondentCollExRepo;
+  @Mock private CollectionExerciseRepository mockRespondentCollExRepo;
 
   @InjectMocks private CollectionExerciseEventReceiverImpl target;
 

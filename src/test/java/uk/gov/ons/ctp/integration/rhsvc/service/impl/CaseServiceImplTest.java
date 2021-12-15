@@ -34,7 +34,7 @@ import uk.gov.ons.ctp.integration.common.product.ProductReference;
 import uk.gov.ons.ctp.integration.rhsvc.RHSvcBeanMapper;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.config.Sis;
-import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentCaseRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.CaseRepository;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.NewCaseDTO;
 
@@ -48,7 +48,7 @@ public class CaseServiceImplTest {
 
   @InjectMocks private CaseServiceImpl caseSvc;
 
-  @Mock private RespondentCaseRepository dataRepo;
+  @Mock private CaseRepository dataRepo;
 
   @Mock private EventPublisher eventPublisher;
 
@@ -79,10 +79,10 @@ public class CaseServiceImplTest {
   @Test
   public void getCaseFoundWithSingleResult() throws Exception {
 
-    when(dataRepo.readCaseUpdateBySampleAttribute("uprn", UPRN, true))
+    when(dataRepo.findCaseUpdatesBySampleAttribute("uprn", UPRN, true))
         .thenReturn(caseUpdates.subList(0, 1));
 
-    List<CaseDTO> rmCase = caseSvc.readCaseUpdateBySampleAttribute("uprn", UPRN);
+    List<CaseDTO> rmCase = caseSvc.findCasesBySampleAttribute("uprn", UPRN);
 
     assertNotNull(rmCase);
     assertEquals(1, rmCase.size());
@@ -93,10 +93,10 @@ public class CaseServiceImplTest {
   @Test
   public void getCaseFoundWithMultipleResults() throws Exception {
 
-    when(dataRepo.readCaseUpdateBySampleAttribute("townName", "Upton", true))
+    when(dataRepo.findCaseUpdatesBySampleAttribute("townName", "Upton", true))
         .thenReturn(caseUpdates);
 
-    List<CaseDTO> rmCase = caseSvc.readCaseUpdateBySampleAttribute("townName", "Upton");
+    List<CaseDTO> rmCase = caseSvc.findCasesBySampleAttribute("townName", "Upton");
 
     assertNotNull(rmCase);
     assertEquals(2, rmCase.size());
@@ -118,19 +118,19 @@ public class CaseServiceImplTest {
   /** Test throws a CTPException where no valid Address cases are returned from repository */
   @Test
   public void getInvalidAddressCaseByUPRNOnly() throws Exception {
-    when(dataRepo.readCaseUpdateBySampleAttribute("uprn", UPRN, true))
+    when(dataRepo.findCaseUpdatesBySampleAttribute("uprn", UPRN, true))
         .thenThrow(new CTPException(null));
-    assertThrows(CTPException.class, () -> caseSvc.readCaseUpdateBySampleAttribute("uprn", UPRN));
+    assertThrows(CTPException.class, () -> caseSvc.findCasesBySampleAttribute("uprn", UPRN));
   }
 
   /** Test for an empty result set when no cases returned from repository */
   @Test
   public void getCaseByUPRNNotFound() throws Exception {
 
-    when(dataRepo.readCaseUpdateBySampleAttribute("doorNumber", "898123", true))
+    when(dataRepo.findCaseUpdatesBySampleAttribute("doorNumber", "898123", true))
         .thenReturn(new ArrayList<>());
 
-    List<CaseDTO> foundCases = caseSvc.readCaseUpdateBySampleAttribute("doorNumber", "898123");
+    List<CaseDTO> foundCases = caseSvc.findCasesBySampleAttribute("doorNumber", "898123");
     assertTrue(foundCases.isEmpty());
   }
 

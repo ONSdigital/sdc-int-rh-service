@@ -13,7 +13,7 @@ import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.model.CaseEvent;
 import uk.gov.ons.ctp.common.event.model.CaseUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.event.CaseEventReceiver;
-import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentCaseRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.CaseRepository;
 
 /**
  * Service implementation responsible for receipt of Case Events. See Spring Integration flow for
@@ -25,7 +25,7 @@ import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentCaseRepository;
 @AllArgsConstructor
 @MessageEndpoint
 public class CaseEventReceiverImpl implements CaseEventReceiver {
-  @Autowired private RespondentCaseRepository respondentCaseRepo;
+  @Autowired private CaseRepository respondentCaseRepo;
 
   @Autowired private EventFilter eventFilter;
 

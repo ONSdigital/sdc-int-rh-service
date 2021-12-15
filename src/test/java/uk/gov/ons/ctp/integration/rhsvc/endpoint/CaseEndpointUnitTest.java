@@ -14,6 +14,7 @@ import static uk.gov.ons.ctp.common.utility.MockMvcControllerAdviceHelper.mockAd
 import static uk.gov.ons.ctp.integration.rhsvc.RespondentHomeFixture.EXPECTED_JSON_CONTENT_TYPE;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,7 +26,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import uk.gov.ons.ctp.common.FixtureHelper;
-import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.error.RestExceptionHandler;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.NewCaseDTO;
@@ -39,7 +39,6 @@ public class CaseEndpointUnitTest {
 
   private static final String UPRN = "123456";
   private static final String INCONSISTENT_CASEID = "ff9999f9-ff9f-9f99-f999-9ff999ff9ff9";
-  private static final String ERROR_MESSAGE = "Failed to retrieve UPRN";
 
   @InjectMocks private CaseEndpoint caseEndpoint;
 
@@ -63,7 +62,7 @@ public class CaseEndpointUnitTest {
     CaseDTO rmCase0 = caseDTO.get(0);
     CaseDTO rmCase1 = caseDTO.get(1);
 
-    when(caseService.readCaseUpdateBySampleAttribute("uprn", UPRN)).thenReturn(caseDTO);
+    when(caseService.findCasesBySampleAttribute("uprn", UPRN)).thenReturn(caseDTO);
 
     mockMvc
         .perform(get("/cases/attribute/uprn/{uprn}", UPRN))
@@ -82,18 +81,17 @@ public class CaseEndpointUnitTest {
         .andExpect(jsonPath("$[1].sample.postcode", is(rmCase1.getSample().get("postcode"))));
   }
 
-  /** Test returns resource not found for non-existent UPRN */
+  /** Test not finding any matching cases */
   @Test
-  public void getCaseByUPRNNotFound() throws Exception {
-
-    when(caseService.readCaseUpdateBySampleAttribute("uprn", UPRN))
-        .thenThrow(new CTPException(CTPException.Fault.RESOURCE_NOT_FOUND, ERROR_MESSAGE));
+  public void caseNotFound() throws Exception {
+    List<CaseDTO> emptyCaseResultsList = new ArrayList<>();
+    when(caseService.findCasesBySampleAttribute("shoeSize", "14")).thenReturn(emptyCaseResultsList);
 
     mockMvc
-        .perform(get("/cases/attribute/uprn/{uprn}", UPRN))
-        .andExpect(status().isNotFound())
-        .andExpect(jsonPath("$.error.code", is(CTPException.Fault.RESOURCE_NOT_FOUND.toString())))
-        .andExpect(jsonPath("$.error.message", is(ERROR_MESSAGE)));
+        .perform(get("/cases/attribute/shoeSize/14"))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(EXPECTED_JSON_CONTENT_TYPE))
+        .andExpect(jsonPath("$.length()", is(0)));
   }
 
   @Test
