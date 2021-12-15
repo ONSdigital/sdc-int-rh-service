@@ -3,6 +3,7 @@ package uk.gov.ons.ctp.integration.rhsvc.endpoint;
 import static uk.gov.ons.ctp.common.log.ScopedStructuredArguments.kv;
 
 import io.micrometer.core.annotation.Timed;
+import java.util.List;
 import java.util.UUID;
 import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.ons.ctp.common.domain.UniquePropertyReferenceNumber;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.error.CTPException.Fault;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
@@ -33,19 +33,30 @@ public class CaseEndpoint {
   @Autowired private CaseService caseService;
 
   /**
-   * the GET end point to return the latest valid Non HI Case by UPRN
+   * the GET end point to return latest valid Case which matches the supplied sample attribute
+   * name/value.
    *
-   * @param uprn the UPRN
-   * @return Returned latest Non HI case with valid address for the UPRN
+   * @param attributeKey - is the name of the field in the sample data to search by.
+   * @param attributeValue - is the value that target case(s) must contain.
+   * @return all valid cases which have a sample field which matches the supplied
+   *     attributeKey/Value.
    * @throws CTPException something went wrong - thrown by case service
    */
-  @RequestMapping(value = "/uprn/{uprn}", method = RequestMethod.GET)
-  public ResponseEntity<CaseDTO> getCaseByUPRN(
-      @PathVariable(value = "uprn") final UniquePropertyReferenceNumber uprn) throws CTPException {
-    log.info("Entering GET getLatestValidNonHICaseByUPRN", kv("pathParam.uprn", uprn));
+  @RequestMapping(value = "attribute/{attributeKey}/{attributeValue}", method = RequestMethod.GET)
+  public ResponseEntity<List<CaseDTO>> findCasesByAttribute(
+      @PathVariable(value = "attributeKey") final String attributeKey,
+      @PathVariable(value = "attributeValue") final String attributeValue)
+      throws CTPException {
+    log.info(
+        "Entering GET getCaseByAttribute",
+        kv("attributeKey", attributeKey),
+        kv("attributeValue", attributeValue));
 
-    CaseDTO result = caseService.getLatestValidCaseByUPRN(uprn);
-    log.debug("Exit GET getLatestValidNonHICaseByUPRN", kv("pathParam.uprn", uprn));
+    List<CaseDTO> result = caseService.findCasesBySampleAttribute(attributeKey, attributeValue);
+    log.debug(
+        "Exit GET getCaseByAttribute",
+        kv("attributeName", attributeKey),
+        kv("attributeValue", attributeValue));
     return ResponseEntity.ok(result);
   }
 

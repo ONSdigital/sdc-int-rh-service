@@ -71,7 +71,7 @@ public class UniqueAccessCodeEndpointTest {
         .andExpect(
             jsonPath("$.collectionExercise.collectionExerciseId", is(COLLECTION_EXERCISE_ID)))
         .andExpect(jsonPath("$.qid", is(QID)))
-        .andExpect(jsonPath("$.collectionCase.address.postcode", is(POSTCODE)))
+        .andExpect(jsonPath("$.collectionCase.sample.postcode", is(POSTCODE)))
         .andExpect(jsonPath("$.receiptReceived", is(Boolean.TRUE)))
         .andExpect(jsonPath("$.eqLaunched", is(Boolean.TRUE)))
         .andExpect(jsonPath("$.wave", is(82)));

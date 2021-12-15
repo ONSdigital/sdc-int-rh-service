@@ -1,5 +1,6 @@
 package uk.gov.ons.ctp.integration.rhsvc.representation;
 
+import java.util.Map;
 import java.util.UUID;
 import lombok.Data;
 
@@ -13,5 +14,6 @@ public class CaseDTO {
   private boolean invalid;
   private String refusalReceived;
   private String caseRef;
-  private AddressDTO address;
+  private Map<String, String> sample;
+  private Map<String, String> sampleSensitive;
 }

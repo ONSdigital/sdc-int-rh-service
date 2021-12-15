@@ -1,6 +1,6 @@
 package uk.gov.ons.ctp.integration.rhsvc.service;
 
-import uk.gov.ons.ctp.common.domain.UniquePropertyReferenceNumber;
+import java.util.List;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.NewCaseDTO;
@@ -14,13 +14,16 @@ import uk.gov.ons.ctp.integration.rhsvc.representation.SMSFulfilmentRequestDTO;
 public interface CaseService {
 
   /**
-   * Retrieve the data relating to non-HI latest valid Case by address UPRN
+   * Retrieve case(s) which have a sample attribute matching the supplied key/value.
    *
-   * @param uprn of address for which latest valid case details are requested
-   * @return Case details for address UPRN
+   * @param attributeKey is the name of the attribute to search on.
+   * @param attributeValue is the value that the search attribute must equal for a case to be
+   *     returned.
+   * @return a List containing matching cases. If no cases then the list will be empty.
    * @throws CTPException if anything went wrong.
    */
-  CaseDTO getLatestValidCaseByUPRN(final UniquePropertyReferenceNumber uprn) throws CTPException;
+  List<CaseDTO> findCasesBySampleAttribute(final String attributeKey, final String attributeValue)
+      throws CTPException;
 
   void fulfilmentRequestBySMS(SMSFulfilmentRequestDTO requestBodyDTO) throws CTPException;
 

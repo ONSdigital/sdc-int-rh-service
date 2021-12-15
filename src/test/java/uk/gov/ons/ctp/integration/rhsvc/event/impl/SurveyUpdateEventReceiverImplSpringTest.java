@@ -29,7 +29,10 @@ import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdateEvent;
 import uk.gov.ons.ctp.common.utility.ParallelTestLocks;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
-import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentDataRepositoryImpl;
+import uk.gov.ons.ctp.integration.rhsvc.repository.CaseRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.CollectionExerciseRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.SurveyRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.UacRepository;
 
 /** Spring Integration test of flow received from Response Management */
 @SpringBootTest
@@ -42,7 +45,10 @@ public class SurveyUpdateEventReceiverImplSpringTest {
 
   @Autowired private SurveyEventReceiverImpl receiver;
   @Autowired private PubSubInboundChannelAdapter surveyEventInbound;
-  @MockBean private RespondentDataRepositoryImpl respondentDataRepo;
+  @MockBean private SurveyRepository respondentSurveyRepo;
+  @MockBean private CollectionExerciseRepository respondentCollExRepo;
+  @MockBean private CaseRepository respondentCaseRepo;
+  @MockBean private UacRepository respondentUacRepo;
   @MockBean private PubSubTemplate pubSubTemplate;
   @MockBean private EventFilter eventFilter;
 

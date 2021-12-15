@@ -10,7 +10,8 @@ import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.model.CollectionExercise;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
-import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.CollectionExerciseRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.SurveyRepository;
 
 @Slf4j
 @Component
@@ -18,22 +19,27 @@ public class EventFilter {
 
   private AppConfig appConfig;
 
-  private RespondentDataRepository respondentDataRepo;
+  private SurveyRepository respondentSurveyRepo;
+  private CollectionExerciseRepository respondentCollExRepo;
 
-  public EventFilter(AppConfig appConfig, RespondentDataRepository respondentDataRepo) {
+  public EventFilter(
+      AppConfig appConfig,
+      SurveyRepository respondentSurveyRepo,
+      CollectionExerciseRepository respondentCollExRepo) {
     this.appConfig = appConfig;
-    this.respondentDataRepo = respondentDataRepo;
+    this.respondentSurveyRepo = respondentSurveyRepo;
+    this.respondentCollExRepo = respondentCollExRepo;
   }
 
   public boolean isValidEvent(String surveyId, String collexId, String caseId, String messageId)
       throws CTPException {
 
-    Optional<SurveyUpdate> surveyUpdateOpt = respondentDataRepo.readSurvey(surveyId);
+    Optional<SurveyUpdate> surveyUpdateOpt = respondentSurveyRepo.readSurvey(surveyId);
     if (surveyUpdateOpt.isPresent()) {
       SurveyUpdate surveyUpdate = surveyUpdateOpt.get();
       if (isAcceptedSurveyType(surveyUpdate.surveyType())) {
         Optional<CollectionExercise> collectionExercise =
-            respondentDataRepo.readCollectionExercise(collexId);
+            respondentCollExRepo.readCollectionExercise(collexId);
         if (collectionExercise.isPresent()) {
           return true;
         } else {

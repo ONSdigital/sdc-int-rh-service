@@ -12,17 +12,17 @@ import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.model.SurveyFulfilment;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.RHSvcBeanMapper;
-import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.SurveyRepository;
 import uk.gov.ons.ctp.integration.rhsvc.representation.ProductDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.SurveyDTO;
 import uk.gov.ons.ctp.integration.rhsvc.service.SurveyService;
 
 @Service
 public class SurveyServiceImpl implements SurveyService {
-  private RespondentDataRepository dataRepo;
+  private SurveyRepository dataRepo;
   private RHSvcBeanMapper mapper;
 
-  public SurveyServiceImpl(RespondentDataRepository dataRepo, RHSvcBeanMapper mapper) {
+  public SurveyServiceImpl(SurveyRepository dataRepo, RHSvcBeanMapper mapper) {
     this.dataRepo = dataRepo;
     this.mapper = mapper;
   }

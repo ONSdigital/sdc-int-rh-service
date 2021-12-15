@@ -53,7 +53,7 @@ import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient.Domain;
 import uk.gov.ons.ctp.integration.rhsvc.RHSvcBeanMapper;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.config.RateLimiterConfig;
-import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.CaseRepository;
 import uk.gov.ons.ctp.integration.rhsvc.representation.PostalFulfilmentRequestDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.SMSFulfilmentRequestDTO;
 
@@ -66,7 +66,7 @@ public class CaseServiceImplFulfilmentTest {
 
   @Mock private AppConfig appConfig;
 
-  @Mock private RespondentDataRepository dataRepo;
+  @Mock private CaseRepository dataRepo;
 
   @Mock private EventPublisher eventPublisher;
 
@@ -492,7 +492,7 @@ public class CaseServiceImplFulfilmentTest {
   private void verifyRateLimiterCall(
       int numTimes, String phoneNo, String clientIp, CaseUpdate caseDetails) throws Exception {
     UniquePropertyReferenceNumber uprn =
-        UniquePropertyReferenceNumber.create(caseDetails.getSample().getUprn());
+        UniquePropertyReferenceNumber.create(caseDetails.getSample().get("uprn"));
     verify(rateLimiterClient, times(numTimes))
         .checkFulfilmentRateLimit(
             eq(Domain.RH), productCaptor.capture(), eq(clientIp), eq(uprn), eq(phoneNo));

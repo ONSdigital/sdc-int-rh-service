@@ -12,12 +12,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.model.CollectionExerciseUpdateEvent;
-import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.CollectionExerciseRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class CollectionExerciseEventReceiverImplUnit_test {
 
-  @Mock private RespondentDataRepository mockRespondentDataRepo;
+  @Mock private CollectionExerciseRepository mockRespondentCollExRepo;
 
   @InjectMocks private CollectionExerciseEventReceiverImpl target;
 
@@ -26,7 +26,7 @@ public class CollectionExerciseEventReceiverImplUnit_test {
     CollectionExerciseUpdateEvent collectionExerciseUpdateEvent =
         FixtureHelper.loadPackageFixtures(CollectionExerciseUpdateEvent[].class).get(0);
     target.acceptCollectionExerciseUpdateEvent(collectionExerciseUpdateEvent);
-    verify(mockRespondentDataRepo)
+    verify(mockRespondentCollExRepo)
         .writeCollectionExercise(
             collectionExerciseUpdateEvent.getPayload().getCollectionExerciseUpdate());
   }
@@ -36,7 +36,7 @@ public class CollectionExerciseEventReceiverImplUnit_test {
     CollectionExerciseUpdateEvent collectionExerciseUpdateEvent =
         FixtureHelper.loadPackageFixtures(CollectionExerciseUpdateEvent[].class).get(0);
     Mockito.doThrow(new CTPException(CTPException.Fault.RESOURCE_NOT_FOUND))
-        .when(mockRespondentDataRepo)
+        .when(mockRespondentCollExRepo)
         .writeCollectionExercise(
             collectionExerciseUpdateEvent.getPayload().getCollectionExerciseUpdate());
     assertThrows(

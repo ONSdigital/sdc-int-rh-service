@@ -37,7 +37,10 @@ import uk.gov.ons.ctp.common.event.model.UacEvent;
 import uk.gov.ons.ctp.common.utility.ParallelTestLocks;
 import uk.gov.ons.ctp.integration.rhsvc.RespondentHomeFixture;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
-import uk.gov.ons.ctp.integration.rhsvc.repository.impl.RespondentDataRepositoryImpl;
+import uk.gov.ons.ctp.integration.rhsvc.repository.CaseRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.CollectionExerciseRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.SurveyRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.UacRepository;
 
 /** Spring Integration test of flow received from Response Management */
 @SpringBootTest
@@ -52,7 +55,10 @@ public class UacEventReceiverImplSpringTest {
   @Autowired private AppConfig appConfig;
   @Autowired private UACEventReceiverImpl receiver;
   @MockBean private PubSubTemplate pubSubTemplate;
-  @MockBean private RespondentDataRepositoryImpl respondentDataRepo;
+  @MockBean private SurveyRepository respondentSurveyRepo;
+  @MockBean private CollectionExerciseRepository respondentCollExRepo;
+  @MockBean private CaseRepository respondentCaseRepo;
+  @MockBean private UacRepository respondentUacRepo;
   @MockBean private EventFilter eventFilter;
 
   @BeforeEach
@@ -77,7 +83,7 @@ public class UacEventReceiverImplSpringTest {
     ArgumentCaptor<UacEvent> captur = ArgumentCaptor.forClass(UacEvent.class);
     verify(receiver).acceptUACEvent(captur.capture());
     assertTrue(captur.getValue().getPayload().equals(uacEvent.getPayload()));
-    verify(respondentDataRepo).writeUAC(any());
+    verify(respondentUacRepo).writeUAC(any());
   }
 
   /** Test the receiver flow for UAC updated */
@@ -105,8 +111,8 @@ public class UacEventReceiverImplSpringTest {
     ArgumentCaptor<UacEvent> captur = ArgumentCaptor.forClass(UacEvent.class);
     verify(receiver).acceptUACEvent(captur.capture());
     assertTrue(captur.getValue().getPayload().equals(uacEvent.getPayload()));
-    verify(respondentDataRepo, never()).writeUAC(any());
-    verify(respondentDataRepo, never()).writeUAC(any());
+    verify(respondentUacRepo, never()).writeUAC(any());
+    verify(respondentUacRepo, never()).writeUAC(any());
   }
 
   @Test
@@ -132,6 +138,6 @@ public class UacEventReceiverImplSpringTest {
     assertEquals(sdf.parse("2011-08-12T20:17:46Z"), captur.getValue().getHeader().getDateTime());
     assertEquals(uacEvent.getHeader(), captur.getValue().getHeader());
     assertTrue(captur.getValue().getPayload().equals(uacEvent.getPayload()));
-    verify(respondentDataRepo).writeUAC(any());
+    verify(respondentUacRepo).writeUAC(any());
   }
 }

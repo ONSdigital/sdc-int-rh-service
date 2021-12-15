@@ -35,7 +35,10 @@ import uk.gov.ons.ctp.common.event.model.Header;
 import uk.gov.ons.ctp.common.utility.ParallelTestLocks;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.event.CaseEventReceiver;
-import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.CaseRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.CollectionExerciseRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.SurveyRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.UacRepository;
 
 /** Spring Integration test of flow received from Response Management */
 @SpringBootTest
@@ -48,7 +51,10 @@ public class CaseEventReceiverImplSpringTest {
 
   @Autowired private CaseEventReceiver receiver;
   @Autowired private PubSubInboundChannelAdapter caseEventInbound;
-  @MockBean private RespondentDataRepository respondentDataRepo;
+  @MockBean private SurveyRepository respondentSurveyRepo;
+  @MockBean private CollectionExerciseRepository respondentCollExRepo;
+  @MockBean private CaseRepository respondentCaseRepo;
+  @MockBean private UacRepository respondentUacRepo;
   @MockBean private PubSubTemplate pubSubTemplate;
   @MockBean private EventFilter eventFilter;
 
@@ -77,7 +83,7 @@ public class CaseEventReceiverImplSpringTest {
     ArgumentCaptor<CaseEvent> captur = ArgumentCaptor.forClass(CaseEvent.class);
     verify(receiver).acceptCaseEvent(captur.capture());
     assertEquals(captur.getValue().getPayload(), caseEvent.getPayload());
-    verify(respondentDataRepo, times(1)).writeCaseUpdate(caseEvent.getPayload().getCaseUpdate());
+    verify(respondentCaseRepo, times(1)).writeCaseUpdate(caseEvent.getPayload().getCaseUpdate());
   }
 
   /** Test the receiver flow for SIS case event */
@@ -100,7 +106,7 @@ public class CaseEventReceiverImplSpringTest {
     ArgumentCaptor<CaseEvent> captur = ArgumentCaptor.forClass(CaseEvent.class);
     verify(receiver).acceptCaseEvent(captur.capture());
     assertEquals(captur.getValue().getPayload(), caseEvent.getPayload());
-    verify(respondentDataRepo, times(0)).writeCaseUpdate(caseEvent.getPayload().getCaseUpdate());
+    verify(respondentCaseRepo, times(0)).writeCaseUpdate(caseEvent.getPayload().getCaseUpdate());
   }
 
   @Test

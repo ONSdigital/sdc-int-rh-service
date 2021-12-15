@@ -12,7 +12,7 @@ import org.springframework.integration.annotation.ServiceActivator;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.model.CollectionExercise;
 import uk.gov.ons.ctp.common.event.model.CollectionExerciseUpdateEvent;
-import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.CollectionExerciseRepository;
 
 /** Service implementation responsible for receipt of Collection Exercise Events. */
 @Slf4j
@@ -21,7 +21,7 @@ import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
 @AllArgsConstructor
 @MessageEndpoint
 public class CollectionExerciseEventReceiverImpl {
-  @Autowired private RespondentDataRepository respondentDataRepo;
+  @Autowired private CollectionExerciseRepository respondentCollExRepo;
 
   /**
    * Message end point for events from Response Management.
@@ -44,7 +44,7 @@ public class CollectionExerciseEventReceiverImpl {
         kv("collectionExerciseId", collectionExercise.getCollectionExerciseId()));
 
     try {
-      respondentDataRepo.writeCollectionExercise(collectionExercise);
+      respondentCollExRepo.writeCollectionExercise(collectionExercise);
     } catch (CTPException ctpEx) {
       log.error(
           "Collection Exercise Event processing failed",

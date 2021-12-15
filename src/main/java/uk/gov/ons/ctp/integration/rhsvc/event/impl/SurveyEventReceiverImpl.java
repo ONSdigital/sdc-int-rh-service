@@ -13,7 +13,7 @@ import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdateEvent;
 import uk.gov.ons.ctp.integration.rhsvc.event.SurveyEventReceiver;
-import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.SurveyRepository;
 
 /** Service implementation responsible for receipt of Survey Events. */
 @Slf4j
@@ -22,7 +22,7 @@ import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
 @AllArgsConstructor
 @MessageEndpoint
 public class SurveyEventReceiverImpl implements SurveyEventReceiver {
-  @Autowired private RespondentDataRepository respondentDataRepo;
+  @Autowired private SurveyRepository respondentSurveyRepo;
 
   /**
    * Message end point for events from Response Management.
@@ -42,7 +42,7 @@ public class SurveyEventReceiverImpl implements SurveyEventReceiver {
         kv("surveyId", surveyUpdate.getSurveyId()));
 
     try {
-      respondentDataRepo.writeSurvey(surveyUpdate);
+      respondentSurveyRepo.writeSurvey(surveyUpdate);
     } catch (CTPException ctpEx) {
       log.error("Survey Event processing failed", kv("surveyMessageId", surveyMessageId), ctpEx);
       throw ctpEx;

@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import ma.glasnost.orika.MapperFacade;
@@ -37,7 +36,7 @@ import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient;
 import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient.Domain;
 import uk.gov.ons.ctp.integration.rhsvc.RHSvcBeanMapper;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
-import uk.gov.ons.ctp.integration.rhsvc.repository.RespondentDataRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.CaseRepository;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.FulfilmentRequestDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.NewCaseDTO;
@@ -50,7 +49,7 @@ import uk.gov.ons.ctp.integration.rhsvc.service.CaseService;
 @Service
 public class CaseServiceImpl implements CaseService {
   @Autowired private AppConfig appConfig;
-  @Autowired private RespondentDataRepository dataRepo;
+  @Autowired private CaseRepository dataRepo;
   @Autowired private MapperFacade mapperFacade;
   @Autowired private EventPublisher eventPublisher;
   @Autowired private ProductReference productReference;
@@ -59,21 +58,17 @@ public class CaseServiceImpl implements CaseService {
   private MapperFacade mapper = new RHSvcBeanMapper();
 
   @Override
-  public CaseDTO getLatestValidCaseByUPRN(final UniquePropertyReferenceNumber uprn)
-      throws CTPException {
+  public List<CaseDTO> findCasesBySampleAttribute(
+      final String attributeKey, final String attributeValue) throws CTPException {
 
-    Optional<CaseUpdate> caseFound =
-        dataRepo.readCaseUpdateByUprn(Long.toString(uprn.getValue()), true);
-    if (caseFound.isPresent()) {
-      log.debug(
-          "Latest valid case retrieved for UPRN",
-          kv("case", caseFound.get().getCaseId()),
-          kv("uprn", uprn));
-      return mapperFacade.map(caseFound.get(), CaseDTO.class);
-    } else {
-      log.warn("No cases returned for uprn", kv("uprn", uprn));
-      throw new CTPException(Fault.RESOURCE_NOT_FOUND, "Failed to retrieve Case");
-    }
+    List<CaseUpdate> foundCases =
+        dataRepo.findCaseUpdatesBySampleAttribute(attributeKey, attributeValue, true);
+    log.debug(
+        "Search for cases by attribute value",
+        kv("numberFoundCase", foundCases.size()),
+        kv("searchAttributeName", attributeKey),
+        kv("searchValue", attributeValue));
+    return mapperFacade.mapAsList(foundCases, CaseDTO.class);
   }
 
   /**
@@ -144,7 +139,7 @@ public class CaseServiceImpl implements CaseService {
       DeliveryChannel deliveryChannel, FulfilmentRequestDTO request, CaseUpdate caseDetails)
       throws CTPException {
     Map<String, Product> map = new HashMap<>();
-    Region region = Region.valueOf(caseDetails.getSample().getRegion());
+    Region region = Region.valueOf(caseDetails.getSample().get("region"));
     for (String fulfilmentCode : new HashSet<>(request.getFulfilmentCodes())) {
       map.put(fulfilmentCode, findProduct(fulfilmentCode, deliveryChannel, region));
     }
@@ -167,7 +162,8 @@ public class CaseServiceImpl implements CaseService {
       for (Product product : products) {
         log.debug("Recording rate-limiting", kv("fulfilmentCode", product.getFulfilmentCode()));
         UniquePropertyReferenceNumber uprn =
-            UniquePropertyReferenceNumber.create(caseDetails.getSample().getUprn());
+            UniquePropertyReferenceNumber.create(
+                caseDetails.getSample().get(CaseUpdate.ATTRIBUTE_UPRN));
         recordRateLimiting(contact, product, ipAddress, uprn);
       }
     } else {
