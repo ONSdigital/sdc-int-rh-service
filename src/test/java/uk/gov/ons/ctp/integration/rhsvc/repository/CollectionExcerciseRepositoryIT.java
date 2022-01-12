@@ -8,7 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.ons.ctp.common.FixtureHelper;
-import uk.gov.ons.ctp.common.event.model.CollectionExercise;
+import uk.gov.ons.ctp.common.event.model.CollectionExerciseUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.FirestoreTestBase;
 
 public class CollectionExcerciseRepositoryIT extends FirestoreTestBase {
@@ -25,11 +25,11 @@ public class CollectionExcerciseRepositoryIT extends FirestoreTestBase {
   public void shouldReadWriteCollectionExercise() throws Exception {
     assertTrue(collExRepo.readCollectionExercise(COLLEX_ID).isEmpty());
 
-    CollectionExercise collex =
-        FixtureHelper.loadPackageFixtures(CollectionExercise[].class).get(0);
+    CollectionExerciseUpdate collex =
+        FixtureHelper.loadPackageFixtures(CollectionExerciseUpdate[].class).get(0);
     collExRepo.writeCollectionExercise(collex);
 
-    Optional<CollectionExercise> retrieved = collExRepo.readCollectionExercise(COLLEX_ID);
+    Optional<CollectionExerciseUpdate> retrieved = collExRepo.readCollectionExercise(COLLEX_ID);
     assertTrue(retrieved.isPresent());
     assertEquals(collex, retrieved.get());
   }

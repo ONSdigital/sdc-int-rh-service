@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.ons.ctp.common.domain.EstabType;
 import uk.gov.ons.ctp.common.event.model.Address;
 import uk.gov.ons.ctp.common.event.model.AddressCompact;
-import uk.gov.ons.ctp.common.event.model.CollectionExercise;
+import uk.gov.ons.ctp.common.event.model.CollectionExerciseUpdate;
 import uk.gov.ons.ctp.common.event.model.NewCaseSample;
 import uk.gov.ons.ctp.common.event.model.NewCaseSampleSensitive;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
@@ -55,7 +55,7 @@ public class RHSvcBeanMapper extends ConfigurableMapper {
         .register();
 
     factory
-        .classMap(CollectionExercise.class, CollectionExerciseDTO.class)
+        .classMap(CollectionExerciseUpdate.class, CollectionExerciseDTO.class)
         .field("metadata.numberOfWaves", "numberOfWaves")
         .field("metadata.waveLength", "waveLength")
         .field("metadata.cohorts", "cohorts")

@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.ons.ctp.common.cloud.RetryableCloudDataStore;
 import uk.gov.ons.ctp.common.error.CTPException;
-import uk.gov.ons.ctp.common.event.model.CollectionExercise;
+import uk.gov.ons.ctp.common.event.model.CollectionExerciseUpdate;
 
 /** A repository implementation for CRUD operations on CollectionExercise data entities */
 @Service
@@ -39,10 +39,10 @@ public class CollectionExerciseRepository {
    * @return - deserialised version of the stored object
    * @throws CTPException - if a cloud exception was detected.
    */
-  public Optional<CollectionExercise> readCollectionExercise(final String collectionExerciseId)
-      throws CTPException {
+  public Optional<CollectionExerciseUpdate> readCollectionExercise(
+      final String collectionExerciseId) throws CTPException {
     return retryableCloudDataStore.retrieveObject(
-        CollectionExercise.class, collectionExerciseSchema, collectionExerciseId);
+        CollectionExerciseUpdate.class, collectionExerciseSchema, collectionExerciseId);
   }
 
   /**
@@ -51,7 +51,7 @@ public class CollectionExerciseRepository {
    * @param collectionExercise - is the case to be stored in the cloud.
    * @throws CTPException - if a cloud exception was detected.
    */
-  public void writeCollectionExercise(final CollectionExercise collectionExercise)
+  public void writeCollectionExercise(final CollectionExerciseUpdate collectionExercise)
       throws CTPException {
     String id = collectionExercise.getCollectionExerciseId();
     retryableCloudDataStore.storeObject(collectionExerciseSchema, id, collectionExercise, id);

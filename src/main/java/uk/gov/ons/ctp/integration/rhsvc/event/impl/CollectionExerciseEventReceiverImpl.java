@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.annotation.MessageEndpoint;
 import org.springframework.integration.annotation.ServiceActivator;
 import uk.gov.ons.ctp.common.error.CTPException;
-import uk.gov.ons.ctp.common.event.model.CollectionExercise;
+import uk.gov.ons.ctp.common.event.model.CollectionExerciseUpdate;
 import uk.gov.ons.ctp.common.event.model.CollectionExerciseUpdateEvent;
 import uk.gov.ons.ctp.integration.rhsvc.repository.CollectionExerciseRepository;
 
@@ -34,7 +34,7 @@ public class CollectionExerciseEventReceiverImpl {
   public void acceptCollectionExerciseUpdateEvent(
       CollectionExerciseUpdateEvent collectionExerciseUpdateEvent) throws CTPException {
 
-    CollectionExercise collectionExercise =
+    CollectionExerciseUpdate collectionExercise =
         collectionExerciseUpdateEvent.getPayload().getCollectionExerciseUpdate();
     String collexMessageId = collectionExerciseUpdateEvent.getHeader().getMessageId().toString();
 
