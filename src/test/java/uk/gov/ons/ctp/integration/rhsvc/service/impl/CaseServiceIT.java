@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.domain.UniquePropertyReferenceNumber;
 import uk.gov.ons.ctp.common.event.model.CaseUpdate;
-import uk.gov.ons.ctp.common.event.model.CollectionExercise;
+import uk.gov.ons.ctp.common.event.model.CollectionExerciseUpdate;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.FirestoreTestBase;
 import uk.gov.ons.ctp.integration.rhsvc.repository.CaseRepository;
@@ -36,8 +36,8 @@ public class CaseServiceIT extends FirestoreTestBase {
     SurveyUpdate survey = FixtureHelper.loadPackageFixtures(SurveyUpdate[].class).get(0);
     survey.setSurveyId(caze.getSurveyId());
     surveyRepo.writeSurvey(survey);
-    CollectionExercise collex =
-        FixtureHelper.loadPackageFixtures(CollectionExercise[].class).get(0);
+    CollectionExerciseUpdate collex =
+        FixtureHelper.loadPackageFixtures(CollectionExerciseUpdate[].class).get(0);
     collex.setSurveyId(survey.getSurveyId());
     collex.setCollectionExerciseId(caze.getCollectionExerciseId());
     collExRepo.writeCollectionExercise(collex);

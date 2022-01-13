@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.ons.ctp.common.domain.SurveyType;
 import uk.gov.ons.ctp.common.error.CTPException;
-import uk.gov.ons.ctp.common.event.model.CollectionExercise;
+import uk.gov.ons.ctp.common.event.model.CollectionExerciseUpdate;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.repository.CollectionExerciseRepository;
@@ -38,7 +38,7 @@ public class EventFilter {
     if (surveyUpdateOpt.isPresent()) {
       SurveyUpdate surveyUpdate = surveyUpdateOpt.get();
       if (isAcceptedSurveyType(surveyUpdate.surveyType())) {
-        Optional<CollectionExercise> collectionExercise =
+        Optional<CollectionExerciseUpdate> collectionExercise =
             respondentCollExRepo.readCollectionExercise(collexId);
         if (collectionExercise.isPresent()) {
           return true;
@@ -66,6 +66,9 @@ public class EventFilter {
   }
 
   private boolean isAcceptedSurveyType(SurveyType type) {
-    return type != null && appConfig.getSurveys().contains(type.getBasename());
+    return type != null
+        && appConfig.getSurveys().stream()
+            .map(s -> s.toUpperCase())
+            .anyMatch(s -> s.equals(type.name()));
   }
 }

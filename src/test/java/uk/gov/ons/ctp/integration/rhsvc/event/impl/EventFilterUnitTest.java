@@ -12,7 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.gov.ons.ctp.common.event.model.CollectionExercise;
+import uk.gov.ons.ctp.common.event.model.CollectionExerciseUpdate;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.repository.CollectionExerciseRepository;
@@ -37,7 +37,7 @@ public class EventFilterUnitTest {
     SurveyUpdate surveyUpdate = new SurveyUpdate();
     surveyUpdate.setSurveyId(SURVEY_ID);
     surveyUpdate.setSampleDefinitionUrl("test/social.json");
-    CollectionExercise collectionExercise = new CollectionExercise();
+    CollectionExerciseUpdate collectionExercise = new CollectionExerciseUpdate();
     collectionExercise.setCollectionExerciseId(COLLEX_ID);
     when(mockRespondentCollExRepo.readCollectionExercise(any()))
         .thenReturn(Optional.of(collectionExercise));

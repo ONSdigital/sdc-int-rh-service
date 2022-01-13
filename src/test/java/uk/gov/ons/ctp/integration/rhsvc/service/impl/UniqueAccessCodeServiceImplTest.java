@@ -30,7 +30,7 @@ import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.EventPublisher;
 import uk.gov.ons.ctp.common.event.TopicType;
 import uk.gov.ons.ctp.common.event.model.CaseUpdate;
-import uk.gov.ons.ctp.common.event.model.CollectionExercise;
+import uk.gov.ons.ctp.common.event.model.CollectionExerciseUpdate;
 import uk.gov.ons.ctp.common.event.model.EventPayload;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 import uk.gov.ons.ctp.common.event.model.UacAuthentication;
@@ -71,7 +71,7 @@ public class UniqueAccessCodeServiceImplTest {
     UacUpdate uacTest = getUAC("linkedHousehold");
     CaseUpdate caseTest = getCase("household");
     SurveyUpdate surveyTest = getSurvey();
-    CollectionExercise collexTest = getCollex();
+    CollectionExerciseUpdate collexTest = getCollex();
 
     when(uacDataRepo.readUAC(UAC_HASH)).thenReturn(Optional.of(uacTest));
     when(caseDataRepo.readCaseUpdate(CASE_ID)).thenReturn(Optional.of(caseTest));
@@ -254,8 +254,8 @@ public class UniqueAccessCodeServiceImplTest {
     return FixtureHelper.loadPackageFixtures(SurveyUpdate[].class).get(0);
   }
 
-  private CollectionExercise getCollex() {
-    return FixtureHelper.loadClassFixtures(CollectionExercise[].class).get(0);
+  private CollectionExerciseUpdate getCollex() {
+    return FixtureHelper.loadClassFixtures(CollectionExerciseUpdate[].class).get(0);
   }
 
   private LocalDateTime convertDate(Date date) {

@@ -15,7 +15,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.event.model.CaseUpdate;
-import uk.gov.ons.ctp.common.event.model.CollectionExercise;
+import uk.gov.ons.ctp.common.event.model.CollectionExerciseUpdate;
 import uk.gov.ons.ctp.common.event.model.SurveyFulfilment;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 import uk.gov.ons.ctp.common.event.model.UacUpdate;
@@ -33,14 +33,14 @@ public class RHSvcBeanMapperTest {
   private CaseUpdate caseUpdate;
   private UacUpdate uacUpdate;
   private SurveyUpdate surveyUpdate;
-  private CollectionExercise collectionExercise;
+  private CollectionExerciseUpdate collectionExercise;
 
   @BeforeEach
   public void setup() {
     caseUpdate = FixtureHelper.loadClassFixtures(CaseUpdate[].class).get(0);
     uacUpdate = FixtureHelper.loadClassFixtures(UacUpdate[].class).get(0);
     surveyUpdate = FixtureHelper.loadClassFixtures(SurveyUpdate[].class).get(0);
-    collectionExercise = FixtureHelper.loadClassFixtures(CollectionExercise[].class).get(0);
+    collectionExercise = FixtureHelper.loadClassFixtures(CollectionExerciseUpdate[].class).get(0);
   }
 
   @Test

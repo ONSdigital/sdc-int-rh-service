@@ -14,7 +14,7 @@ import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.EventPublisher;
 import uk.gov.ons.ctp.common.event.TopicType;
 import uk.gov.ons.ctp.common.event.model.CaseUpdate;
-import uk.gov.ons.ctp.common.event.model.CollectionExercise;
+import uk.gov.ons.ctp.common.event.model.CollectionExerciseUpdate;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 import uk.gov.ons.ctp.common.event.model.UacAuthentication;
 import uk.gov.ons.ctp.common.event.model.UacUpdate;
@@ -66,7 +66,7 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
               .readSurvey(caseUpdate.getSurveyId())
               .orElseThrow(
                   () -> new CTPException(CTPException.Fault.SYSTEM_ERROR, "Survey Not Found"));
-      CollectionExercise collex =
+      CollectionExerciseUpdate collex =
           collExDataRepo
               .readCollectionExercise(caseUpdate.getCollectionExerciseId())
               .orElseThrow(
@@ -108,7 +108,7 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
   private UniqueAccessCodeDTO createUniqueAccessCodeDTO(
       UacUpdate uac,
       CaseUpdate collectionCase,
-      CollectionExercise collectionExercise,
+      CollectionExerciseUpdate collectionExercise,
       SurveyUpdate surveyUpdate) {
     UniqueAccessCodeDTO uniqueAccessCodeDTO = new UniqueAccessCodeDTO();
 
