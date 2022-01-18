@@ -23,7 +23,7 @@ import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CollectionExerciseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.ProductDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.SurveyLiteDTO;
-import uk.gov.ons.ctp.integration.rhsvc.representation.UniqueAccessCodeDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.RhClaimsDTO;
 
 @DisplayName("RHSvc Bean Mapper Test")
 public class RHSvcBeanMapperTest {
@@ -59,7 +59,7 @@ public class RHSvcBeanMapperTest {
   @Test
   @DisplayName("UacUpdate -> UniqueAccessCodeDTO mapping")
   public void shouldMapUacUpdateToUniqueAccessCodeDTO() {
-    UniqueAccessCodeDTO dto = mapper.map(uacUpdate, UniqueAccessCodeDTO.class);
+    RhClaimsDTO dto = mapper.map(uacUpdate, RhClaimsDTO.class);
     assertTrue(dto.isActive());
     assertEquals(
         "8a9d5db4bbee34fd16e40aa2aaae52cfbdf1842559023614c30edb480ec252b4", dto.getUacHash());

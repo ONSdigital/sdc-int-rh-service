@@ -105,6 +105,27 @@ rate-limiter:
     connectTimeoutMillis: 0
     connectionRequestTimeoutMillis: 0
     socketTimeoutMillis: 0
+    
+keystore: '{
+  "keys": {
+    "1fd9125153420767a7259ee3dada222e74812f82": {
+      "type": "public",
+      "purpose": "authentication",
+      "value": "-----BEGIN PUBLIC KEY-----\nMIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA2uj63sibvXlXz9O3AU0P\nCjBf2O4S5OJ9dEGQbufc+kjQb1mNTkv2k6Hweol4JjudUhTBtSY6IQJj1+ZnN03z\ndY9BvvCB8R4AAcPaS9WeP8MxY5FX9aKIiEaFoVHdLJm2E0s/uBqY2OfEVL3qsfph\naogX7c+UpisInDVDRExcmJU1pjqNWq7KE9tbt1OMy2lOfIkKGzntbSEeX6bV98fr\nGvZvFFInomTrE4IUpxdlQSlTN+PDZNhr3FXnLLhF6YalxGWykF6+ceslfP7/lq7R\n5d4S/hqPeJbkFofM9IzI/E14I+cif7rDoJN4dkRcTyE8yvefLHLp7GM3kv38Fuu8\nTSCojS/mDOIr/glpSvOgbCEteISGjLm0MWdM4m2P2NEYcn5OAwqo5kbtSKUSMkdQ\ntRrqTMZtisvXkdlEO3OVbqARTEviKw0pGJK6rDyZv4lUnib5r+mMqzTN6hYUgTYw\nrvf+v3ZennCQF6THfHelUdqSanXGokQs7TdE7SpP0rBAb3sAUGZxNSXnxKu3tQFf\nYaUVUbktYEytEwNtr1RgVb1jV/xJhqE1AUKtPfeImZ1cQM78BMMbcm8rF7p0qdBN\nsu/4gLKHy6cXjnx7uv+N2MJxVqDddXoZsIcPj161/cDXYLQ4VsjsHgGwJk+s4IVS\nIzDZVQ9mhgHvu6Ob0fQu3ksCAwEAAQ==\n-----END PUBLIC KEY-----"
+    },
+    "57db285d00430f8c9dbaa3e1fb281f7053acd977": {
+      "type": "private",
+      "purpose": "authentication",
+      "value": "-----BEGIN RSA PRIVATE KEY-----\n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\n-----END RSA PRIVATE KEY-----"
+    }
+  }
+}'
+
+eq:
+  protocol: https
+  host: www.google.com
+  path: /en/start/launch-eq/?token=
+  response-id-salt: CENSUS
 
 swagger-settings:
   swagger-ui-active: true

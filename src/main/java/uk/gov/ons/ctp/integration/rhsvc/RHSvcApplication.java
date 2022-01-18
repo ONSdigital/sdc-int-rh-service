@@ -1,16 +1,10 @@
 package uk.gov.ons.ctp.integration.rhsvc;
 
-import com.google.cloud.spring.pubsub.core.PubSubTemplate;
-import com.google.cloud.spring.pubsub.support.PublisherFactory;
-import com.google.cloud.spring.pubsub.support.SubscriberFactory;
-import com.google.cloud.spring.pubsub.support.converter.JacksonPubSubMessageConverter;
-import io.micrometer.stackdriver.StackdriverConfig;
-import io.micrometer.stackdriver.StackdriverMeterRegistry;
 import java.time.Duration;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
-import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +20,15 @@ import org.springframework.integration.annotation.IntegrationComponentScan;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+
+import com.google.cloud.spring.pubsub.core.PubSubTemplate;
+import com.google.cloud.spring.pubsub.support.PublisherFactory;
+import com.google.cloud.spring.pubsub.support.SubscriberFactory;
+import com.google.cloud.spring.pubsub.support.converter.JacksonPubSubMessageConverter;
+
+import io.micrometer.stackdriver.StackdriverConfig;
+import io.micrometer.stackdriver.StackdriverMeterRegistry;
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.EventPublisher;
 import uk.gov.ons.ctp.common.event.EventSender;
@@ -34,6 +37,7 @@ import uk.gov.ons.ctp.common.event.persistence.FirestoreEventPersistence;
 import uk.gov.ons.ctp.common.jackson.CustomObjectMapper;
 import uk.gov.ons.ctp.common.rest.RestClient;
 import uk.gov.ons.ctp.common.rest.RestClientConfig;
+import uk.gov.ons.ctp.integration.eqlaunch.service.EqLaunchService;
 import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.service.notify.NotificationClient;
@@ -135,6 +139,17 @@ public class RHSvcApplication {
   @Primary
   public CustomObjectMapper customObjectMapper() {
     return new CustomObjectMapper();
+  }
+
+  /**
+   * Bean to allow CC service to call the eqlauncher.
+   *
+   * @return a EqLauncherServer instance.
+   * @throws CTPException on error
+   */
+  @Bean
+  public EqLaunchService eqLaunchService() throws CTPException {
+    return new EqLaunchService(appConfig.getKeystore());
   }
 
   @Bean

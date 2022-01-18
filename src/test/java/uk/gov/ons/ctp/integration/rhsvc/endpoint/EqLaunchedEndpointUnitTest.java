@@ -19,7 +19,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.error.RestExceptionHandler;
 import uk.gov.ons.ctp.common.jackson.CustomObjectMapper;
-import uk.gov.ons.ctp.integration.rhsvc.representation.EqLaunchedDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.EqLaunchDTO;
 import uk.gov.ons.ctp.integration.rhsvc.service.EqLaunchedService;
 
 /** Respondent Home Endpoint Unit tests */
@@ -32,7 +32,7 @@ public final class EqLaunchedEndpointUnitTest {
   private ObjectMapper mapper = new ObjectMapper();
 
   private MockMvc mockMvc;
-  private EqLaunchedDTO dto;
+  private EqLaunchDTO dto;
 
   /**
    * Set up of tests
@@ -46,7 +46,7 @@ public final class EqLaunchedEndpointUnitTest {
             .setHandlerExceptionResolvers(mockAdviceFor(RestExceptionHandler.class))
             .setMessageConverters(new MappingJackson2HttpMessageConverter(new CustomObjectMapper()))
             .build();
-    dto = FixtureHelper.loadClassFixtures(EqLaunchedDTO[].class).get(0);
+    dto = FixtureHelper.loadClassFixtures(EqLaunchDTO[].class).get(0);
   }
 
   @Test

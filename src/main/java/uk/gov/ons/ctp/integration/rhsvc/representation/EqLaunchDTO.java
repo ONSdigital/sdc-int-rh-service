@@ -1,22 +1,28 @@
 package uk.gov.ons.ctp.integration.rhsvc.representation;
 
 import java.io.Serializable;
-import java.util.UUID;
+
 import javax.validation.constraints.NotNull;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import uk.gov.ons.ctp.common.domain.Language;
 
 /** This is a request object which holds details about a launched survey. */
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @SuppressWarnings("serial")
-public class EqLaunchedDTO implements Serializable {
+public class EqLaunchDTO implements Serializable {
 
-  @NotNull private String questionnaireId;
-
-  @NotNull private UUID caseId;
-
-  @NotNull private String agentId;
-
+  @NotNull private Language languageCode;
+  
+  @NotNull private String accountServiceUrl;
+  
+  @NotNull private String accountServiceLogoutUrl;
+  
   private String clientIP;
 }

@@ -26,7 +26,7 @@ import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient.Domain;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.config.LoadsheddingConfig;
 import uk.gov.ons.ctp.integration.rhsvc.config.RateLimiterConfig;
-import uk.gov.ons.ctp.integration.rhsvc.representation.EqLaunchedDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.EqLaunchDTO;
 
 @ExtendWith(MockitoExtension.class)
 public class EqLaunchedServiceImplTest {
@@ -41,7 +41,7 @@ public class EqLaunchedServiceImplTest {
 
   @Captor ArgumentCaptor<EqLaunch> sendEventCaptor;
 
-  private EqLaunchedDTO eqLaunchedDTO;
+  private EqLaunchDTO eqLaunchedDTO;
 
   @BeforeEach
   public void setup() {
@@ -55,7 +55,7 @@ public class EqLaunchedServiceImplTest {
   }
 
   private void createPayload() {
-    eqLaunchedDTO = new EqLaunchedDTO();
+    eqLaunchedDTO = new EqLaunchDTO();
     eqLaunchedDTO.setQuestionnaireId("1234");
     eqLaunchedDTO.setCaseId(UUID.fromString("3fa85f64-5717-4562-b3fc-2c963f66afa6"));
     eqLaunchedDTO.setAgentId("1000007");

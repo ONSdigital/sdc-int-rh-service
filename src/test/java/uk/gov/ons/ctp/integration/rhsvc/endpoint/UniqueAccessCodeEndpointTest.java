@@ -21,7 +21,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.error.RestExceptionHandler;
-import uk.gov.ons.ctp.integration.rhsvc.representation.UniqueAccessCodeDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.RhClaimsDTO;
 import uk.gov.ons.ctp.integration.rhsvc.service.UniqueAccessCodeService;
 
 /** Unit Tests on endpoint for UAC resources */
@@ -42,7 +42,7 @@ public class UniqueAccessCodeEndpointTest {
 
   private MockMvc mockMvc;
 
-  private List<UniqueAccessCodeDTO> uacDTO;
+  private List<RhClaimsDTO> uacDTO;
 
   /** Setup tests */
   @BeforeEach
@@ -51,13 +51,13 @@ public class UniqueAccessCodeEndpointTest {
         MockMvcBuilders.standaloneSetup(uacEndpoint)
             .setHandlerExceptionResolvers(mockAdviceFor(RestExceptionHandler.class))
             .build();
-    this.uacDTO = FixtureHelper.loadClassFixtures(UniqueAccessCodeDTO[].class);
+    this.uacDTO = FixtureHelper.loadClassFixtures(RhClaimsDTO[].class);
   }
 
   /** Test returns valid JSON for valid UAC */
   @Test
   public void getUACClaimContextUACFound() throws Exception {
-    when(uacService.getAndAuthenticateUAC(UAC_HASH)).thenReturn(uacDTO.get(0));
+    when(uacService.getUACClaimContext(UAC_HASH)).thenReturn(uacDTO.get(0));
 
     String COLLECTION_EXERCISE_ID = "4883af91-0052-4497-9805-3238544fcf8a";
     String SURVEY_ID = "3883af91-0052-4497-9805-3238544fcf8a";
@@ -80,7 +80,7 @@ public class UniqueAccessCodeEndpointTest {
   /** Test returns resource not found for invalid UAC */
   @Test
   public void getUACClaimContextUACNotFound() throws Exception {
-    when(uacService.getAndAuthenticateUAC(UAC_HASH))
+    when(uacService.getUACClaimContext(UAC_HASH))
         .thenThrow(new CTPException(CTPException.Fault.RESOURCE_NOT_FOUND, ERROR_MESSAGE));
 
     mockMvc

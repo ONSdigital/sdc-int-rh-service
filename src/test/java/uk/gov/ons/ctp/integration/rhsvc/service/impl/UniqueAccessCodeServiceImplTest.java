@@ -40,7 +40,7 @@ import uk.gov.ons.ctp.integration.rhsvc.repository.CaseRepository;
 import uk.gov.ons.ctp.integration.rhsvc.repository.CollectionExerciseRepository;
 import uk.gov.ons.ctp.integration.rhsvc.repository.SurveyRepository;
 import uk.gov.ons.ctp.integration.rhsvc.repository.UacRepository;
-import uk.gov.ons.ctp.integration.rhsvc.representation.UniqueAccessCodeDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.RhClaimsDTO;
 
 // ** Unit tests of the Unique Access Code Service */
 @ExtendWith(MockitoExtension.class)
@@ -79,7 +79,7 @@ public class UniqueAccessCodeServiceImplTest {
     when(collExDataRepo.readCollectionExercise(COLLECTION_EXERCISE_ID))
         .thenReturn(Optional.of(collexTest));
 
-    UniqueAccessCodeDTO uacDTO = uacSvc.getAndAuthenticateUAC(UAC_HASH);
+    RhClaimsDTO uacDTO = uacSvc.getUACClaimContext(UAC_HASH);
 
     verify(uacDataRepo, times(1)).readUAC(UAC_HASH);
     verify(caseDataRepo, times(1)).readCaseUpdate(CASE_ID);
@@ -143,7 +143,7 @@ public class UniqueAccessCodeServiceImplTest {
     when(caseDataRepo.readCaseUpdate(CASE_ID)).thenReturn(Optional.empty());
 
     CTPException thrown =
-        assertThrows(CTPException.class, () -> uacSvc.getAndAuthenticateUAC(UAC_HASH));
+        assertThrows(CTPException.class, () -> uacSvc.getUACClaimContext(UAC_HASH));
 
     assertEquals(CTPException.Fault.SYSTEM_ERROR, thrown.getFault());
     assertEquals("Case Not Found", thrown.getMessage());
@@ -168,7 +168,7 @@ public class UniqueAccessCodeServiceImplTest {
     when(surveyDataRepo.readSurvey(SURVEY_ID)).thenReturn(Optional.empty());
 
     CTPException thrown =
-        assertThrows(CTPException.class, () -> uacSvc.getAndAuthenticateUAC(UAC_HASH));
+        assertThrows(CTPException.class, () -> uacSvc.getUACClaimContext(UAC_HASH));
 
     assertEquals(CTPException.Fault.SYSTEM_ERROR, thrown.getFault());
     assertEquals("Survey Not Found", thrown.getMessage());
@@ -195,7 +195,7 @@ public class UniqueAccessCodeServiceImplTest {
         .thenReturn(Optional.empty());
 
     CTPException thrown =
-        assertThrows(CTPException.class, () -> uacSvc.getAndAuthenticateUAC(UAC_HASH));
+        assertThrows(CTPException.class, () -> uacSvc.getUACClaimContext(UAC_HASH));
 
     assertEquals(CTPException.Fault.SYSTEM_ERROR, thrown.getFault());
     assertEquals("CollectionExercise Not Found", thrown.getMessage());
@@ -216,7 +216,7 @@ public class UniqueAccessCodeServiceImplTest {
     when(uacDataRepo.readUAC(UAC_HASH)).thenReturn(Optional.of(uacTest));
 
     CTPException thrown =
-        assertThrows(CTPException.class, () -> uacSvc.getAndAuthenticateUAC(UAC_HASH));
+        assertThrows(CTPException.class, () -> uacSvc.getUACClaimContext(UAC_HASH));
 
     assertEquals(CTPException.Fault.SYSTEM_ERROR, thrown.getFault());
     assertEquals("UAC has no caseId", thrown.getMessage());
@@ -232,7 +232,7 @@ public class UniqueAccessCodeServiceImplTest {
   public void getUACNotFound() throws Exception {
 
     CTPException thrown =
-        assertThrows(CTPException.class, () -> uacSvc.getAndAuthenticateUAC(UAC_HASH));
+        assertThrows(CTPException.class, () -> uacSvc.getUACClaimContext(UAC_HASH));
 
     assertEquals(CTPException.Fault.RESOURCE_NOT_FOUND, thrown.getFault());
     assertEquals("Failed to retrieve UAC", thrown.getMessage());

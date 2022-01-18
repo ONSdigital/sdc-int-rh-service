@@ -3,11 +3,13 @@ package uk.gov.ons.ctp.integration.rhsvc.service.impl;
 import static uk.gov.ons.ctp.common.log.ScopedStructuredArguments.kv;
 
 import java.util.UUID;
-import lombok.extern.slf4j.Slf4j;
-import ma.glasnost.orika.MapperFacade;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import lombok.extern.slf4j.Slf4j;
+import ma.glasnost.orika.MapperFacade;
 import uk.gov.ons.ctp.common.domain.Channel;
 import uk.gov.ons.ctp.common.domain.Source;
 import uk.gov.ons.ctp.common.error.CTPException;
@@ -24,28 +26,54 @@ import uk.gov.ons.ctp.integration.rhsvc.repository.SurveyRepository;
 import uk.gov.ons.ctp.integration.rhsvc.repository.UacRepository;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CollectionExerciseDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.EqLaunchDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.RhClaimsDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.SurveyLiteDTO;
-import uk.gov.ons.ctp.integration.rhsvc.representation.UniqueAccessCodeDTO;
-import uk.gov.ons.ctp.integration.rhsvc.service.UniqueAccessCodeService;
+import uk.gov.ons.ctp.integration.rhsvc.representation.ClaimsDataDTO;
 
 /** Implementation to deal with UAC data */
 @Slf4j
 @Service
-public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
+public class UniqueAccessCodeServiceImpl {
   @Autowired private SurveyRepository surveyDataRepo;
   @Autowired private CollectionExerciseRepository collExDataRepo;
   @Autowired private CaseRepository caseDataRepo;
   @Autowired private UacRepository uacDataRepo;
   @Autowired private EventPublisher eventPublisher;
   @Autowired private MapperFacade mapperFacade;
+  
+  @Autowired private EqLaunchedServiceImpl eqLaunchedService;
+
 
   /** Constructor */
   public UniqueAccessCodeServiceImpl() {}
 
-  @Override
-  public UniqueAccessCodeDTO getAndAuthenticateUAC(String uacHash) throws CTPException {
+  public RhClaimsDTO getUACClaimContext(String uacHash) throws CTPException {
+    
+    ClaimsDataDTO claims = buildClaimsData(uacHash);
+    
+    sendUacAuthenticationEvent(claims.getCaseUpdate().getCaseId(), claims.getUacUpdate().getQid());
+    
+    RhClaimsDTO rhClaimsDTO = createRhClaimsDTO(claims.getUacUpdate(), claims.getCaseUpdate(), claims.getCollectionExerciseUpdate(), claims.getSurveyUpdate());
+    
+    return rhClaimsDTO;
+  }
+  
+  public String createEqLaunchUrl(String uacHash, EqLaunchDTO eqLaunchedDTO) throws CTPException {
 
-    UniqueAccessCodeDTO data;
+    ClaimsDataDTO claims = buildClaimsData(uacHash);
+    
+    sendUacAuthenticationEvent(claims.getCaseUpdate().getCaseId(), claims.getUacUpdate().getQid());
+    
+    ClaimsDataDTO uacDTO = createUniqueAccessCode2DTO(claims.getUacUpdate(), claims.getCaseUpdate(), claims.getCollectionExerciseUpdate(), claims.getSurveyUpdate());
+    String launchURL = eqLaunchedService.eqLaunched(uacDTO, eqLaunchedDTO);
+
+    return launchURL;
+  }
+  
+  private ClaimsDataDTO buildClaimsData(String uacHash) throws CTPException {
+
+    ClaimsDataDTO data;
     UacUpdate uac =
         uacDataRepo
             .readUAC(uacHash)
@@ -74,8 +102,7 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
                       new CTPException(
                           CTPException.Fault.SYSTEM_ERROR, "CollectionExercise Not Found"));
 
-      data = createUniqueAccessCodeDTO(uac, caseUpdate, collex, survey);
-      sendUacAuthenticationEvent(data);
+      data = createUniqueAccessCode2DTO(uac, caseUpdate, collex, survey);
     } else {
       throw new CTPException(CTPException.Fault.SYSTEM_ERROR, "UAC has no caseId");
     }
@@ -84,15 +111,14 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
   }
 
   /** Send UacAuthentication event */
-  private void sendUacAuthenticationEvent(UniqueAccessCodeDTO data) throws CTPException {
-    UUID caseId = data.getCollectionCase().getCaseId();
+  private void sendUacAuthenticationEvent(String caseId, String qid) throws CTPException {
 
     log.info(
         "Generating UacAuthentication event for caseId",
         kv("caseId", caseId),
-        kv("questionnaireId", data.getQid()));
+        kv("questionnaireId", qid));
 
-    UacAuthentication uacAuthentication = UacAuthentication.builder().qid(data.getQid()).build();
+    UacAuthentication uacAuthentication = UacAuthentication.builder().qid(qid).build();
 
     UUID messageId =
         eventPublisher.sendEvent(
@@ -105,12 +131,27 @@ public class UniqueAccessCodeServiceImpl implements UniqueAccessCodeService {
             + messageId);
   }
 
-  private UniqueAccessCodeDTO createUniqueAccessCodeDTO(
+  private ClaimsDataDTO createUniqueAccessCode2DTO(
       UacUpdate uac,
       CaseUpdate collectionCase,
       CollectionExerciseUpdate collectionExercise,
       SurveyUpdate surveyUpdate) {
-    UniqueAccessCodeDTO uniqueAccessCodeDTO = new UniqueAccessCodeDTO();
+    ClaimsDataDTO uniqueAccessCode2DTO = new ClaimsDataDTO();
+
+    uniqueAccessCode2DTO.setUacUpdate(uac);
+    uniqueAccessCode2DTO.setCaseUpdate(collectionCase);
+    uniqueAccessCode2DTO.setCollectionExerciseUpdate(collectionExercise);
+    uniqueAccessCode2DTO.setSurveyUpdate(surveyUpdate);
+
+    return uniqueAccessCode2DTO;
+  }
+  
+  private RhClaimsDTO createRhClaimsDTO(
+      UacUpdate uac,
+      CaseUpdate collectionCase,
+      CollectionExerciseUpdate collectionExercise,
+      SurveyUpdate surveyUpdate) {
+    RhClaimsDTO uniqueAccessCodeDTO = new RhClaimsDTO();
 
     mapperFacade.map(uac, uniqueAccessCodeDTO);
 
