@@ -40,7 +40,7 @@ import uk.gov.ons.ctp.integration.rhsvc.repository.CaseRepository;
 import uk.gov.ons.ctp.integration.rhsvc.repository.CollectionExerciseRepository;
 import uk.gov.ons.ctp.integration.rhsvc.repository.SurveyRepository;
 import uk.gov.ons.ctp.integration.rhsvc.repository.UacRepository;
-import uk.gov.ons.ctp.integration.rhsvc.representation.RhClaimsDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.RhClaimsResponseDTO;
 
 // ** Unit tests of the Unique Access Code Service */
 @ExtendWith(MockitoExtension.class)
@@ -79,7 +79,7 @@ public class UniqueAccessCodeServiceImplTest {
     when(collExDataRepo.readCollectionExercise(COLLECTION_EXERCISE_ID))
         .thenReturn(Optional.of(collexTest));
 
-    RhClaimsDTO uacDTO = uacSvc.getUACClaimContext(UAC_HASH);
+    RhClaimsResponseDTO uacDTO = uacSvc.getUACClaimContext(UAC_HASH);
 
     verify(uacDataRepo, times(1)).readUAC(UAC_HASH);
     verify(caseDataRepo, times(1)).readCaseUpdate(CASE_ID);

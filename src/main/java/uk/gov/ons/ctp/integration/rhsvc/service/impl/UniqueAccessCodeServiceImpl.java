@@ -27,7 +27,7 @@ import uk.gov.ons.ctp.integration.rhsvc.repository.UacRepository;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CollectionExerciseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.EqLaunchDTO;
-import uk.gov.ons.ctp.integration.rhsvc.representation.RhClaimsDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.RhClaimsResponseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.SurveyLiteDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.ClaimsDataDTO;
 
@@ -48,32 +48,47 @@ public class UniqueAccessCodeServiceImpl {
   /** Constructor */
   public UniqueAccessCodeServiceImpl() {}
 
-  public RhClaimsDTO getUACClaimContext(String uacHash) throws CTPException {
+  /**
+   * Retrieve the data for a hashed UAC, and send an authentication event.
+   *
+   * @param uacHash hashed unique access code for which to retrieve data.
+   * @return RhClaimsResponseDTO holding the UAC data to respond to the request.
+   * @throws CTPException something went wrong
+   */
+  public RhClaimsResponseDTO getUACClaimContext(String uacHash) throws CTPException {
     
     ClaimsDataDTO claims = buildClaimsData(uacHash);
     
     sendUacAuthenticationEvent(claims.getCaseUpdate().getCaseId(), claims.getUacUpdate().getQid());
     
-    RhClaimsDTO rhClaimsDTO = createRhClaimsDTO(claims.getUacUpdate(), claims.getCaseUpdate(), claims.getCollectionExerciseUpdate(), claims.getSurveyUpdate());
+    RhClaimsResponseDTO rhClaimsDTO = createRhClaimsResponseDTO(claims.getUacUpdate(), claims.getCaseUpdate(), claims.getCollectionExerciseUpdate(), claims.getSurveyUpdate());
     
     return rhClaimsDTO;
   }
   
+  /**
+   * Creates the EQ launch URL, and also sends UAC authentication and launch events.
+   * 
+   * @param uacHash uacHash hashed unique access code for which to retrieve data.
+   * @param eqLaunchedDTO contains data supplied to the endpoint which is needed in order to be able to create the EQ launch URL.
+   * @return String containing the EQ launch URL.
+   * @throws CTPException if something went wrong.
+   */
   public String createEqLaunchUrl(String uacHash, EqLaunchDTO eqLaunchedDTO) throws CTPException {
 
     ClaimsDataDTO claims = buildClaimsData(uacHash);
     
     sendUacAuthenticationEvent(claims.getCaseUpdate().getCaseId(), claims.getUacUpdate().getQid());
     
-    ClaimsDataDTO uacDTO = createUniqueAccessCode2DTO(claims.getUacUpdate(), claims.getCaseUpdate(), claims.getCollectionExerciseUpdate(), claims.getSurveyUpdate());
-    String launchURL = eqLaunchedService.eqLaunched(uacDTO, eqLaunchedDTO);
+    String launchURL = eqLaunchedService.generateEqLaunchToken(claims, eqLaunchedDTO);
 
     return launchURL;
   }
   
   private ClaimsDataDTO buildClaimsData(String uacHash) throws CTPException {
 
-    ClaimsDataDTO data;
+    ClaimsDataDTO claimsData;
+    
     UacUpdate uac =
         uacDataRepo
             .readUAC(uacHash)
@@ -81,33 +96,38 @@ public class UniqueAccessCodeServiceImpl {
                 () ->
                     new CTPException(
                         CTPException.Fault.RESOURCE_NOT_FOUND, "Failed to retrieve UAC"));
-    String caseId = uac.getCaseId();
-    if (!StringUtils.isEmpty(caseId)) {
-      // UAC has a caseId
-      CaseUpdate caseUpdate =
-          caseDataRepo
-              .readCaseUpdate(caseId)
-              .orElseThrow(
-                  () -> new CTPException(CTPException.Fault.SYSTEM_ERROR, "Case Not Found"));
-      SurveyUpdate survey =
-          surveyDataRepo
-              .readSurvey(caseUpdate.getSurveyId())
-              .orElseThrow(
-                  () -> new CTPException(CTPException.Fault.SYSTEM_ERROR, "Survey Not Found"));
-      CollectionExerciseUpdate collex =
-          collExDataRepo
-              .readCollectionExercise(caseUpdate.getCollectionExerciseId())
-              .orElseThrow(
-                  () ->
-                      new CTPException(
-                          CTPException.Fault.SYSTEM_ERROR, "CollectionExercise Not Found"));
 
-      data = createUniqueAccessCode2DTO(uac, caseUpdate, collex, survey);
-    } else {
+    String caseId = uac.getCaseId();
+    if (StringUtils.isEmpty(caseId)) {
       throw new CTPException(CTPException.Fault.SYSTEM_ERROR, "UAC has no caseId");
     }
+    
+    CaseUpdate caseUpdate =
+        caseDataRepo
+            .readCaseUpdate(caseId)
+            .orElseThrow(
+                () -> new CTPException(CTPException.Fault.SYSTEM_ERROR, "Case Not Found"));
+    SurveyUpdate survey =
+        surveyDataRepo
+            .readSurvey(caseUpdate.getSurveyId())
+            .orElseThrow(
+                () -> new CTPException(CTPException.Fault.SYSTEM_ERROR, "Survey Not Found"));
+    CollectionExerciseUpdate collex =
+        collExDataRepo
+            .readCollectionExercise(caseUpdate.getCollectionExerciseId())
+            .orElseThrow(
+                () ->
+                    new CTPException(
+                        CTPException.Fault.SYSTEM_ERROR, "CollectionExercise Not Found"));
+     
+    claimsData = ClaimsDataDTO.builder()
+      .uacUpdate(uac)
+      .caseUpdate(caseUpdate)
+      .collectionExerciseUpdate(collex)
+      .surveyUpdate(survey)
+      .build();
 
-    return data;
+    return claimsData;
   }
 
   /** Send UacAuthentication event */
@@ -130,28 +150,13 @@ public class UniqueAccessCodeServiceImpl {
             + ", messageId: "
             + messageId);
   }
-
-  private ClaimsDataDTO createUniqueAccessCode2DTO(
+ 
+  private RhClaimsResponseDTO createRhClaimsResponseDTO(
       UacUpdate uac,
       CaseUpdate collectionCase,
       CollectionExerciseUpdate collectionExercise,
       SurveyUpdate surveyUpdate) {
-    ClaimsDataDTO uniqueAccessCode2DTO = new ClaimsDataDTO();
-
-    uniqueAccessCode2DTO.setUacUpdate(uac);
-    uniqueAccessCode2DTO.setCaseUpdate(collectionCase);
-    uniqueAccessCode2DTO.setCollectionExerciseUpdate(collectionExercise);
-    uniqueAccessCode2DTO.setSurveyUpdate(surveyUpdate);
-
-    return uniqueAccessCode2DTO;
-  }
-  
-  private RhClaimsDTO createRhClaimsDTO(
-      UacUpdate uac,
-      CaseUpdate collectionCase,
-      CollectionExerciseUpdate collectionExercise,
-      SurveyUpdate surveyUpdate) {
-    RhClaimsDTO uniqueAccessCodeDTO = new RhClaimsDTO();
+    RhClaimsResponseDTO uniqueAccessCodeDTO = new RhClaimsResponseDTO();
 
     mapperFacade.map(uac, uniqueAccessCodeDTO);
 

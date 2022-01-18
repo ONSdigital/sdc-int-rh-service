@@ -17,7 +17,7 @@ import uk.gov.ons.ctp.common.domain.Language;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.error.CTPException.Fault;
 import uk.gov.ons.ctp.integration.rhsvc.representation.EqLaunchDTO;
-import uk.gov.ons.ctp.integration.rhsvc.representation.RhClaimsDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.RhClaimsResponseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.service.impl.UniqueAccessCodeServiceImpl;
 
 /** The REST endpoint controller for UAC requests. */
@@ -36,11 +36,11 @@ public class UniqueAccessCodeEndpoint {
    * @throws CTPException something went wrong
    */
   @RequestMapping(value = "/{uacHash}", method = RequestMethod.GET)
-  public ResponseEntity<RhClaimsDTO> getUACClaimContext(
+  public ResponseEntity<RhClaimsResponseDTO> getUACClaimContext(
       @PathVariable("uacHash") final String uacHash) throws CTPException {
 
     log.info("Entering GET getUACClaimContext", kv("uacHash", uacHash));
-    RhClaimsDTO uacDTO = uacService.getUACClaimContext(uacHash);
+    RhClaimsResponseDTO uacDTO = uacService.getUACClaimContext(uacHash);
 
     log.debug("Exit GET getUACClaimContext");
 
@@ -87,7 +87,7 @@ public class UniqueAccessCodeEndpoint {
     
     String launchURL = uacService.createEqLaunchUrl(uacHash, eqLaunchedDTO);
 
-//    log.debug("Exit POST surveyLaunched", kv("caseId", eqLaunchedDTO.getCaseId()));
+    log.debug("Exit POST surveyLaunched", kv("clientIP", eqLaunchedDTO.getClientIP()));
     
     return ResponseEntity.ok(launchURL);
   }

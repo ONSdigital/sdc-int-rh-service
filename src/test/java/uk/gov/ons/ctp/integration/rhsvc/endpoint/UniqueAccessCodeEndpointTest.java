@@ -21,7 +21,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.error.RestExceptionHandler;
-import uk.gov.ons.ctp.integration.rhsvc.representation.RhClaimsDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.RhClaimsResponseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.service.UniqueAccessCodeService;
 
 /** Unit Tests on endpoint for UAC resources */
@@ -42,7 +42,7 @@ public class UniqueAccessCodeEndpointTest {
 
   private MockMvc mockMvc;
 
-  private List<RhClaimsDTO> uacDTO;
+  private List<RhClaimsResponseDTO> uacDTO;
 
   /** Setup tests */
   @BeforeEach
@@ -51,7 +51,7 @@ public class UniqueAccessCodeEndpointTest {
         MockMvcBuilders.standaloneSetup(uacEndpoint)
             .setHandlerExceptionResolvers(mockAdviceFor(RestExceptionHandler.class))
             .build();
-    this.uacDTO = FixtureHelper.loadClassFixtures(RhClaimsDTO[].class);
+    this.uacDTO = FixtureHelper.loadClassFixtures(RhClaimsResponseDTO[].class);
   }
 
   /** Test returns valid JSON for valid UAC */

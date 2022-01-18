@@ -45,19 +45,19 @@ public class EqLaunchedServiceImpl {
     this.appConfig = appConfig;
   }
 
-  public String eqLaunched(ClaimsDataDTO uac2DTO, EqLaunchDTO eqLaunchedDTO) throws CTPException {
-    log.info("Generating EqLaunched event", kv("eqLaunchedDTO", eqLaunchedDTO));
+  public String generateEqLaunchToken(ClaimsDataDTO claimsDataDTO, EqLaunchDTO eqLaunchedDTO) throws CTPException {
+    log.info("Generating EqLaunched event and url", kv("eqLaunchedDTO", eqLaunchedDTO));
 
     checkRateLimit(eqLaunchedDTO.getClientIP());
 
-    EqLaunch eqLaunch = EqLaunch.builder().qid(uac2DTO.getUacUpdate().getQid()).build();
+    EqLaunch eqLaunch = EqLaunch.builder().qid(claimsDataDTO.getUacUpdate().getQid()).build();
 
     UUID messageId =
         eventPublisher.sendEvent(TopicType.EQ_LAUNCH, Source.RESPONDENT_HOME, Channel.RH, eqLaunch);
 
     log.debug("EqLaunch event published", kv("qid", eqLaunch.getQid()), kv("messageId", messageId));
     
-    String eqUrl = createLaunchUrl(uac2DTO, eqLaunchedDTO);
+    String eqUrl = createLaunchUrl(claimsDataDTO, eqLaunchedDTO);
     
     return eqUrl;
   }

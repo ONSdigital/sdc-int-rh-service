@@ -4,7 +4,7 @@ import lombok.Data;
 
 /** Representation of a UAC claim request */
 @Data
-public class RhClaimsDTO {
+public class RhClaimsResponseDTO {
 
   /** enum for valid case status */
   public enum CaseStatus {
