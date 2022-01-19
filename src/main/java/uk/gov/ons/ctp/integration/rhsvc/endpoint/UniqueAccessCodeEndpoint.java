@@ -48,7 +48,7 @@ public class UniqueAccessCodeEndpoint {
   }
 
   /**
-   * The GET end point to get an EQ Launch URL for a case.
+   * The GET end point to build an EQ Launch URL for a case. It also sends a launch event.
    * 
    * @param uacHash the hashed UAC.
    * @param languageCodeString is either 'en' or 'cy'.
@@ -59,35 +59,35 @@ public class UniqueAccessCodeEndpoint {
    * @throws CTPException something went wrong.
    */
   @GetMapping(value = "/{uacHash}/launch")
-  public ResponseEntity<String> surveyLaunched(@PathVariable("uacHash") final String uacHash,
+  public ResponseEntity<String> generateEqLaunchToken(@PathVariable("uacHash") final String uacHash,
       @RequestParam(required = true) String languageCode,
       @RequestParam(required = true) String accountServiceUrl, 
       @RequestParam(required = true) String accountServiceLogoutUrl,
       @RequestParam(required = true) String clientIP) throws CTPException {
 
-    log.info("Entering POST surveyLaunched",
+    log.info("Entering GET generateEqLaunchToken",
         kv("languageCode", languageCode),
         kv("accountServiceUrl", accountServiceUrl),
         kv("accountServiceLogoutUrl", accountServiceLogoutUrl),
         kv("clientIP", clientIP)
         );
 
-    // Valid the specified language
+    // Validate the specified language
     Language language = Language.lookup(languageCode);
     if (language == null) {
       throw new CTPException(Fault.BAD_REQUEST, "Invalid language code: '" + languageCode + "'");
     }
     
+    // Generate launch URL
     EqLaunchDTO eqLaunchedDTO = EqLaunchDTO.builder()
         .languageCode(language)
         .accountServiceUrl(accountServiceUrl)
         .accountServiceLogoutUrl(accountServiceLogoutUrl)
         .clientIP(clientIP)
         .build();
-    
     String launchURL = uacService.generateEqLaunchToken(uacHash, eqLaunchedDTO);
 
-    log.debug("Exit POST surveyLaunched", kv("clientIP", eqLaunchedDTO.getClientIP()));
+    log.debug("Exit GET generateEqLaunchToken", kv("clientIP", eqLaunchedDTO.getClientIP()));
     
     return ResponseEntity.ok(launchURL);
   }

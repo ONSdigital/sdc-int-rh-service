@@ -27,22 +27,22 @@ public class EqLaunchedServiceImpl {
   @Autowired private AppConfig appConfig;
   @Autowired private EqLaunchService eqLaunchService;
 
-  String createLaunchUrl(ClaimsDataDTO uac2DTO, EqLaunchDTO eqLaunchedDTO)
+  String createLaunchUrl(ClaimsDataDTO claimsDataDTO, EqLaunchDTO eqLaunchedDTO)
       throws CTPException {
 
     String encryptedPayload = "";
 
-    UacUpdate uacUpdate = uac2DTO.getUacUpdate();
-    CaseUpdate caze = uac2DTO.getCaseUpdate();
-    CollectionExerciseUpdate collex = uac2DTO.getCollectionExerciseUpdate();
-    SurveyUpdate survey = uac2DTO.getSurveyUpdate();
+    UacUpdate uacUpdate = claimsDataDTO.getUacUpdate();
+    CaseUpdate caze = claimsDataDTO.getCaseUpdate();
+    CollectionExerciseUpdate collex = claimsDataDTO.getCollectionExerciseUpdate();
+    SurveyUpdate survey = claimsDataDTO.getSurveyUpdate();
 
     try {
       EqLaunchData eqLaunchData =
           EqLaunchData.builder()
               .language(eqLaunchedDTO.getLanguageCode())
-              .source(Source.CONTACT_CENTRE_API)
-              .channel(Channel.CC)
+              .source(Source.RESPONDENT_HOME)
+              .channel(Channel.RH)
               .salt(appConfig.getEq().getResponseIdSalt())
               .surveyType(SurveyType.fromSampleDefinitionUrl(survey.getSampleDefinitionUrl()))
               .collectionExerciseUpdate(collex)
@@ -62,6 +62,7 @@ public class EqLaunchedServiceImpl {
           e);
       throw e;
     }
+    
     String eqUrl =
         appConfig.getEq().getProtocol()
             + "://"
@@ -71,6 +72,7 @@ public class EqLaunchedServiceImpl {
     if (log.isDebugEnabled()) {
       log.debug("Have created launch URL", kv("launchURL", eqUrl));
     }
+    
     return eqUrl;
   }
 }
