@@ -1,9 +1,7 @@
 package uk.gov.ons.ctp.integration.rhsvc.representation;
 
 import java.io.Serializable;
-
 import javax.validation.constraints.NotNull;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,10 +17,10 @@ import uk.gov.ons.ctp.common.domain.Language;
 public class EqLaunchDTO implements Serializable {
 
   @NotNull private Language languageCode;
-  
+
   @NotNull private String accountServiceUrl;
-  
+
   @NotNull private String accountServiceLogoutUrl;
-  
+
   private String clientIP;
 }

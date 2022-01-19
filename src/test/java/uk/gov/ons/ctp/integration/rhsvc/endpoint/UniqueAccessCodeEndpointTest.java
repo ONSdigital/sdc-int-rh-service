@@ -1,6 +1,8 @@
 package uk.gov.ons.ctp.integration.rhsvc.endpoint;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -8,11 +10,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.ons.ctp.common.utility.MockMvcControllerAdviceHelper.mockAdviceFor;
 import static uk.gov.ons.ctp.integration.rhsvc.RespondentHomeFixture.EXPECTED_JSON_CONTENT_TYPE;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 
 import java.util.List;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,7 +20,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.error.RestExceptionHandler;
@@ -96,11 +94,13 @@ public class UniqueAccessCodeEndpointTest {
 
   @Test
   public void generateEqLaunchToken_happyPath() throws Exception {
-    when(uacService.generateEqLaunchToken(eq(UAC_HASH), any()))
-        .thenReturn("an-eq-launch-url");
+    when(uacService.generateEqLaunchToken(eq(UAC_HASH), any())).thenReturn("an-eq-launch-url");
 
     mockMvc
-        .perform(get("/uacs/{uac}/launch?languageCode=en&accountServiceUrl=/service_url&accountServiceLogoutUrl=/logout_url&clientIP=1.2.3.4", UAC_HASH))
+        .perform(
+            get(
+                "/uacs/{uac}/launch?languageCode=en&accountServiceUrl=/service_url&accountServiceLogoutUrl=/logout_url&clientIP=1.2.3.4",
+                UAC_HASH))
         .andExpect(status().isOk())
         .andExpect(content().string("an-eq-launch-url"));
   }
@@ -108,56 +108,66 @@ public class UniqueAccessCodeEndpointTest {
   @Test
   public void generateEqLaunchToken_invalidLanguage() throws Exception {
     mockMvc
-        .perform(get("/uacs/{uac}/launch?"
-            + "languageCode=french&"
-            + "accountServiceUrl=/service_url&"
-            + "accountServiceLogoutUrl=/logout_url&"
-            + "clientIP=1.2.3.4", 
-            UAC_HASH))
+        .perform(
+            get(
+                "/uacs/{uac}/launch?"
+                    + "languageCode=french&"
+                    + "accountServiceUrl=/service_url&"
+                    + "accountServiceLogoutUrl=/logout_url&"
+                    + "clientIP=1.2.3.4",
+                UAC_HASH))
         .andExpect(status().isBadRequest());
   }
 
   @Test
   public void generateEqLaunchToken_noLanguage() throws Exception {
     mockMvc
-        .perform(get("/uacs/{uac}/launch?"
-            + "accountServiceUrl=service_url&"
-            + "accountServiceLogoutUrl=logout_url&"
-            + "clientIP=1.2.3.4", 
-            UAC_HASH))
+        .perform(
+            get(
+                "/uacs/{uac}/launch?"
+                    + "accountServiceUrl=service_url&"
+                    + "accountServiceLogoutUrl=logout_url&"
+                    + "clientIP=1.2.3.4",
+                UAC_HASH))
         .andExpect(status().isBadRequest());
   }
 
   @Test
   public void generateEqLaunchToken_noAccountServiceUrl() throws Exception {
     mockMvc
-    .perform(get("/uacs/{uac}/launch?"
-        + "languageCode=french&"
-        + "accountServiceLogoutUrl=/logout_url&"
-        + "clientIP=1.2.3.4", 
-        UAC_HASH))
-    .andExpect(status().isBadRequest());
+        .perform(
+            get(
+                "/uacs/{uac}/launch?"
+                    + "languageCode=french&"
+                    + "accountServiceLogoutUrl=/logout_url&"
+                    + "clientIP=1.2.3.4",
+                UAC_HASH))
+        .andExpect(status().isBadRequest());
   }
 
   @Test
   public void generateEqLaunchToken_noAccountServiceLogoutUrl() throws Exception {
     mockMvc
-    .perform(get("/uacs/{uac}/launch?"
-        + "languageCode=french&"
-        + "accountServiceUrl=/service_url&"
-        + "clientIP=1.2.3.4", 
-        UAC_HASH))
-    .andExpect(status().isBadRequest());
+        .perform(
+            get(
+                "/uacs/{uac}/launch?"
+                    + "languageCode=french&"
+                    + "accountServiceUrl=/service_url&"
+                    + "clientIP=1.2.3.4",
+                UAC_HASH))
+        .andExpect(status().isBadRequest());
   }
-  
+
   @Test
   public void generateEqLaunchToken_noClientIP() throws Exception {
     mockMvc
-    .perform(get("/uacs/{uac}/launch?"
-        + "languageCode=french&"
-        + "accountServiceUrl=/service_url&"
-        + "accountServiceLogoutUrl=/logout_url&",
-        UAC_HASH))
-    .andExpect(status().isBadRequest());
+        .perform(
+            get(
+                "/uacs/{uac}/launch?"
+                    + "languageCode=french&"
+                    + "accountServiceUrl=/service_url&"
+                    + "accountServiceLogoutUrl=/logout_url&",
+                UAC_HASH))
+        .andExpect(status().isBadRequest());
   }
 }

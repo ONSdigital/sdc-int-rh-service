@@ -15,7 +15,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import uk.gov.ons.ctp.common.domain.Channel;
 import uk.gov.ons.ctp.common.domain.Language;
 import uk.gov.ons.ctp.common.event.model.CaseUpdate;
@@ -39,50 +38,52 @@ public class EqLaunchedServiceImplTest {
   @Mock private SurveyUpdate surveyUpdate;
 
   @Mock private EqLaunchService eqLaunchService;
-  
+
   @InjectMocks EqLaunchedServiceImpl eqLaunchedService;
 
   @Captor ArgumentCaptor<EqLaunchData> eqLaunchDataCaptor;
-  
 
   @BeforeEach
   public void setup() {
     when(appConfig.getEq().getProtocol()).thenReturn("https");
     when(appConfig.getEq().getHost()).thenReturn("www.google.com");
     when(appConfig.getEq().getPath()).thenReturn("/en/start/launch-eq/?token=");
-    
+
     when(appConfig.getEq().getResponseIdSalt()).thenReturn("123");
-    
+
     when(surveyUpdate.getSampleDefinitionUrl()).thenReturn("social.json");
   }
 
   @Test
   public void testEqLaunchedAddressAgentIdValue() throws Exception {
-    ClaimsDataDTO claimsDataDTO = ClaimsDataDTO.builder()
-        .uacUpdate(uacUpdate)
-        .caseUpdate(caseUpdate)
-        .collectionExerciseUpdate(collectionExerciseUpdate)
-        .surveyUpdate(surveyUpdate)
-        .build();
+    ClaimsDataDTO claimsDataDTO =
+        ClaimsDataDTO.builder()
+            .uacUpdate(uacUpdate)
+            .caseUpdate(caseUpdate)
+            .collectionExerciseUpdate(collectionExerciseUpdate)
+            .surveyUpdate(surveyUpdate)
+            .build();
 
-    EqLaunchDTO eqLaunchDTO = EqLaunchDTO.builder()
-        .languageCode(Language.WELSH)
-        .accountServiceUrl("/accountServiceUrl")
-        .accountServiceLogoutUrl("/accountServiceLogoutUrl")
-        .clientIP("11.22.33.44")
-        .build();
-    
+    EqLaunchDTO eqLaunchDTO =
+        EqLaunchDTO.builder()
+            .languageCode(Language.WELSH)
+            .accountServiceUrl("/accountServiceUrl")
+            .accountServiceLogoutUrl("/accountServiceLogoutUrl")
+            .clientIP("11.22.33.44")
+            .build();
+
     when(eqLaunchService.getEqLaunchJwe(any())).thenReturn("eyJraWQiOiIx...");
-   
+
     // Invoke code under test
     String eqLaunchURL = eqLaunchedService.createLaunchUrl(claimsDataDTO, eqLaunchDTO);
-    
-    assertEquals("https://www.google.com/en/start/launch-eq/?token=eyJraWQiOiIx...", eqLaunchURL);    
-    
+
+    assertEquals("https://www.google.com/en/start/launch-eq/?token=eyJraWQiOiIx...", eqLaunchURL);
+
     // Verify claims information passed to the eq-launcher
     verify(eqLaunchService).getEqLaunchJwe(eqLaunchDataCaptor.capture());
     EqLaunchData eqLaunchData = eqLaunchDataCaptor.getValue();
     assertEquals(Channel.RH, eqLaunchData.getChannel());
-    //TODO: Consider testing all fields of eqLaunchData once we have confirmed that the url is correctly constructed
+    // TODO: Consider testing all fields of eqLaunchData once we have confirmed that the url is
+    // correctly constructed
   }
 }

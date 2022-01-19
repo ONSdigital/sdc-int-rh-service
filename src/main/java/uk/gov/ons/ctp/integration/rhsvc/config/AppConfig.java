@@ -1,13 +1,11 @@
 package uk.gov.ons.ctp.integration.rhsvc.config;
 
 import java.util.Set;
-
+import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.validation.annotation.Validated;
-
-import lombok.Data;
 import uk.gov.ons.ctp.common.config.CustomCircuitBreakerConfig;
 import uk.gov.ons.ctp.integration.eqlaunch.crypto.KeyStore;
 

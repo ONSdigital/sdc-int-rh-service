@@ -2,10 +2,9 @@ package uk.gov.ons.ctp.integration.rhsvc.service.impl;
 
 import static uk.gov.ons.ctp.common.log.ScopedStructuredArguments.kv;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import lombok.extern.slf4j.Slf4j;
 import uk.gov.ons.ctp.common.domain.Channel;
 import uk.gov.ons.ctp.common.domain.Source;
 import uk.gov.ons.ctp.common.domain.SurveyType;
@@ -62,7 +61,7 @@ public class EqLaunchedServiceImpl {
           e);
       throw e;
     }
-    
+
     String eqUrl =
         appConfig.getEq().getProtocol()
             + "://"
@@ -72,7 +71,7 @@ public class EqLaunchedServiceImpl {
     if (log.isDebugEnabled()) {
       log.debug("Have created launch URL", kv("launchURL", eqUrl));
     }
-    
+
     return eqUrl;
   }
 }

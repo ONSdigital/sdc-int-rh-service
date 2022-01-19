@@ -3,13 +3,11 @@ package uk.gov.ons.ctp.integration.rhsvc.service.impl;
 import static uk.gov.ons.ctp.common.log.ScopedStructuredArguments.kv;
 
 import java.util.UUID;
-
+import lombok.extern.slf4j.Slf4j;
+import ma.glasnost.orika.MapperFacade;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import lombok.extern.slf4j.Slf4j;
-import ma.glasnost.orika.MapperFacade;
 import uk.gov.ons.ctp.common.domain.Channel;
 import uk.gov.ons.ctp.common.domain.Source;
 import uk.gov.ons.ctp.common.error.CTPException;
@@ -29,11 +27,11 @@ import uk.gov.ons.ctp.integration.rhsvc.repository.CollectionExerciseRepository;
 import uk.gov.ons.ctp.integration.rhsvc.repository.SurveyRepository;
 import uk.gov.ons.ctp.integration.rhsvc.repository.UacRepository;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.ClaimsDataDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CollectionExerciseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.EqLaunchDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.RhClaimsResponseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.SurveyLiteDTO;
-import uk.gov.ons.ctp.integration.rhsvc.representation.ClaimsDataDTO;
 
 /** Implementation to deal with UAC data */
 @Slf4j
@@ -45,11 +43,10 @@ public class UniqueAccessCodeServiceImpl {
   @Autowired private UacRepository uacDataRepo;
   @Autowired private EventPublisher eventPublisher;
   @Autowired private MapperFacade mapperFacade;
-  
+
   @Autowired private EqLaunchedServiceImpl eqLaunchedService;
   @Autowired private RateLimiterClient rateLimiterClient;
   @Autowired private AppConfig appConfig;
-
 
   /** Constructor */
   public UniqueAccessCodeServiceImpl() {}
@@ -62,47 +59,59 @@ public class UniqueAccessCodeServiceImpl {
    * @throws CTPException something went wrong
    */
   public RhClaimsResponseDTO getUACClaimContext(String uacHash) throws CTPException {
-    
+
     ClaimsDataDTO claims = buildClaimsData(uacHash);
-    
+
     sendUacAuthenticationEvent(claims.getCaseUpdate().getCaseId(), claims.getUacUpdate().getQid());
-    
-    RhClaimsResponseDTO rhClaimsDTO = createRhClaimsResponseDTO(claims.getUacUpdate(), claims.getCaseUpdate(), claims.getCollectionExerciseUpdate(), claims.getSurveyUpdate());
-    
+
+    RhClaimsResponseDTO rhClaimsDTO =
+        createRhClaimsResponseDTO(
+            claims.getUacUpdate(),
+            claims.getCaseUpdate(),
+            claims.getCollectionExerciseUpdate(),
+            claims.getSurveyUpdate());
+
     return rhClaimsDTO;
   }
-  
+
   /**
    * Creates the EQ launch URL, and also sends UAC authentication and launch events.
-   * 
+   *
    * @param uacHash uacHash hashed unique access code for which to retrieve data.
-   * @param eqLaunchedDTO contains data supplied to the endpoint which is needed in order to be able to create the EQ launch URL.
+   * @param eqLaunchedDTO contains data supplied to the endpoint which is needed in order to be able
+   *     to create the EQ launch URL.
    * @return String containing the EQ launch URL.
    * @throws CTPException if something went wrong.
    */
-  public String generateEqLaunchToken(String uacHash, EqLaunchDTO eqLaunchedDTO) throws CTPException {
+  public String generateEqLaunchToken(String uacHash, EqLaunchDTO eqLaunchedDTO)
+      throws CTPException {
 
-    log.info("Generating eq launch url and publish Launched event", kv("eqLaunchedDTO", eqLaunchedDTO));
-    
+    log.info(
+        "Generating eq launch url and publish Launched event", kv("eqLaunchedDTO", eqLaunchedDTO));
+
     checkRateLimit(eqLaunchedDTO.getClientIP());
 
     // Build launch URL
     ClaimsDataDTO claimsDataDTO = buildClaimsData(uacHash);
     String eqLaunchUrl = eqLaunchedService.createLaunchUrl(claimsDataDTO, eqLaunchedDTO);
-    
+
     // Publish the launch event
     EqLaunch eqLaunch = EqLaunch.builder().qid(claimsDataDTO.getUacUpdate().getQid()).build();
     UUID messageId =
         eventPublisher.sendEvent(TopicType.EQ_LAUNCH, Source.RESPONDENT_HOME, Channel.RH, eqLaunch);
-    log.debug("EqLaunch event published", kv("qid", eqLaunch.getQid()), kv("messageId", messageId), kv("caseId", claimsDataDTO.getCaseUpdate().getCaseId()));
-      
+    log.debug(
+        "EqLaunch event published",
+        kv("qid", eqLaunch.getQid()),
+        kv("messageId", messageId),
+        kv("caseId", claimsDataDTO.getCaseUpdate().getCaseId()));
+
     return eqLaunchUrl;
   }
-  
+
   private ClaimsDataDTO buildClaimsData(String uacHash) throws CTPException {
 
     ClaimsDataDTO claimsData;
-    
+
     UacUpdate uac =
         uacDataRepo
             .readUAC(uacHash)
@@ -115,12 +124,11 @@ public class UniqueAccessCodeServiceImpl {
     if (StringUtils.isEmpty(caseId)) {
       throw new CTPException(CTPException.Fault.SYSTEM_ERROR, "UAC has no caseId");
     }
-    
+
     CaseUpdate caseUpdate =
         caseDataRepo
             .readCaseUpdate(caseId)
-            .orElseThrow(
-                () -> new CTPException(CTPException.Fault.SYSTEM_ERROR, "Case Not Found"));
+            .orElseThrow(() -> new CTPException(CTPException.Fault.SYSTEM_ERROR, "Case Not Found"));
     SurveyUpdate survey =
         surveyDataRepo
             .readSurvey(caseUpdate.getSurveyId())
@@ -133,13 +141,14 @@ public class UniqueAccessCodeServiceImpl {
                 () ->
                     new CTPException(
                         CTPException.Fault.SYSTEM_ERROR, "CollectionExercise Not Found"));
-     
-    claimsData = ClaimsDataDTO.builder()
-      .uacUpdate(uac)
-      .caseUpdate(caseUpdate)
-      .collectionExerciseUpdate(collex)
-      .surveyUpdate(survey)
-      .build();
+
+    claimsData =
+        ClaimsDataDTO.builder()
+            .uacUpdate(uac)
+            .caseUpdate(caseUpdate)
+            .collectionExerciseUpdate(collex)
+            .surveyUpdate(survey)
+            .build();
 
     return claimsData;
   }
@@ -164,7 +173,7 @@ public class UniqueAccessCodeServiceImpl {
             + ", messageId: "
             + messageId);
   }
- 
+
   private RhClaimsResponseDTO createRhClaimsResponseDTO(
       UacUpdate uac,
       CaseUpdate collectionCase,
@@ -188,7 +197,7 @@ public class UniqueAccessCodeServiceImpl {
 
     return uniqueAccessCodeDTO;
   }
-  
+
   private void checkRateLimit(String ipAddress) throws CTPException {
     if (appConfig.getRateLimiter().isEnabled()) {
       int modulus = appConfig.getLoadshedding().getModulus();
