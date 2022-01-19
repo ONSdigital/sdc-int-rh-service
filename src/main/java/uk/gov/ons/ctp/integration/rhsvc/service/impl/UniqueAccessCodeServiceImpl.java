@@ -17,9 +17,13 @@ import uk.gov.ons.ctp.common.event.EventPublisher;
 import uk.gov.ons.ctp.common.event.TopicType;
 import uk.gov.ons.ctp.common.event.model.CaseUpdate;
 import uk.gov.ons.ctp.common.event.model.CollectionExerciseUpdate;
+import uk.gov.ons.ctp.common.event.model.EqLaunch;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 import uk.gov.ons.ctp.common.event.model.UacAuthentication;
 import uk.gov.ons.ctp.common.event.model.UacUpdate;
+import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient;
+import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient.Domain;
+import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.repository.CaseRepository;
 import uk.gov.ons.ctp.integration.rhsvc.repository.CollectionExerciseRepository;
 import uk.gov.ons.ctp.integration.rhsvc.repository.SurveyRepository;
@@ -43,6 +47,8 @@ public class UniqueAccessCodeServiceImpl {
   @Autowired private MapperFacade mapperFacade;
   
   @Autowired private EqLaunchedServiceImpl eqLaunchedService;
+  @Autowired private RateLimiterClient rateLimiterClient;
+  @Autowired private AppConfig appConfig;
 
 
   /** Constructor */
@@ -74,15 +80,23 @@ public class UniqueAccessCodeServiceImpl {
    * @return String containing the EQ launch URL.
    * @throws CTPException if something went wrong.
    */
-  public String createEqLaunchUrl(String uacHash, EqLaunchDTO eqLaunchedDTO) throws CTPException {
+  public String generateEqLaunchToken(String uacHash, EqLaunchDTO eqLaunchedDTO) throws CTPException {
 
-    ClaimsDataDTO claims = buildClaimsData(uacHash);
+    log.info("Generating eq launch url and publish Launched event", kv("eqLaunchedDTO", eqLaunchedDTO));
     
-    sendUacAuthenticationEvent(claims.getCaseUpdate().getCaseId(), claims.getUacUpdate().getQid());
-    
-    String launchURL = eqLaunchedService.generateEqLaunchToken(claims, eqLaunchedDTO);
+    checkRateLimit(eqLaunchedDTO.getClientIP());
 
-    return launchURL;
+    // Build launch URL
+    ClaimsDataDTO claimsDataDTO = buildClaimsData(uacHash);
+    String eqLaunchUrl = eqLaunchedService.createLaunchUrl(claimsDataDTO, eqLaunchedDTO);
+    
+    // Publish the launch event
+    EqLaunch eqLaunch = EqLaunch.builder().qid(claimsDataDTO.getUacUpdate().getQid()).build();
+    UUID messageId =
+        eventPublisher.sendEvent(TopicType.EQ_LAUNCH, Source.RESPONDENT_HOME, Channel.RH, eqLaunch);
+    log.debug("EqLaunch event published", kv("qid", eqLaunch.getQid()), kv("messageId", messageId), kv("caseId", claimsDataDTO.getCaseUpdate().getCaseId()));
+      
+    return eqLaunchUrl;
   }
   
   private ClaimsDataDTO buildClaimsData(String uacHash) throws CTPException {
@@ -173,5 +187,18 @@ public class UniqueAccessCodeServiceImpl {
     uniqueAccessCodeDTO.setSurvey(surveyLiteDTO);
 
     return uniqueAccessCodeDTO;
+  }
+  
+  private void checkRateLimit(String ipAddress) throws CTPException {
+    if (appConfig.getRateLimiter().isEnabled()) {
+      int modulus = appConfig.getLoadshedding().getModulus();
+      log.debug(
+          "Invoking rate limiter for survey launched",
+          kv("ipAddress", ipAddress),
+          kv("loadshedding.modulus", modulus));
+      rateLimiterClient.checkEqLaunchLimit(Domain.RH, ipAddress, modulus);
+    } else {
+      log.info("Rate limiter client is disabled");
+    }
   }
 }

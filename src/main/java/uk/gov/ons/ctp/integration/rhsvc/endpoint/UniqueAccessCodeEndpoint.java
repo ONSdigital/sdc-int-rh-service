@@ -85,7 +85,7 @@ public class UniqueAccessCodeEndpoint {
         .clientIP(clientIP)
         .build();
     
-    String launchURL = uacService.createEqLaunchUrl(uacHash, eqLaunchedDTO);
+    String launchURL = uacService.generateEqLaunchToken(uacHash, eqLaunchedDTO);
 
     log.debug("Exit POST surveyLaunched", kv("clientIP", eqLaunchedDTO.getClientIP()));
     
