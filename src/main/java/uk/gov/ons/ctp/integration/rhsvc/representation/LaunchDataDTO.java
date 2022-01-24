@@ -7,10 +7,10 @@ import uk.gov.ons.ctp.common.event.model.CollectionExerciseUpdate;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 import uk.gov.ons.ctp.common.event.model.UacUpdate;
 
-/** Representation of a UAC claim request */
+/** Holds data needed to launch EQ */
 @Data
 @Builder
-public class ClaimsDataDTO {
+public class LaunchDataDTO {
 
   private UacUpdate uacUpdate;
   private CaseUpdate caseUpdate;

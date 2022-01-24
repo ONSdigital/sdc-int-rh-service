@@ -27,9 +27,9 @@ import uk.gov.ons.ctp.integration.rhsvc.repository.CollectionExerciseRepository;
 import uk.gov.ons.ctp.integration.rhsvc.repository.SurveyRepository;
 import uk.gov.ons.ctp.integration.rhsvc.repository.UacRepository;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
-import uk.gov.ons.ctp.integration.rhsvc.representation.ClaimsDataDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CollectionExerciseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.EqLaunchDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.LaunchDataDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.RhClaimsResponseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.SurveyLiteDTO;
 
@@ -60,16 +60,17 @@ public class UniqueAccessCodeServiceImpl {
    */
   public RhClaimsResponseDTO getUACClaimContext(String uacHash) throws CTPException {
 
-    ClaimsDataDTO claims = buildClaimsData(uacHash);
+    LaunchDataDTO launchData = gatherLaunchData(uacHash);
 
-    sendUacAuthenticationEvent(claims.getCaseUpdate().getCaseId(), claims.getUacUpdate().getQid());
+    sendUacAuthenticationEvent(
+        launchData.getCaseUpdate().getCaseId(), launchData.getUacUpdate().getQid());
 
     RhClaimsResponseDTO rhClaimsDTO =
         createRhClaimsResponseDTO(
-            claims.getUacUpdate(),
-            claims.getCaseUpdate(),
-            claims.getCollectionExerciseUpdate(),
-            claims.getSurveyUpdate());
+            launchData.getUacUpdate(),
+            launchData.getCaseUpdate(),
+            launchData.getCollectionExerciseUpdate(),
+            launchData.getSurveyUpdate());
 
     return rhClaimsDTO;
   }
@@ -92,25 +93,25 @@ public class UniqueAccessCodeServiceImpl {
     checkRateLimit(eqLaunchedDTO.getClientIP());
 
     // Build launch URL
-    ClaimsDataDTO claimsDataDTO = buildClaimsData(uacHash);
-    String eqLaunchUrl = eqLaunchedService.createLaunchUrl(claimsDataDTO, eqLaunchedDTO);
+    LaunchDataDTO launchData = gatherLaunchData(uacHash);
+    String eqLaunchUrl = eqLaunchedService.createLaunchUrl(launchData, eqLaunchedDTO);
 
     // Publish the launch event
-    EqLaunch eqLaunch = EqLaunch.builder().qid(claimsDataDTO.getUacUpdate().getQid()).build();
+    EqLaunch eqLaunch = EqLaunch.builder().qid(launchData.getUacUpdate().getQid()).build();
     UUID messageId =
         eventPublisher.sendEvent(TopicType.EQ_LAUNCH, Source.RESPONDENT_HOME, Channel.RH, eqLaunch);
     log.debug(
         "EqLaunch event published",
         kv("qid", eqLaunch.getQid()),
         kv("messageId", messageId),
-        kv("caseId", claimsDataDTO.getCaseUpdate().getCaseId()));
+        kv("caseId", launchData.getCaseUpdate().getCaseId()));
 
     return eqLaunchUrl;
   }
 
-  private ClaimsDataDTO buildClaimsData(String uacHash) throws CTPException {
+  private LaunchDataDTO gatherLaunchData(String uacHash) throws CTPException {
 
-    ClaimsDataDTO claimsData;
+    LaunchDataDTO launchData;
 
     UacUpdate uac =
         uacDataRepo
@@ -142,15 +143,15 @@ public class UniqueAccessCodeServiceImpl {
                     new CTPException(
                         CTPException.Fault.SYSTEM_ERROR, "CollectionExercise Not Found"));
 
-    claimsData =
-        ClaimsDataDTO.builder()
+    launchData =
+        LaunchDataDTO.builder()
             .uacUpdate(uac)
             .caseUpdate(caseUpdate)
             .collectionExerciseUpdate(collex)
             .surveyUpdate(survey)
             .build();
 
-    return claimsData;
+    return launchData;
   }
 
   /** Send UacAuthentication event */

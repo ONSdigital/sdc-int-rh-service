@@ -16,8 +16,8 @@ import uk.gov.ons.ctp.common.event.model.UacUpdate;
 import uk.gov.ons.ctp.integration.eqlaunch.service.EqLaunchData;
 import uk.gov.ons.ctp.integration.eqlaunch.service.EqLaunchService;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
-import uk.gov.ons.ctp.integration.rhsvc.representation.ClaimsDataDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.EqLaunchDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.LaunchDataDTO;
 
 /** This is a service layer class, which performs RH business level logic for the endpoints. */
 @Slf4j
@@ -26,15 +26,14 @@ public class EqLaunchedServiceImpl {
   @Autowired private AppConfig appConfig;
   @Autowired private EqLaunchService eqLaunchService;
 
-  String createLaunchUrl(ClaimsDataDTO claimsDataDTO, EqLaunchDTO eqLaunchedDTO)
-      throws CTPException {
+  String createLaunchUrl(LaunchDataDTO launchData, EqLaunchDTO eqLaunchedDTO) throws CTPException {
 
     String encryptedPayload = "";
 
-    UacUpdate uacUpdate = claimsDataDTO.getUacUpdate();
-    CaseUpdate caze = claimsDataDTO.getCaseUpdate();
-    CollectionExerciseUpdate collex = claimsDataDTO.getCollectionExerciseUpdate();
-    SurveyUpdate survey = claimsDataDTO.getSurveyUpdate();
+    UacUpdate uacUpdate = launchData.getUacUpdate();
+    CaseUpdate caze = launchData.getCaseUpdate();
+    CollectionExerciseUpdate collex = launchData.getCollectionExerciseUpdate();
+    SurveyUpdate survey = launchData.getSurveyUpdate();
 
     try {
       EqLaunchData eqLaunchData =

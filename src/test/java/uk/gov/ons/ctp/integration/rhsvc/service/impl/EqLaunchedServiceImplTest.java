@@ -24,8 +24,8 @@ import uk.gov.ons.ctp.common.event.model.UacUpdate;
 import uk.gov.ons.ctp.integration.eqlaunch.service.EqLaunchData;
 import uk.gov.ons.ctp.integration.eqlaunch.service.EqLaunchService;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
-import uk.gov.ons.ctp.integration.rhsvc.representation.ClaimsDataDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.EqLaunchDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.LaunchDataDTO;
 
 @ExtendWith(MockitoExtension.class)
 public class EqLaunchedServiceImplTest {
@@ -56,8 +56,8 @@ public class EqLaunchedServiceImplTest {
 
   @Test
   public void testEqLaunchedAddressAgentIdValue() throws Exception {
-    ClaimsDataDTO claimsDataDTO =
-        ClaimsDataDTO.builder()
+    LaunchDataDTO launchData =
+        LaunchDataDTO.builder()
             .uacUpdate(uacUpdate)
             .caseUpdate(caseUpdate)
             .collectionExerciseUpdate(collectionExerciseUpdate)
@@ -75,7 +75,7 @@ public class EqLaunchedServiceImplTest {
     when(eqLaunchService.getEqLaunchJwe(any())).thenReturn("eyJraWQiOiIx...");
 
     // Invoke code under test
-    String eqLaunchURL = eqLaunchedService.createLaunchUrl(claimsDataDTO, eqLaunchDTO);
+    String eqLaunchURL = eqLaunchedService.createLaunchUrl(launchData, eqLaunchDTO);
 
     assertEquals("https://www.google.com/en/start/launch-eq/?token=eyJraWQiOiIx...", eqLaunchURL);
 
