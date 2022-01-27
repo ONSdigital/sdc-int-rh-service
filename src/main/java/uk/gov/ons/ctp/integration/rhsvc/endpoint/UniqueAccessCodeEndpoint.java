@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.ons.ctp.common.domain.Language;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.error.CTPException.Fault;
-import uk.gov.ons.ctp.integration.rhsvc.representation.EqLaunchDTO;
-import uk.gov.ons.ctp.integration.rhsvc.representation.RhClaimsResponseDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.EqLaunchRequestDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.UACContextDTO;
 import uk.gov.ons.ctp.integration.rhsvc.service.impl.UniqueAccessCodeServiceImpl;
 
 /** The REST endpoint controller for UAC requests. */
@@ -35,11 +35,11 @@ public class UniqueAccessCodeEndpoint {
    * @throws CTPException something went wrong
    */
   @RequestMapping(value = "/{uacHash}", method = RequestMethod.GET)
-  public ResponseEntity<RhClaimsResponseDTO> getUACClaimContext(
+  public ResponseEntity<UACContextDTO> getUACClaimContext(
       @PathVariable("uacHash") final String uacHash) throws CTPException {
 
     log.info("Entering GET getUACClaimContext", kv("uacHash", uacHash));
-    RhClaimsResponseDTO uacDTO = uacService.getUACClaimContext(uacHash);
+    UACContextDTO uacDTO = uacService.getUACClaimContext(uacHash);
 
     log.debug("Exit GET getUACClaimContext");
 
@@ -80,8 +80,8 @@ public class UniqueAccessCodeEndpoint {
     }
 
     // Generate launch URL
-    EqLaunchDTO eqLaunchedDTO =
-        EqLaunchDTO.builder()
+    EqLaunchRequestDTO eqLaunchedDTO =
+        EqLaunchRequestDTO.builder()
             .languageCode(language)
             .accountServiceUrl(accountServiceUrl)
             .accountServiceLogoutUrl(accountServiceLogoutUrl)

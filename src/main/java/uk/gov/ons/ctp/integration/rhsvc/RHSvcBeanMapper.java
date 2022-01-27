@@ -27,7 +27,7 @@ import uk.gov.ons.ctp.common.util.StringToUUIDConverter;
 import uk.gov.ons.ctp.integration.rhsvc.representation.AddressDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CollectionExerciseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.NewCaseDTO;
-import uk.gov.ons.ctp.integration.rhsvc.representation.RhClaimsResponseDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.UACContextDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.SurveyLiteDTO;
 
 /** The bean mapper that maps to/from DTOs and repository entity types. */
@@ -49,7 +49,7 @@ public class RHSvcBeanMapper extends ConfigurableMapper {
     converterFactory.registerConverter(new ArrayListConverter());
 
     factory
-        .classMap(UacUpdate.class, RhClaimsResponseDTO.class)
+        .classMap(UacUpdate.class, UACContextDTO.class)
         .field("metadata.wave", "wave")
         .byDefault()
         .register();

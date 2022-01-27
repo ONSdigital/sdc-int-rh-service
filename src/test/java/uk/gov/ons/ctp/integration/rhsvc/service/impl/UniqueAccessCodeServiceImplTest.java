@@ -49,8 +49,8 @@ import uk.gov.ons.ctp.integration.rhsvc.repository.CaseRepository;
 import uk.gov.ons.ctp.integration.rhsvc.repository.CollectionExerciseRepository;
 import uk.gov.ons.ctp.integration.rhsvc.repository.SurveyRepository;
 import uk.gov.ons.ctp.integration.rhsvc.repository.UacRepository;
-import uk.gov.ons.ctp.integration.rhsvc.representation.EqLaunchDTO;
-import uk.gov.ons.ctp.integration.rhsvc.representation.RhClaimsResponseDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.EqLaunchRequestDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.UACContextDTO;
 
 // ** Unit tests of the Unique Access Code Service */
 @ExtendWith(MockitoExtension.class)
@@ -79,7 +79,7 @@ public class UniqueAccessCodeServiceImplTest {
   @Captor ArgumentCaptor<EqLaunch> sendEventCaptor;
 
   @Mock private RateLimiterClient rateLimiterClient;
-  @Mock private EqLaunchedServiceImpl eqLaunchedService;
+  @Mock private EqLaunchServiceImpl eqLaunchedService;
 
   @Test
   public void getUAC_LinkedToExistingCase() throws Exception {
@@ -95,7 +95,7 @@ public class UniqueAccessCodeServiceImplTest {
     when(collExDataRepo.readCollectionExercise(COLLECTION_EXERCISE_ID))
         .thenReturn(Optional.of(collexTest));
 
-    RhClaimsResponseDTO uacDTO = uacSvc.getUACClaimContext(UAC_HASH);
+    UACContextDTO uacDTO = uacSvc.getUACClaimContext(UAC_HASH);
 
     verify(uacDataRepo, times(1)).readUAC(UAC_HASH);
     verify(caseDataRepo, times(1)).readCaseUpdate(CASE_ID);
@@ -306,8 +306,8 @@ public class UniqueAccessCodeServiceImplTest {
 
     when(eqLaunchedService.createLaunchUrl(any(), any())).thenReturn("http:eq-lpmb");
 
-    EqLaunchDTO eqLaunchDTO =
-        EqLaunchDTO.builder()
+    EqLaunchRequestDTO eqLaunchDTO =
+        EqLaunchRequestDTO.builder()
             .languageCode(Language.WELSH)
             .accountServiceUrl("/accountServiceUrl")
             .accountServiceLogoutUrl("/accountServiceLogoutUrl")

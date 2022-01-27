@@ -16,17 +16,17 @@ import uk.gov.ons.ctp.common.event.model.UacUpdate;
 import uk.gov.ons.ctp.integration.eqlaunch.service.EqLaunchData;
 import uk.gov.ons.ctp.integration.eqlaunch.service.EqLaunchService;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
-import uk.gov.ons.ctp.integration.rhsvc.representation.EqLaunchDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.EqLaunchRequestDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.LaunchDataDTO;
 
 /** This is a service layer class, which performs RH business level logic for the endpoints. */
 @Slf4j
 @Service
-public class EqLaunchedServiceImpl {
+public class EqLaunchServiceImpl {
   @Autowired private AppConfig appConfig;
   @Autowired private EqLaunchService eqLaunchService;
 
-  String createLaunchUrl(LaunchDataDTO launchData, EqLaunchDTO eqLaunchedDTO) throws CTPException {
+  String createLaunchUrl(LaunchDataDTO launchData, EqLaunchRequestDTO eqLaunchedDTO) throws CTPException {
 
     String encryptedPayload = "";
 

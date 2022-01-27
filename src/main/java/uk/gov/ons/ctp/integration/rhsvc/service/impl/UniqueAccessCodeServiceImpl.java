@@ -28,9 +28,9 @@ import uk.gov.ons.ctp.integration.rhsvc.repository.SurveyRepository;
 import uk.gov.ons.ctp.integration.rhsvc.repository.UacRepository;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CollectionExerciseDTO;
-import uk.gov.ons.ctp.integration.rhsvc.representation.EqLaunchDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.EqLaunchRequestDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.LaunchDataDTO;
-import uk.gov.ons.ctp.integration.rhsvc.representation.RhClaimsResponseDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.UACContextDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.SurveyLiteDTO;
 
 /** Implementation to deal with UAC data */
@@ -44,7 +44,7 @@ public class UniqueAccessCodeServiceImpl {
   @Autowired private EventPublisher eventPublisher;
   @Autowired private MapperFacade mapperFacade;
 
-  @Autowired private EqLaunchedServiceImpl eqLaunchedService;
+  @Autowired private EqLaunchServiceImpl eqLaunchedService;
   @Autowired private RateLimiterClient rateLimiterClient;
   @Autowired private AppConfig appConfig;
 
@@ -58,21 +58,21 @@ public class UniqueAccessCodeServiceImpl {
    * @return RhClaimsResponseDTO holding the UAC data to respond to the request.
    * @throws CTPException something went wrong
    */
-  public RhClaimsResponseDTO getUACClaimContext(String uacHash) throws CTPException {
+  public UACContextDTO getUACClaimContext(String uacHash) throws CTPException {
 
     LaunchDataDTO launchData = gatherLaunchData(uacHash);
 
     sendUacAuthenticationEvent(
         launchData.getCaseUpdate().getCaseId(), launchData.getUacUpdate().getQid());
 
-    RhClaimsResponseDTO rhClaimsDTO =
+    UACContextDTO uacContextDTO =
         createRhClaimsResponseDTO(
             launchData.getUacUpdate(),
             launchData.getCaseUpdate(),
             launchData.getCollectionExerciseUpdate(),
             launchData.getSurveyUpdate());
 
-    return rhClaimsDTO;
+    return uacContextDTO;
   }
 
   /**
@@ -84,7 +84,7 @@ public class UniqueAccessCodeServiceImpl {
    * @return String containing the EQ launch URL.
    * @throws CTPException if something went wrong.
    */
-  public String generateEqLaunchToken(String uacHash, EqLaunchDTO eqLaunchedDTO)
+  public String generateEqLaunchToken(String uacHash, EqLaunchRequestDTO eqLaunchedDTO)
       throws CTPException {
 
     log.info(
@@ -175,12 +175,12 @@ public class UniqueAccessCodeServiceImpl {
             + messageId);
   }
 
-  private RhClaimsResponseDTO createRhClaimsResponseDTO(
+  private UACContextDTO createRhClaimsResponseDTO(
       UacUpdate uac,
       CaseUpdate collectionCase,
       CollectionExerciseUpdate collectionExercise,
       SurveyUpdate surveyUpdate) {
-    RhClaimsResponseDTO uniqueAccessCodeDTO = new RhClaimsResponseDTO();
+    UACContextDTO uniqueAccessCodeDTO = new UACContextDTO();
 
     mapperFacade.map(uac, uniqueAccessCodeDTO);
 

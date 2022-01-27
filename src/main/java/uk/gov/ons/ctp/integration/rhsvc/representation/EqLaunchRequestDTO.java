@@ -14,7 +14,7 @@ import uk.gov.ons.ctp.common.domain.Language;
 @AllArgsConstructor
 @Builder
 @SuppressWarnings("serial")
-public class EqLaunchDTO implements Serializable {
+public class EqLaunchRequestDTO implements Serializable {
 
   @NotNull private Language languageCode;
 

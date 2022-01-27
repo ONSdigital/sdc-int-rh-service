@@ -24,7 +24,7 @@ import uk.gov.ons.ctp.common.event.model.UacUpdate;
 import uk.gov.ons.ctp.integration.eqlaunch.service.EqLaunchData;
 import uk.gov.ons.ctp.integration.eqlaunch.service.EqLaunchService;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
-import uk.gov.ons.ctp.integration.rhsvc.representation.EqLaunchDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.EqLaunchRequestDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.LaunchDataDTO;
 
 @ExtendWith(MockitoExtension.class)
@@ -39,7 +39,7 @@ public class EqLaunchedServiceImplTest {
 
   @Mock private EqLaunchService eqLaunchService;
 
-  @InjectMocks EqLaunchedServiceImpl eqLaunchedService;
+  @InjectMocks EqLaunchServiceImpl eqLaunchedService;
 
   @Captor ArgumentCaptor<EqLaunchData> eqLaunchDataCaptor;
 
@@ -64,8 +64,8 @@ public class EqLaunchedServiceImplTest {
             .surveyUpdate(surveyUpdate)
             .build();
 
-    EqLaunchDTO eqLaunchDTO =
-        EqLaunchDTO.builder()
+    EqLaunchRequestDTO eqLaunchDTO =
+        EqLaunchRequestDTO.builder()
             .languageCode(Language.WELSH)
             .accountServiceUrl("/accountServiceUrl")
             .accountServiceLogoutUrl("/accountServiceLogoutUrl")
