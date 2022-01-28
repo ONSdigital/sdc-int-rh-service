@@ -26,7 +26,8 @@ public class EqLaunchServiceImpl {
   @Autowired private AppConfig appConfig;
   @Autowired private EqLaunchService eqLaunchService;
 
-  String createLaunchUrl(LaunchDataDTO launchData, EqLaunchRequestDTO eqLaunchedDTO) throws CTPException {
+  String createLaunchUrl(LaunchDataDTO launchData, EqLaunchRequestDTO eqLaunchedDTO)
+      throws CTPException {
 
     String encryptedPayload = "";
 

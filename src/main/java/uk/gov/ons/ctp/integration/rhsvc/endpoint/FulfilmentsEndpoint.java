@@ -21,7 +21,7 @@ import uk.gov.ons.ctp.integration.common.product.model.Product.CaseType;
 import uk.gov.ons.ctp.integration.common.product.model.Product.DeliveryChannel;
 import uk.gov.ons.ctp.integration.common.product.model.Product.Region;
 import uk.gov.ons.ctp.integration.rhsvc.representation.OldProductDTO;
-import uk.gov.ons.ctp.integration.rhsvc.service.FulfilmentsService;
+import uk.gov.ons.ctp.integration.rhsvc.service.impl.FulfilmentsServiceImpl;
 
 /** The REST controller for the RH Fulfilment end points */
 @Slf4j
@@ -29,10 +29,10 @@ import uk.gov.ons.ctp.integration.rhsvc.service.FulfilmentsService;
 @RestController
 @RequestMapping(value = "/", produces = "application/json")
 public final class FulfilmentsEndpoint implements CTPEndpoint {
-  private FulfilmentsService fulfilmentsService;
+  private FulfilmentsServiceImpl fulfilmentsService;
 
   @Autowired
-  public FulfilmentsEndpoint(final FulfilmentsService fulfilmentsService) {
+  public FulfilmentsEndpoint(final FulfilmentsServiceImpl fulfilmentsService) {
     this.fulfilmentsService = fulfilmentsService;
   }
 

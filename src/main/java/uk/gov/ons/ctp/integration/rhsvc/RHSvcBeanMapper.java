@@ -27,8 +27,8 @@ import uk.gov.ons.ctp.common.util.StringToUUIDConverter;
 import uk.gov.ons.ctp.integration.rhsvc.representation.AddressDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CollectionExerciseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.NewCaseDTO;
-import uk.gov.ons.ctp.integration.rhsvc.representation.UACContextDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.SurveyLiteDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.UACContextDTO;
 
 /** The bean mapper that maps to/from DTOs and repository entity types. */
 @Component

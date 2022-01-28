@@ -27,7 +27,7 @@ import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.error.RestExceptionHandler;
 import uk.gov.ons.ctp.common.jackson.CustomObjectMapper;
 import uk.gov.ons.ctp.integration.rhsvc.representation.OldProductDTO;
-import uk.gov.ons.ctp.integration.rhsvc.service.FulfilmentsService;
+import uk.gov.ons.ctp.integration.rhsvc.service.impl.FulfilmentsServiceImpl;
 
 /**
  * This class holds unit tests for the Fulfilments Endpoint to validate its handling of requests and
@@ -37,7 +37,7 @@ import uk.gov.ons.ctp.integration.rhsvc.service.FulfilmentsService;
 public final class FulfilmentsEndpointUnitTest {
   @InjectMocks private FulfilmentsEndpoint fulfilmentsEndpoint;
 
-  @Mock FulfilmentsService fulfilmentsService;
+  @Mock FulfilmentsServiceImpl fulfilmentsService;
 
   private MockMvc mockMvc;
 

@@ -22,8 +22,8 @@ import uk.gov.ons.ctp.common.event.model.UacUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CollectionExerciseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.ProductDTO;
-import uk.gov.ons.ctp.integration.rhsvc.representation.UACContextDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.SurveyLiteDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.UACContextDTO;
 
 @DisplayName("RHSvc Bean Mapper Test")
 public class RHSvcBeanMapperTest {

@@ -13,16 +13,14 @@ import uk.gov.ons.ctp.integration.common.product.model.Product.DeliveryChannel;
 import uk.gov.ons.ctp.integration.common.product.model.Product.Region;
 import uk.gov.ons.ctp.integration.common.product.model.Product.RequestChannel;
 import uk.gov.ons.ctp.integration.rhsvc.representation.OldProductDTO;
-import uk.gov.ons.ctp.integration.rhsvc.service.FulfilmentsService;
 
 @Service
-public class FulfilmentsServiceImpl implements FulfilmentsService {
+public class FulfilmentsServiceImpl {
 
   @Autowired ProductReference productReference;
 
   @Autowired MapperFacade mapperFacade;
 
-  @Override
   public List<OldProductDTO> getFulfilments(
       List<CaseType> caseTypes,
       Region region,

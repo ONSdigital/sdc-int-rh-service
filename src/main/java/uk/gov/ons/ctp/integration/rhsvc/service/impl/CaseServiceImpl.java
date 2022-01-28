@@ -42,12 +42,11 @@ import uk.gov.ons.ctp.integration.rhsvc.representation.FulfilmentRequestDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.NewCaseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.PostalFulfilmentRequestDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.SMSFulfilmentRequestDTO;
-import uk.gov.ons.ctp.integration.rhsvc.service.CaseService;
 
 /** Implementation to deal with Case data */
 @Slf4j
 @Service
-public class CaseServiceImpl implements CaseService {
+public class CaseServiceImpl {
   @Autowired private AppConfig appConfig;
   @Autowired private CaseRepository dataRepo;
   @Autowired private MapperFacade mapperFacade;
@@ -57,7 +56,6 @@ public class CaseServiceImpl implements CaseService {
 
   private MapperFacade mapper = new RHSvcBeanMapper();
 
-  @Override
   public List<CaseDTO> findCasesBySampleAttribute(
       final String attributeKey, final String attributeValue) throws CTPException {
 
@@ -77,7 +75,6 @@ public class CaseServiceImpl implements CaseService {
    * @param requestBodyDTO contains the parameters from the originating http POST request.
    * @throws CTPException if the specified case cannot be found, or if no matching product is found.
    */
-  @Override
   public void fulfilmentRequestBySMS(SMSFulfilmentRequestDTO requestBodyDTO) throws CTPException {
     Contact contact = new Contact();
     contact.setTelNo(requestBodyDTO.getTelNo());
@@ -87,7 +84,6 @@ public class CaseServiceImpl implements CaseService {
     createAndSendFulfilments(DeliveryChannel.SMS, contact, requestBodyDTO, products);
   }
 
-  @Override
   public void fulfilmentRequestByPost(PostalFulfilmentRequestDTO requestBodyDTO)
       throws CTPException {
     Contact contact = new Contact();
@@ -101,7 +97,6 @@ public class CaseServiceImpl implements CaseService {
     createAndSendFulfilments(DeliveryChannel.POST, contact, requestBodyDTO, products);
   }
 
-  @Override
   public void sendNewCaseEvent(NewCaseDTO newCaseDTO) throws CTPException {
     log.debug(
         "Entering createAndSendNewCase",

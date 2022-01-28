@@ -30,8 +30,8 @@ import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CollectionExerciseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.EqLaunchRequestDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.LaunchDataDTO;
-import uk.gov.ons.ctp.integration.rhsvc.representation.UACContextDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.SurveyLiteDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.UACContextDTO;
 
 /** Implementation to deal with UAC data */
 @Slf4j
