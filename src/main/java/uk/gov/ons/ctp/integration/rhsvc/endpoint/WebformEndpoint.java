@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.integration.rhsvc.representation.WebformDTO;
-import uk.gov.ons.ctp.integration.rhsvc.service.WebformService;
+import uk.gov.ons.ctp.integration.rhsvc.service.impl.WebformServiceImpl;
 
 /** The REST endpoint controller for the webform endpoint. */
 @Slf4j
@@ -21,7 +21,7 @@ import uk.gov.ons.ctp.integration.rhsvc.service.WebformService;
 @RestController
 @RequestMapping(value = "/", produces = "application/json")
 public final class WebformEndpoint {
-  @Autowired private WebformService webformService;
+  @Autowired private WebformServiceImpl webformService;
 
   @RequestMapping(value = "/webform", method = RequestMethod.POST)
   public void webformCapture(@Valid @RequestBody WebformDTO webform) throws CTPException {

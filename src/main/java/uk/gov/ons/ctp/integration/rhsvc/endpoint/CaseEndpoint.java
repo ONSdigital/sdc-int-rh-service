@@ -22,7 +22,7 @@ import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.NewCaseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.PostalFulfilmentRequestDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.SMSFulfilmentRequestDTO;
-import uk.gov.ons.ctp.integration.rhsvc.service.CaseService;
+import uk.gov.ons.ctp.integration.rhsvc.service.impl.CaseServiceImpl;
 
 /** The REST controller to deal with Cases */
 @Slf4j
@@ -30,7 +30,7 @@ import uk.gov.ons.ctp.integration.rhsvc.service.CaseService;
 @RestController
 @RequestMapping(value = "/cases", produces = "application/json")
 public class CaseEndpoint {
-  @Autowired private CaseService caseService;
+  @Autowired private CaseServiceImpl caseService;
 
   /**
    * the GET end point to return latest valid Case which matches the supplied sample attribute

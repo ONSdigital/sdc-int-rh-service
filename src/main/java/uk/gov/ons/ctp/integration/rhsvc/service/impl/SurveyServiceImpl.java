@@ -15,10 +15,9 @@ import uk.gov.ons.ctp.integration.rhsvc.RHSvcBeanMapper;
 import uk.gov.ons.ctp.integration.rhsvc.repository.SurveyRepository;
 import uk.gov.ons.ctp.integration.rhsvc.representation.ProductDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.SurveyDTO;
-import uk.gov.ons.ctp.integration.rhsvc.service.SurveyService;
 
 @Service
-public class SurveyServiceImpl implements SurveyService {
+public class SurveyServiceImpl {
   private SurveyRepository dataRepo;
   private RHSvcBeanMapper mapper;
 
@@ -27,14 +26,12 @@ public class SurveyServiceImpl implements SurveyService {
     this.mapper = mapper;
   }
 
-  @Override
   public List<SurveyDTO> listSurveys() throws CTPException {
     List<SurveyUpdate> surveys = dataRepo.listSurveys();
     var dtos = surveys.stream().map(this::from).collect(toList());
     return dtos;
   }
 
-  @Override
   public SurveyDTO survey(UUID surveyId) throws CTPException {
     SurveyUpdate surveyUpdate =
         dataRepo

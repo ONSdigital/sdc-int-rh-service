@@ -23,7 +23,7 @@
     <groupId>ons.sdc.int.common</groupId>
     <artifactId>common</artifactId>
     <!-- change this to the version of ALL common libs to be used by this build -->
-    <version>1.0.76</version>
+    <version>1.0.77-SNAPSHOT</version>
   </parent>
 
   <scm>
@@ -165,6 +165,13 @@
       <artifactId>rate-limiter-client</artifactId>
       <version>${project.parent.version}</version>
     </dependency>
+    
+    <dependency>
+      <groupId>ons.sdc.int.common</groupId>
+      <artifactId>eq-launcher</artifactId>
+      <version>${project.parent.version}</version>
+    </dependency>
+    
     <!-- END OF ONS DEPENDENCIES -->
 
     <!-- APP SPECIFIC DEPENDENCIES -->

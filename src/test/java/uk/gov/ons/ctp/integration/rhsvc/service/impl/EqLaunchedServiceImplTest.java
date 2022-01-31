@@ -1,13 +1,11 @@
 package uk.gov.ons.ctp.integration.rhsvc.service.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.never;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,108 +13,77 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.ons.ctp.common.domain.Channel;
-import uk.gov.ons.ctp.common.domain.Source;
-import uk.gov.ons.ctp.common.event.EventPublisher;
-import uk.gov.ons.ctp.common.event.TopicType;
-import uk.gov.ons.ctp.common.event.model.EqLaunch;
-import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient;
-import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient.Domain;
+import uk.gov.ons.ctp.common.domain.Language;
+import uk.gov.ons.ctp.common.event.model.CaseUpdate;
+import uk.gov.ons.ctp.common.event.model.CollectionExerciseUpdate;
+import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
+import uk.gov.ons.ctp.common.event.model.UacUpdate;
+import uk.gov.ons.ctp.integration.eqlaunch.service.EqLaunchData;
+import uk.gov.ons.ctp.integration.eqlaunch.service.EqLaunchService;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
-import uk.gov.ons.ctp.integration.rhsvc.config.LoadsheddingConfig;
-import uk.gov.ons.ctp.integration.rhsvc.config.RateLimiterConfig;
-import uk.gov.ons.ctp.integration.rhsvc.representation.EqLaunchedDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.EqLaunchRequestDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.LaunchDataDTO;
 
 @ExtendWith(MockitoExtension.class)
 public class EqLaunchedServiceImplTest {
-  private static final int A_MODULUS = 10;
-  private static final String AN_IP_ADDR = "254.123.786.3";
 
-  @Mock private EventPublisher publisher;
-  @Mock private RateLimiterClient rateLimiterClient;
-  @Mock private AppConfig appConfig;
+  private AppConfig appConfig = mock(AppConfig.class, Mockito.RETURNS_DEEP_STUBS);
 
-  @InjectMocks EqLaunchedServiceImpl eqLaunchedService;
+  @Mock private UacUpdate uacUpdate;
+  @Mock private CaseUpdate caseUpdate;
+  @Mock private CollectionExerciseUpdate collectionExerciseUpdate;
+  @Mock private SurveyUpdate surveyUpdate;
 
-  @Captor ArgumentCaptor<EqLaunch> sendEventCaptor;
+  @Mock private EqLaunchService eqLaunchService;
 
-  private EqLaunchedDTO eqLaunchedDTO;
+  @InjectMocks EqLaunchServiceImpl eqLaunchedService;
+
+  @Captor ArgumentCaptor<EqLaunchData> eqLaunchDataCaptor;
 
   @BeforeEach
   public void setup() {
-    mockEnableRateLimiter(true);
+    when(appConfig.getEq().getProtocol()).thenReturn("https");
+    when(appConfig.getEq().getHost()).thenReturn("www.google.com");
+    when(appConfig.getEq().getPath()).thenReturn("/en/start/launch-eq/?token=");
 
-    LoadsheddingConfig loadsheddingConf = new LoadsheddingConfig();
-    loadsheddingConf.setModulus(10);
-    lenient().when(appConfig.getLoadshedding()).thenReturn(loadsheddingConf);
+    when(appConfig.getEq().getResponseIdSalt()).thenReturn("123");
 
-    createPayload();
-  }
-
-  private void createPayload() {
-    eqLaunchedDTO = new EqLaunchedDTO();
-    eqLaunchedDTO.setQuestionnaireId("1234");
-    eqLaunchedDTO.setCaseId(UUID.fromString("3fa85f64-5717-4562-b3fc-2c963f66afa6"));
-    eqLaunchedDTO.setAgentId("1000007");
-    eqLaunchedDTO.setClientIP(AN_IP_ADDR);
-  }
-
-  private void mockEnableRateLimiter(boolean enabled) {
-    RateLimiterConfig config = new RateLimiterConfig();
-    config.setEnabled(enabled);
-    when(appConfig.getRateLimiter()).thenReturn(config);
-  }
-
-  private void verifyRateLimiterCalled() throws Exception {
-    verify(rateLimiterClient).checkEqLaunchLimit(eq(Domain.RH), eq(AN_IP_ADDR), eq(A_MODULUS));
-  }
-
-  private void verifyRateLimiterNotCalled() throws Exception {
-    verify(rateLimiterClient, never())
-        .checkEqLaunchLimit(eq(Domain.RH), eq(AN_IP_ADDR), eq(A_MODULUS));
-  }
-
-  private void callAndVerifyEqLaunched(Channel expectedChannel) throws Exception {
-    eqLaunchedService.eqLaunched(eqLaunchedDTO);
-
-    // Get hold of the event pay load that eqLaunchedService created
-    verify(publisher)
-        .sendEvent(
-            eq(TopicType.EQ_LAUNCH),
-            eq(Source.RESPONDENT_HOME),
-            eq(expectedChannel),
-            sendEventCaptor.capture());
-    EqLaunch eventPayload = sendEventCaptor.getValue();
-
-    // Verify contents of pay load object
-    assertEquals(eqLaunchedDTO.getQuestionnaireId(), eventPayload.getQid());
+    when(surveyUpdate.getSampleDefinitionUrl()).thenReturn("social.json");
   }
 
   @Test
   public void testEqLaunchedAddressAgentIdValue() throws Exception {
-    callAndVerifyEqLaunched(Channel.AD);
-    verifyRateLimiterCalled();
-  }
+    LaunchDataDTO launchData =
+        LaunchDataDTO.builder()
+            .uacUpdate(uacUpdate)
+            .caseUpdate(caseUpdate)
+            .collectionExerciseUpdate(collectionExerciseUpdate)
+            .surveyUpdate(surveyUpdate)
+            .build();
 
-  @Test
-  public void testEqLaunchedAddressAgentIdEmptyString() throws Exception {
-    eqLaunchedDTO.setAgentId("");
-    callAndVerifyEqLaunched(Channel.RH);
-    verifyRateLimiterCalled();
-  }
+    EqLaunchRequestDTO eqLaunchDTO =
+        EqLaunchRequestDTO.builder()
+            .languageCode(Language.WELSH)
+            .accountServiceUrl("/accountServiceUrl")
+            .accountServiceLogoutUrl("/accountServiceLogoutUrl")
+            .clientIP("11.22.33.44")
+            .build();
 
-  @Test
-  public void testEqLaunchedAddressAgentIdNull() throws Exception {
-    eqLaunchedDTO.setAgentId(null);
-    callAndVerifyEqLaunched(Channel.RH);
-    verifyRateLimiterCalled();
-  }
+    when(eqLaunchService.getEqLaunchJwe(any())).thenReturn("eyJraWQiOiIx...");
 
-  @Test
-  public void shouldNotCallRateLimterWhenNotEnabled() throws Exception {
-    mockEnableRateLimiter(false);
-    callAndVerifyEqLaunched(Channel.AD);
-    verifyRateLimiterNotCalled();
+    // Invoke code under test
+    String eqLaunchURL = eqLaunchedService.createLaunchUrl(launchData, eqLaunchDTO);
+
+    assertEquals("https://www.google.com/en/start/launch-eq/?token=eyJraWQiOiIx...", eqLaunchURL);
+
+    // Verify claims information passed to the eq-launcher
+    verify(eqLaunchService).getEqLaunchJwe(eqLaunchDataCaptor.capture());
+    EqLaunchData eqLaunchData = eqLaunchDataCaptor.getValue();
+    assertEquals(Channel.RH, eqLaunchData.getChannel());
+    // TODO: Consider testing all fields of eqLaunchData once we have confirmed that the url is
+    // correctly constructed
   }
 }

@@ -4,7 +4,13 @@ import lombok.Data;
 
 /** Representation of a UAC claim request */
 @Data
-public class UniqueAccessCodeDTO {
+public class UACContextDTO {
+
+  /** enum for valid case status */
+  public enum CaseStatus {
+    OK,
+    UNLINKED
+  }
 
   private String uacHash;
   private String collectionInstrumentUrl;

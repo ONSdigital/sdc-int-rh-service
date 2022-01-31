@@ -31,7 +31,7 @@ import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.NewCaseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.PostalFulfilmentRequestDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.SMSFulfilmentRequestDTO;
-import uk.gov.ons.ctp.integration.rhsvc.service.CaseService;
+import uk.gov.ons.ctp.integration.rhsvc.service.impl.CaseServiceImpl;
 
 // ** Unit Tests on endpoint for Case resources */
 @ExtendWith(MockitoExtension.class)
@@ -42,7 +42,7 @@ public class CaseEndpointUnitTest {
 
   @InjectMocks private CaseEndpoint caseEndpoint;
 
-  @Mock CaseService caseService;
+  @Mock CaseServiceImpl caseService;
 
   private MockMvc mockMvc;
 

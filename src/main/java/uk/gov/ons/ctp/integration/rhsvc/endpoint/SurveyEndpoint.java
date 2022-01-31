@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.integration.rhsvc.representation.SurveyDTO;
-import uk.gov.ons.ctp.integration.rhsvc.service.SurveyService;
+import uk.gov.ons.ctp.integration.rhsvc.service.impl.SurveyServiceImpl;
 
 /** The REST controller to deal with Surveys */
 @Slf4j
@@ -21,9 +21,9 @@ import uk.gov.ons.ctp.integration.rhsvc.service.SurveyService;
 @RestController
 @RequestMapping(value = "/surveys", produces = "application/json")
 public class SurveyEndpoint {
-  private SurveyService surveyService;
+  private SurveyServiceImpl surveyService;
 
-  public SurveyEndpoint(SurveyService surveyService) {
+  public SurveyEndpoint(SurveyServiceImpl surveyService) {
     this.surveyService = surveyService;
   }
 

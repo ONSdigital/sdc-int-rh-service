@@ -34,6 +34,7 @@ import uk.gov.ons.ctp.common.event.persistence.FirestoreEventPersistence;
 import uk.gov.ons.ctp.common.jackson.CustomObjectMapper;
 import uk.gov.ons.ctp.common.rest.RestClient;
 import uk.gov.ons.ctp.common.rest.RestClientConfig;
+import uk.gov.ons.ctp.integration.eqlaunch.service.EqLaunchService;
 import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.service.notify.NotificationClient;
@@ -135,6 +136,17 @@ public class RHSvcApplication {
   @Primary
   public CustomObjectMapper customObjectMapper() {
     return new CustomObjectMapper();
+  }
+
+  /**
+   * Bean to allow CC service to call the eqlauncher.
+   *
+   * @return a EqLauncherServer instance.
+   * @throws CTPException on error
+   */
+  @Bean
+  public EqLaunchService eqLaunchService() throws CTPException {
+    return new EqLaunchService(appConfig.getKeystore());
   }
 
   @Bean

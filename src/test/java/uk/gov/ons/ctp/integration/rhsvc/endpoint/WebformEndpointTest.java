@@ -21,14 +21,14 @@ import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.error.RestExceptionHandler;
 import uk.gov.ons.ctp.common.jackson.CustomObjectMapper;
 import uk.gov.ons.ctp.integration.rhsvc.representation.WebformDTO;
-import uk.gov.ons.ctp.integration.rhsvc.service.WebformService;
+import uk.gov.ons.ctp.integration.rhsvc.service.impl.WebformServiceImpl;
 
 /** Respondent Home Endpoint Unit tests */
 @ExtendWith(MockitoExtension.class)
 public final class WebformEndpointTest {
   @InjectMocks private WebformEndpoint webformEndpoint;
 
-  @Mock WebformService webformService;
+  @Mock WebformServiceImpl webformService;
 
   private MockMvc mockMvc;
   private ObjectMapper mapper = new ObjectMapper();

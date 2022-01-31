@@ -28,7 +28,7 @@ import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.error.CTPException.Fault;
 import uk.gov.ons.ctp.common.error.RestExceptionHandler;
 import uk.gov.ons.ctp.integration.rhsvc.representation.SurveyDTO;
-import uk.gov.ons.ctp.integration.rhsvc.service.SurveyService;
+import uk.gov.ons.ctp.integration.rhsvc.service.impl.SurveyServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
 public class SurveyEndpointTest {
@@ -36,7 +36,7 @@ public class SurveyEndpointTest {
   private static final String SURVEY_ID_1 = "91b32904-5360-11ec-b6f8-4c3275913db5";
   private static final String SURVEY_ID_2 = "c552e4b6-5360-11ec-a2e7-4c3275913db5";
 
-  @Mock SurveyService service;
+  @Mock SurveyServiceImpl service;
   @InjectMocks private SurveyEndpoint endpoint;
 
   private MockMvc mockMvc;

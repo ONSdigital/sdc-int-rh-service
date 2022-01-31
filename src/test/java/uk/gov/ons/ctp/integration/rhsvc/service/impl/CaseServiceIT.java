@@ -18,13 +18,12 @@ import uk.gov.ons.ctp.integration.rhsvc.repository.CaseRepository;
 import uk.gov.ons.ctp.integration.rhsvc.repository.CollectionExerciseRepository;
 import uk.gov.ons.ctp.integration.rhsvc.repository.SurveyRepository;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
-import uk.gov.ons.ctp.integration.rhsvc.service.CaseService;
 
 public class CaseServiceIT extends FirestoreTestBase {
   @Autowired private SurveyRepository surveyRepo;
   @Autowired private CollectionExerciseRepository collExRepo;
   @Autowired private CaseRepository caseRepo;
-  @Autowired private CaseService service;
+  @Autowired private CaseServiceImpl service;
 
   @BeforeEach
   public void setup() {
