@@ -3,6 +3,7 @@ package uk.gov.ons.ctp.integration.rhsvc.service.impl;
 import static java.util.stream.Collectors.toList;
 import static uk.gov.ons.ctp.common.log.ScopedStructuredArguments.kv;
 
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -25,8 +26,6 @@ import uk.gov.ons.ctp.common.event.model.CaseUpdate;
 import uk.gov.ons.ctp.common.event.model.Contact;
 import uk.gov.ons.ctp.common.event.model.FulfilmentRequest;
 import uk.gov.ons.ctp.common.event.model.NewCasePayloadContent;
-import uk.gov.ons.ctp.common.event.model.NewCaseSample;
-import uk.gov.ons.ctp.common.event.model.NewCaseSampleSensitive;
 import uk.gov.ons.ctp.integration.common.product.ProductReference;
 import uk.gov.ons.ctp.integration.common.product.model.Product;
 import uk.gov.ons.ctp.integration.common.product.model.Product.DeliveryChannel;
@@ -34,7 +33,6 @@ import uk.gov.ons.ctp.integration.common.product.model.Product.Region;
 import uk.gov.ons.ctp.integration.common.product.model.Product.RequestChannel;
 import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient;
 import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient.Domain;
-import uk.gov.ons.ctp.integration.rhsvc.RHSvcBeanMapper;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.repository.CaseRepository;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
@@ -54,7 +52,7 @@ public class CaseServiceImpl {
   @Autowired private ProductReference productReference;
   @Autowired private RateLimiterClient rateLimiterClient;
 
-  private MapperFacade mapper = new RHSvcBeanMapper();
+  private DateTimeFormatter dobFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
   public List<CaseDTO> findCasesBySampleAttribute(
       final String attributeKey, final String attributeValue) throws CTPException {
@@ -116,12 +114,42 @@ public class CaseServiceImpl {
 
     final UUID caseId = UUID.randomUUID();
 
-    NewCaseSample newCaseSample = mapper.map(caseRegistrationDTO, NewCaseSample.class);
-    NewCaseSampleSensitive newCaseSampleSensitive =
-        mapper.map(caseRegistrationDTO, NewCaseSampleSensitive.class);
+    Map<String, String> sample = new HashMap<>();
+    sample.put(NewCasePayloadContent.ATTRIBUTE_SCHOOL_ID, caseRegistrationDTO.getSchoolId());
+    sample.put(NewCasePayloadContent.ATTRIBUTE_SCHOOL_NAME, caseRegistrationDTO.getSchoolName());
+    sample.put(
+        NewCasePayloadContent.ATTRIBUTE_CONSENT_GIVEN_TEST,
+        Boolean.toString(caseRegistrationDTO.isConsentGivenTest()));
+    sample.put(
+        NewCasePayloadContent.ATTRIBUTE_CONSENT_GIVEN_SURVEY,
+        Boolean.toString(caseRegistrationDTO.isConsentGivenSurvey()));
 
-    return new NewCasePayloadContent(
-        caseId, collectionExerciseId, newCaseSample, newCaseSampleSensitive);
+    Map<String, String> sampleSensitive = new HashMap<>();
+    sampleSensitive.put(
+        NewCasePayloadContent.ATTRIBUTE_FIRST_NAME, caseRegistrationDTO.getFirstName());
+    sampleSensitive.put(
+        NewCasePayloadContent.ATTRIBUTE_LAST_NAME, caseRegistrationDTO.getLastName());
+    sampleSensitive.put(
+        NewCasePayloadContent.ATTRIBUTE_CHILD_FIRST_NAME, caseRegistrationDTO.getChildFirstName());
+    sampleSensitive.put(
+        NewCasePayloadContent.ATTRIBUTE_CHILD_MIDDLE_NAMES,
+        caseRegistrationDTO.getChildMiddleNames());
+    sampleSensitive.put(
+        NewCasePayloadContent.ATTRIBUTE_CHILD_LAST_NAME, caseRegistrationDTO.getChildLastName());
+    sampleSensitive.put(
+        NewCasePayloadContent.ATTRIBUTE_CHILD_DOB,
+        caseRegistrationDTO.getChildDob().format(dobFormatter));
+    sampleSensitive.put(
+        NewCasePayloadContent.ATTRIBUTE_MOBILE_NUMBER, caseRegistrationDTO.getMobileNumber());
+    sampleSensitive.put(
+        NewCasePayloadContent.ATTRIBUTE_EMAIL_ADDRESS, caseRegistrationDTO.getEmailAddress());
+
+    return NewCasePayloadContent.builder()
+        .caseId(caseId)
+        .collectionExerciseId(collectionExerciseId)
+        .sample(sample)
+        .sampleSensitive(sampleSensitive)
+        .build();
   }
 
   /*

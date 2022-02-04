@@ -18,15 +18,12 @@ import uk.gov.ons.ctp.common.domain.EstabType;
 import uk.gov.ons.ctp.common.event.model.Address;
 import uk.gov.ons.ctp.common.event.model.AddressCompact;
 import uk.gov.ons.ctp.common.event.model.CollectionExerciseUpdate;
-import uk.gov.ons.ctp.common.event.model.NewCaseSample;
-import uk.gov.ons.ctp.common.event.model.NewCaseSampleSensitive;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 import uk.gov.ons.ctp.common.event.model.UacUpdate;
 import uk.gov.ons.ctp.common.util.StringToUPRNConverter;
 import uk.gov.ons.ctp.common.util.StringToUUIDConverter;
 import uk.gov.ons.ctp.integration.rhsvc.representation.AddressDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CollectionExerciseDTO;
-import uk.gov.ons.ctp.integration.rhsvc.representation.NewCaseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.SurveyLiteDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.UACContextDTO;
 
@@ -63,10 +60,8 @@ public class RHSvcBeanMapper extends ConfigurableMapper {
         .byDefault()
         .register();
 
-    factory.classMap(NewCaseSampleSensitive.class, NewCaseDTO.class).byDefault().register();
     factory.classMap(AddressDTO.class, AddressCompact.class).byDefault().register();
     factory.classMap(Address.class, AddressCompact.class).byDefault().register();
-    factory.classMap(NewCaseSample.class, NewCaseDTO.class).byDefault().register();
     factory.classMap(SurveyUpdate.class, SurveyLiteDTO.class).byDefault().register();
   }
 
