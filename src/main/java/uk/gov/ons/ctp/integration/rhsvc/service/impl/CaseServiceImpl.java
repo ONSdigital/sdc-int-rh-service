@@ -10,11 +10,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import lombok.extern.slf4j.Slf4j;
-import ma.glasnost.orika.MapperFacade;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import lombok.extern.slf4j.Slf4j;
+import ma.glasnost.orika.MapperFacade;
 import uk.gov.ons.ctp.common.domain.Channel;
 import uk.gov.ons.ctp.common.domain.Source;
 import uk.gov.ons.ctp.common.domain.UniquePropertyReferenceNumber;
@@ -52,7 +54,7 @@ public class CaseServiceImpl {
   @Autowired private ProductReference productReference;
   @Autowired private RateLimiterClient rateLimiterClient;
 
-  private DateTimeFormatter dobFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+  private static final DateTimeFormatter DOB_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
   public List<CaseDTO> findCasesBySampleAttribute(
       final String attributeKey, final String attributeValue) throws CTPException {
@@ -138,7 +140,7 @@ public class CaseServiceImpl {
         NewCasePayloadContent.ATTRIBUTE_CHILD_LAST_NAME, caseRegistrationDTO.getChildLastName());
     sampleSensitive.put(
         NewCasePayloadContent.ATTRIBUTE_CHILD_DOB,
-        caseRegistrationDTO.getChildDob().format(dobFormatter));
+        caseRegistrationDTO.getChildDob().format(DOB_FORMATTER));
     sampleSensitive.put(
         NewCasePayloadContent.ATTRIBUTE_MOBILE_NUMBER, caseRegistrationDTO.getMobileNumber());
     sampleSensitive.put(
