@@ -76,12 +76,12 @@ public class UniqueAccessCodeServiceImpl {
   }
 
   /**
-   * Creates the EQ launch URL, and also sends UAC authentication and launch events.
+   * Creates the EQ launch token, and also sends UAC authentication and launch events.
    *
    * @param uacHash uacHash hashed unique access code for which to retrieve data.
    * @param eqLaunchedDTO contains data supplied to the endpoint which is needed in order to be able
    *     to create the EQ launch URL.
-   * @return String containing the EQ launch URL.
+   * @return String containing the EQ launch token.
    * @throws CTPException if something went wrong.
    */
   public String generateEqLaunchToken(String uacHash, EqLaunchRequestDTO eqLaunchedDTO)
@@ -94,7 +94,7 @@ public class UniqueAccessCodeServiceImpl {
 
     // Build launch URL
     LaunchDataDTO launchData = gatherLaunchData(uacHash);
-    String eqLaunchUrl = eqLaunchedService.createLaunchUrl(launchData, eqLaunchedDTO);
+    String eqLaunchUrl = eqLaunchedService.createLaunchToken(launchData, eqLaunchedDTO);
 
     // Publish the launch event
     EqLaunch eqLaunch = EqLaunch.builder().qid(launchData.getUacUpdate().getQid()).build();
