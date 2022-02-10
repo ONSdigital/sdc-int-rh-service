@@ -8,6 +8,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -151,25 +152,40 @@ public class CaseServiceImplTest {
             sendEventCaptor.capture());
     NewCasePayloadContent eventPayload = sendEventCaptor.getValue();
 
+    DateTimeFormatter dobFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    String expectedChildDOB = newCaseDTO.get(0).getChildDob().format(dobFormatter);
+
     UUID expectedCollectionExerciseId = UUID.fromString(COLLECTION_EXERCISE_ID);
     assertEquals(expectedCollectionExerciseId, eventPayload.getCollectionExerciseId());
-    assertEquals(newCaseDTO.get(0).getSchoolId(), eventPayload.getSample().getSchoolId());
-    assertEquals(newCaseDTO.get(0).getSchoolName(), eventPayload.getSample().getSchoolName());
     assertEquals(
-        newCaseDTO.get(0).getFirstName(), eventPayload.getSampleSensitive().getFirstName());
-    assertEquals(newCaseDTO.get(0).getLastName(), eventPayload.getSampleSensitive().getLastName());
+        newCaseDTO.get(0).getSchoolId(),
+        eventPayload.getSample().get(NewCasePayloadContent.ATTRIBUTE_SCHOOL_ID));
+    assertEquals(
+        newCaseDTO.get(0).getSchoolName(),
+        eventPayload.getSample().get(NewCasePayloadContent.ATTRIBUTE_SCHOOL_NAME));
+    assertEquals(
+        newCaseDTO.get(0).getFirstName(),
+        eventPayload.getSampleSensitive().get(NewCasePayloadContent.ATTRIBUTE_FIRST_NAME));
+    assertEquals(
+        newCaseDTO.get(0).getLastName(),
+        eventPayload.getSampleSensitive().get(NewCasePayloadContent.ATTRIBUTE_LAST_NAME));
     assertEquals(
         newCaseDTO.get(0).getChildFirstName(),
-        eventPayload.getSampleSensitive().getChildFirstName());
+        eventPayload.getSampleSensitive().get(NewCasePayloadContent.ATTRIBUTE_CHILD_FIRST_NAME));
     assertEquals(
         newCaseDTO.get(0).getChildMiddleNames(),
-        eventPayload.getSampleSensitive().getChildMiddleNames());
+        eventPayload.getSampleSensitive().get(NewCasePayloadContent.ATTRIBUTE_CHILD_MIDDLE_NAMES));
     assertEquals(
-        newCaseDTO.get(0).getChildLastName(), eventPayload.getSampleSensitive().getChildLastName());
-    assertEquals(newCaseDTO.get(0).getChildDob(), eventPayload.getSampleSensitive().getChildDob());
+        newCaseDTO.get(0).getChildLastName(),
+        eventPayload.getSampleSensitive().get(NewCasePayloadContent.ATTRIBUTE_CHILD_LAST_NAME));
     assertEquals(
-        newCaseDTO.get(0).getMobileNumber(), eventPayload.getSampleSensitive().getMobileNumber());
+        expectedChildDOB,
+        eventPayload.getSampleSensitive().get(NewCasePayloadContent.ATTRIBUTE_CHILD_DOB));
     assertEquals(
-        newCaseDTO.get(0).getEmailAddress(), eventPayload.getSampleSensitive().getEmailAddress());
+        newCaseDTO.get(0).getMobileNumber(),
+        eventPayload.getSampleSensitive().get(NewCasePayloadContent.ATTRIBUTE_MOBILE_NUMBER));
+    assertEquals(
+        newCaseDTO.get(0).getEmailAddress(),
+        eventPayload.getSampleSensitive().get(NewCasePayloadContent.ATTRIBUTE_EMAIL_ADDRESS));
   }
 }
