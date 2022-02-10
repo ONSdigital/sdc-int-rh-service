@@ -29,7 +29,7 @@ import uk.gov.ons.ctp.integration.rhsvc.representation.LaunchDataDTO;
 
 @ExtendWith(MockitoExtension.class)
 public class EqLaunchedServiceImplTest {
-
+  private static final String DUMMY_TOKEN = "eyJraWQiOiIx...";
   private AppConfig appConfig = mock(AppConfig.class, Mockito.RETURNS_DEEP_STUBS);
 
   @Mock private UacUpdate uacUpdate;
@@ -45,12 +45,7 @@ public class EqLaunchedServiceImplTest {
 
   @BeforeEach
   public void setup() {
-    when(appConfig.getEq().getProtocol()).thenReturn("https");
-    when(appConfig.getEq().getHost()).thenReturn("www.google.com");
-    when(appConfig.getEq().getPath()).thenReturn("/en/start/launch-eq/?token=");
-
     when(appConfig.getEq().getResponseIdSalt()).thenReturn("123");
-
     when(surveyUpdate.getSampleDefinitionUrl()).thenReturn("social.json");
   }
 
@@ -72,12 +67,12 @@ public class EqLaunchedServiceImplTest {
             .clientIP("11.22.33.44")
             .build();
 
-    when(eqLaunchService.getEqLaunchJwe(any())).thenReturn("eyJraWQiOiIx...");
+    when(eqLaunchService.getEqLaunchJwe(any())).thenReturn(DUMMY_TOKEN);
 
     // Invoke code under test
-    String eqLaunchURL = eqLaunchedService.createLaunchUrl(launchData, eqLaunchDTO);
+    String launchToken = eqLaunchedService.createLaunchToken(launchData, eqLaunchDTO);
 
-    assertEquals("https://www.google.com/en/start/launch-eq/?token=eyJraWQiOiIx...", eqLaunchURL);
+    assertEquals(DUMMY_TOKEN, launchToken);
 
     // Verify claims information passed to the eq-launcher
     verify(eqLaunchService).getEqLaunchJwe(eqLaunchDataCaptor.capture());

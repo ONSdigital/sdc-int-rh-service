@@ -26,10 +26,10 @@ public class EqLaunchServiceImpl {
   @Autowired private AppConfig appConfig;
   @Autowired private EqLaunchService eqLaunchService;
 
-  String createLaunchUrl(LaunchDataDTO launchData, EqLaunchRequestDTO eqLaunchedDTO)
+  String createLaunchToken(LaunchDataDTO launchData, EqLaunchRequestDTO eqLaunchedDTO)
       throws CTPException {
 
-    String encryptedPayload = "";
+    String encryptedToken = "";
 
     UacUpdate uacUpdate = launchData.getUacUpdate();
     CaseUpdate caze = launchData.getCaseUpdate();
@@ -51,7 +51,7 @@ public class EqLaunchServiceImpl {
               .accountServiceUrl(eqLaunchedDTO.getAccountServiceUrl())
               .accountServiceLogoutUrl(eqLaunchedDTO.getAccountServiceLogoutUrl())
               .build();
-      encryptedPayload = eqLaunchService.getEqLaunchJwe(eqLaunchData);
+      encryptedToken = eqLaunchService.getEqLaunchJwe(eqLaunchData);
 
     } catch (CTPException e) {
       log.error(
@@ -62,16 +62,10 @@ public class EqLaunchServiceImpl {
       throw e;
     }
 
-    String eqUrl =
-        appConfig.getEq().getProtocol()
-            + "://"
-            + appConfig.getEq().getHost()
-            + appConfig.getEq().getPath()
-            + encryptedPayload;
     if (log.isDebugEnabled()) {
-      log.debug("Have created launch URL", kv("launchURL", eqUrl));
+      log.debug("Have created launch token", kv("token", encryptedToken));
     }
 
-    return eqUrl;
+    return encryptedToken;
   }
 }

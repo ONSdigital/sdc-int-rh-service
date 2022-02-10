@@ -304,7 +304,7 @@ public class UniqueAccessCodeServiceImplTest {
     when(collExDataRepo.readCollectionExercise(COLLECTION_EXERCISE_ID))
         .thenReturn(Optional.of(collexTest));
 
-    when(eqLaunchedService.createLaunchUrl(any(), any())).thenReturn("http:eq-lpmb");
+    when(eqLaunchedService.createLaunchToken(any(), any())).thenReturn("http:eq-lpmb");
 
     EqLaunchRequestDTO eqLaunchDTO =
         EqLaunchRequestDTO.builder()
