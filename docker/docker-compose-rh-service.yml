@@ -27,4 +27,5 @@ services:
     - spring.profiles.active=local
     - spring.cloud.gcp.pubsub.emulator-host=host.docker.internal:9808
     - rate-limiter.rest-client-config.host=host.docker.internal
-    - JAVA_TOOL_OPTIONS="--add-opens java.base/java.lang=ALL-UNNAMED"
+    
+#    - JAVA_TOOL_OPTIONS="--add-opens=java.base/java.lang=ALL-UNNAMED"
