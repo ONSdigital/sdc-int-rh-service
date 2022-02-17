@@ -1,7 +1,7 @@
 FROM openjdk:17
 
-RUN apt-get update
-RUN apt-get -yq clean
+# RUN apt-get update
+# RUN apt-get -yq clean
 RUN groupadd -g 985 rhsvc && \
     useradd -r -u 985 -g rhsvc rhsvc
 USER rhsvc
