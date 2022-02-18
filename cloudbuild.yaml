@@ -9,7 +9,7 @@ steps:
     id: Expand M2 Cache
     args: ['xpzf', 'm2.tar.gz']
 
-  - name: 'maven:3-jdk-11'
+  - name: 'maven:3.8.4-openjdk-17'
     id: Maven Package
     env:
       - TZ=Europe/London
@@ -17,7 +17,7 @@ steps:
     entrypoint: mvn
 
   - name: 'gcr.io/cloud-builders/docker'
-    args: [ 'build', '-t', 'europe-west2-docker.pkg.dev/ons-ci-int/int-docker-snapshot/rh-service:$BRANCH_NAME-$SHORT_SHA', '-f', 'cloudbuild.docker', '.' ]
+    args: [ 'build', '-t', 'europe-west2-docker.pkg.dev/ons-ci-int/int-docker-snapshot/rh-service:$BRANCH_NAME-$SHORT_SHA', '.' ]
 
   # Update M2 repo cache
   - name: europe-west2-docker.pkg.dev/ons-ci-int/int-docker-ci/cloudbuild/tar
@@ -54,5 +54,3 @@ availableSecrets:
   secretManager:
     - versionName: projects/415467542055/secrets/SDC_INT_RH_SERVICE_CODECOV/versions/2
       env: SDC_INT_RH_SERVICE_CODECOV
-
-
