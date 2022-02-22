@@ -23,7 +23,7 @@
     <groupId>ons.sdc.int.common</groupId>
     <artifactId>common</artifactId>
     <!-- change this to the version of ALL common libs to be used by this build -->
-    <version>1.0.80</version>
+    <version>1.0.81</version>
   </parent>
 
   <scm>
@@ -103,8 +103,6 @@
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
-      <version>${lombok.version}</version><!--$NO-MVN-MAN-VER$-->
-      <scope>provided</scope>
     </dependency>
 
     <dependency>
