@@ -1,6 +1,5 @@
 package uk.gov.ons.ctp.integration.rhsvc.representation;
 
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import javax.validation.constraints.NotEmpty;
@@ -19,8 +18,6 @@ public abstract class FulfilmentRequestDTO {
   @NotNull private UUID caseId;
 
   @NotEmpty private List<@NotEmpty String> fulfilmentCodes;
-
-  @NotNull private Date dateTime;
 
   private String clientIP;
 }

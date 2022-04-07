@@ -20,8 +20,7 @@ import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.error.CTPException.Fault;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.NewCaseDTO;
-import uk.gov.ons.ctp.integration.rhsvc.representation.PostalFulfilmentRequestDTO;
-import uk.gov.ons.ctp.integration.rhsvc.representation.SMSFulfilmentRequestDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.PrintFulfilmentRequestDTO;
 import uk.gov.ons.ctp.integration.rhsvc.service.impl.CaseServiceImpl;
 
 /** The REST controller to deal with Cases */
@@ -69,44 +68,46 @@ public class CaseEndpoint {
     }
   }
 
-  /**
-   * the POST end point to request an SMS fulfilment for a case.
-   *
-   * @param caseId is the id for the case.
-   * @param requestBodyDTO contains the request body, which specifies the case id, telephone number,
-   *     etc.
-   * @throws CTPException if the case is not found, or the product cannot be found, or if something
-   *     else went wrong.
-   */
-  @RequestMapping(value = "/{caseId}/fulfilments/sms", method = RequestMethod.POST)
-  @ResponseStatus(value = HttpStatus.OK)
-  public void fulfilmentRequestBySMS(
-      @PathVariable(value = "caseId") final UUID caseId,
-      @Valid @RequestBody SMSFulfilmentRequestDTO requestBodyDTO)
-      throws CTPException {
-    String methodName = "fulfilmentRequestBySMS";
-    log.info(
-        "Entering POST {}",
-        methodName,
-        kv("pathParam.caseId", caseId),
-        kv("requestBody", requestBodyDTO));
+  //  /**
+  //   * the POST end point to request an SMS fulfilment for a case.
+  //   *
+  //   * @param caseId is the id for the case.
+  //   * @param requestBodyDTO contains the request body, which specifies the case id, telephone
+  // number,
+  //   *     etc.
+  //   * @throws CTPException if the case is not found, or the product cannot be found, or if
+  // something
+  //   *     else went wrong.
+  //   */
+  //  @RequestMapping(value = "/{caseId}/fulfilment/sms", method = RequestMethod.POST)
+  //  @ResponseStatus(value = HttpStatus.OK)
+  //  public void fulfilmentRequestBySMS(
+  //      @PathVariable(value = "caseId") final UUID caseId,
+  //      @Valid @RequestBody SMSFulfilmentRequestDTO requestBodyDTO)
+  //      throws CTPException {
+  //    String methodName = "fulfilmentRequestBySMS";
+  //    log.info(
+  //        "Entering POST {}",
+  //        methodName,
+  //        kv("pathParam.caseId", caseId),
+  //        kv("requestBody", requestBodyDTO));
+  //
+  //    // Treat an empty clientIP as if it's a null value
+  //    String clientIP = requestBodyDTO.getClientIP();
+  //    if (clientIP != null && clientIP.isBlank()) {
+  //      requestBodyDTO.setClientIP(null);
+  //    }
+  //
+  //    validateMatchingCaseId(caseId, requestBodyDTO.getCaseId(), methodName);
+  //    caseService.fulfilmentRequestBySMS(requestBodyDTO);
+  //    log.debug("Exit POST {}", methodName, kv("pathParam.caseId", caseId));
+  //  }
 
-    // Treat an empty clientIP as if it's a null value
-    String clientIP = requestBodyDTO.getClientIP();
-    if (clientIP != null && clientIP.isBlank()) {
-      requestBodyDTO.setClientIP(null);
-    }
-
-    validateMatchingCaseId(caseId, requestBodyDTO.getCaseId(), methodName);
-    caseService.fulfilmentRequestBySMS(requestBodyDTO);
-    log.debug("Exit POST {}", methodName, kv("pathParam.caseId", caseId));
-  }
-
-  @RequestMapping(value = "/{caseId}/fulfilments/post", method = RequestMethod.POST)
+  @RequestMapping(value = "/{caseId}/fulfilment/post", method = RequestMethod.POST)
   @ResponseStatus(value = HttpStatus.OK)
   public void fulfilmentRequestByPost(
       @PathVariable(value = "caseId") final UUID caseId,
-      @Valid @RequestBody PostalFulfilmentRequestDTO requestBodyDTO)
+      @Valid @RequestBody PrintFulfilmentRequestDTO requestBodyDTO)
       throws CTPException {
     String methodName = "fulfilmentRequestByPost";
     log.info(

@@ -4,7 +4,7 @@ import static java.util.stream.Collectors.toList;
 import static uk.gov.ons.ctp.common.log.ScopedStructuredArguments.kv;
 
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -13,9 +13,14 @@ import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import ma.glasnost.orika.MapperFacade;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.ons.ctp.common.domain.Channel;
+import uk.gov.ons.ctp.common.domain.DeliveryChannel;
+import uk.gov.ons.ctp.common.domain.Language;
+import uk.gov.ons.ctp.common.domain.Product;
+import uk.gov.ons.ctp.common.domain.ProductGroup;
 import uk.gov.ons.ctp.common.domain.Source;
 import uk.gov.ons.ctp.common.domain.UniquePropertyReferenceNumber;
 import uk.gov.ons.ctp.common.error.CTPException;
@@ -26,20 +31,17 @@ import uk.gov.ons.ctp.common.event.model.CaseUpdate;
 import uk.gov.ons.ctp.common.event.model.Contact;
 import uk.gov.ons.ctp.common.event.model.FulfilmentRequest;
 import uk.gov.ons.ctp.common.event.model.NewCasePayloadContent;
-import uk.gov.ons.ctp.integration.common.product.ProductReference;
-import uk.gov.ons.ctp.integration.common.product.model.Product;
-import uk.gov.ons.ctp.integration.common.product.model.Product.DeliveryChannel;
-import uk.gov.ons.ctp.integration.common.product.model.Product.Region;
-import uk.gov.ons.ctp.integration.common.product.model.Product.RequestChannel;
+import uk.gov.ons.ctp.common.event.model.SurveyFulfilment;
+import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient;
 import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient.Domain;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.repository.CaseRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.SurveyRepository;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.FulfilmentRequestDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.NewCaseDTO;
-import uk.gov.ons.ctp.integration.rhsvc.representation.PostalFulfilmentRequestDTO;
-import uk.gov.ons.ctp.integration.rhsvc.representation.SMSFulfilmentRequestDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.PrintFulfilmentRequestDTO;
 
 /** Implementation to deal with Case data */
 @Slf4j
@@ -47,9 +49,9 @@ import uk.gov.ons.ctp.integration.rhsvc.representation.SMSFulfilmentRequestDTO;
 public class CaseServiceImpl {
   @Autowired private AppConfig appConfig;
   @Autowired private CaseRepository dataRepo;
+  @Autowired private SurveyRepository surveyRepository;
   @Autowired private MapperFacade mapperFacade;
   @Autowired private EventPublisher eventPublisher;
-  @Autowired private ProductReference productReference;
   @Autowired private RateLimiterClient rateLimiterClient;
 
   private static final DateTimeFormatter DOB_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -67,32 +69,34 @@ public class CaseServiceImpl {
     return mapperFacade.mapAsList(foundCases, CaseDTO.class);
   }
 
-  /**
-   * This method contains the business logic for submitting a fulfilment by SMS request.
-   *
-   * @param requestBodyDTO contains the parameters from the originating http POST request.
-   * @throws CTPException if the specified case cannot be found, or if no matching product is found.
-   */
-  public void fulfilmentRequestBySMS(SMSFulfilmentRequestDTO requestBodyDTO) throws CTPException {
-    Contact contact = new Contact();
-    contact.setTelNo(requestBodyDTO.getTelNo());
-    CaseUpdate caseDetails = findCaseDetails(requestBodyDTO.getCaseId());
-    var products = createProductList(DeliveryChannel.SMS, requestBodyDTO, caseDetails);
-    recordRateLimiting(contact, requestBodyDTO.getClientIP(), products, caseDetails);
-    createAndSendFulfilments(DeliveryChannel.SMS, contact, requestBodyDTO, products);
-  }
+  //  /**
+  //   * This method contains the business logic for submitting a fulfilment by SMS request.
+  //   *
+  //   * @param requestBodyDTO contains the parameters from the originating http POST request.
+  //   * @throws CTPException if the specified case cannot be found, or if no matching product is
+  // found.
+  //   */
+  //  public void fulfilmentRequestBySMS(SMSFulfilmentRequestDTO requestBodyDTO) throws CTPException
+  // {
+  //    Contact contact = new Contact();
+  //    contact.setTelNo(requestBodyDTO.getTelNo());
+  //    CaseUpdate caseDetails = findCaseDetails(requestBodyDTO.getCaseId());
+  //    var products = createProductList(DeliveryChannel.SMS, requestBodyDTO, caseDetails);
+  //    recordRateLimiting(contact, requestBodyDTO.getClientIP(), products, caseDetails);
+  //    createAndSendFulfilments(DeliveryChannel.SMS, contact, requestBodyDTO, products);
+  //  }
 
-  public void fulfilmentRequestByPost(PostalFulfilmentRequestDTO requestBodyDTO)
+  public void fulfilmentRequestByPost(PrintFulfilmentRequestDTO requestBodyDTO)
       throws CTPException {
     Contact contact = new Contact();
-    contact.setTitle(requestBodyDTO.getTitle());
     contact.setForename(requestBodyDTO.getForename());
     contact.setSurname(requestBodyDTO.getSurname());
     CaseUpdate caseDetails = findCaseDetails(requestBodyDTO.getCaseId());
-    var products = createProductList(DeliveryChannel.POST, requestBodyDTO, caseDetails);
-    preValidatePostalContactDetails(products, contact);
+    SurveyUpdate surveyUpdate = surveyRepository.readSurvey(caseDetails.getSurveyId()).get();
+    var products = createProductList(DeliveryChannel.POST, requestBodyDTO, surveyUpdate);
+    validateContactName(contact);
     recordRateLimiting(contact, requestBodyDTO.getClientIP(), products, caseDetails);
-    createAndSendFulfilments(DeliveryChannel.POST, contact, requestBodyDTO, products);
+    createAndSendFulfilments(DeliveryChannel.POST, requestBodyDTO, contact, products);
   }
 
   public void sendNewCaseEvent(NewCaseDTO newCaseDTO) throws CTPException {
@@ -159,23 +163,28 @@ public class CaseServiceImpl {
    * NOTE: must return list in order of fulfilmentCodes
    */
   private List<Product> createProductList(
-      DeliveryChannel deliveryChannel, FulfilmentRequestDTO request, CaseUpdate caseDetails)
+      DeliveryChannel deliveryChannel, FulfilmentRequestDTO request, SurveyUpdate surveyUpdate)
       throws CTPException {
     Map<String, Product> map = new HashMap<>();
-    Region region = Region.valueOf(caseDetails.getSample().get("region"));
     for (String fulfilmentCode : new HashSet<>(request.getFulfilmentCodes())) {
-      map.put(fulfilmentCode, findProduct(fulfilmentCode, deliveryChannel, region));
+      SurveyFulfilment fulfilment =
+          findSurveyFulfilment(fulfilmentCode, deliveryChannel, surveyUpdate);
+      Product product = new Product();
+      product.setProductGroup(ProductGroup.UAC);
+      product.setDeliveryChannel(deliveryChannel);
+      product.setFulfilmentCode(fulfilmentCode);
+      product.setDescription(fulfilment.getDescription());
+
+      String[] languageStrings = fulfilment.getMetadata().get("languages").toString().replace("\"","").split(",");
+      List<Language> languages = new ArrayList<>();
+      for(String languageString : languageStrings){
+        languages.add(Language.valueOf(languageString));
+      }
+      product.setLanguages(languages);
+
+      map.put(fulfilmentCode, product);
     }
     return request.getFulfilmentCodes().stream().map(fc -> map.get(fc)).collect(toList());
-  }
-
-  private void preValidatePostalContactDetails(List<Product> products, Contact contact)
-      throws CTPException {
-    for (Product product : products) {
-      if (isIndividual(product)) {
-        validateContactName(contact);
-      }
-    }
   }
 
   private void recordRateLimiting(
@@ -211,10 +220,9 @@ public class CaseServiceImpl {
 
   private void createAndSendFulfilments(
       DeliveryChannel deliveryChannel,
-      Contact contact,
       FulfilmentRequestDTO request,
-      List<Product> products)
-      throws CTPException {
+      Contact contact,
+      List<Product> products) {
     log.debug(
         "Entering createAndSendFulfilment",
         kv("fulfilmentCodes", request.getFulfilmentCodes()),
@@ -228,60 +236,49 @@ public class CaseServiceImpl {
     }
   }
 
-  private boolean isIndividual(Product product) {
-    return product.getIndividual() == null ? false : product.getIndividual();
-  }
-
   private FulfilmentRequest createFulfilmentRequestPayload(
-      UUID caseId, Contact contact, Product product) throws CTPException {
-
-    String individualCaseId = null;
-    if (isIndividual(product)) {
-      individualCaseId = UUID.randomUUID().toString();
-    }
+      UUID caseId, Contact contact, Product product) {
 
     FulfilmentRequest fulfilmentRequest = new FulfilmentRequest();
-    fulfilmentRequest.setIndividualCaseId(individualCaseId);
-    fulfilmentRequest.setFulfilmentCode(product.getFulfilmentCode());
+    fulfilmentRequest.setPackCode(product.getFulfilmentCode());
     fulfilmentRequest.setCaseId(caseId.toString());
-    fulfilmentRequest.setContact(contact);
+
+    Map<String, Object> personalisation = new HashMap<>();
+    if (Strings.isNotBlank(contact.getForename())) {
+      personalisation.put("firstName", contact.getForename());
+    }
+    if (Strings.isNotBlank(contact.getSurname())) {
+      personalisation.put("lastName", contact.getSurname());
+    }
+    fulfilmentRequest.setPersonalisation(personalisation);
+
     return fulfilmentRequest;
   }
 
-  private Product findProduct(String fulfilmentCode, DeliveryChannel deliveryChannel, Region region)
+  private SurveyFulfilment findSurveyFulfilment(
+      String packCode, DeliveryChannel deliveryChannel, SurveyUpdate surveyUpdate)
       throws CTPException {
     log.debug(
-        "Attempting to find product.",
-        kv("region", region),
+        "Attempting to find surveyFulfilment.",
         kv("deliveryChannel", deliveryChannel),
-        kv("fulfilmentCode", fulfilmentCode));
+        kv("packCode", packCode));
 
-    // Build search criteria base on the cases details and the requested fulfilmentCode
-    Product searchCriteria = new Product();
-    searchCriteria.setRequestChannels(Collections.singletonList(RequestChannel.RH));
-    searchCriteria.setRegions(Collections.singletonList(region));
-    searchCriteria.setDeliveryChannel(deliveryChannel);
-    searchCriteria.setFulfilmentCode(fulfilmentCode);
+    List<SurveyFulfilment> fulfilments = new ArrayList<>();
 
-    // Attempt to find matching product
-    return productReference.searchProducts(searchCriteria).stream()
-        .findFirst()
-        .orElseThrow(
-            () -> {
-              log.warn("Compatible product cannot be found", kv("searchCriteria", searchCriteria));
-              return new CTPException(Fault.BAD_REQUEST, "Compatible product cannot be found");
-            });
-  }
+    switch (deliveryChannel) {
+      case POST -> fulfilments = surveyUpdate.getAllowedPrintFulfilments();
+      case SMS -> fulfilments = surveyUpdate.getAllowedSmsFulfilments();
+      case EMAIL -> fulfilments = surveyUpdate.getAllowedEmailFulfilments();
+    }
 
-  // Read case from firestore
-  private CaseUpdate findCaseDetails(UUID caseId) throws CTPException {
-    return dataRepo
-        .readCaseUpdate(caseId.toString())
-        .orElseThrow(
-            () -> {
-              log.info("Case not found", kv("caseId", caseId));
-              return new CTPException(Fault.RESOURCE_NOT_FOUND, "Case not found: " + caseId);
-            });
+    for (SurveyFulfilment surveyFulfilment : fulfilments) {
+      if (surveyFulfilment.getPackCode().equals(packCode)) {
+        return surveyFulfilment;
+      }
+    }
+
+    log.warn("Fulfilment not compatible with survey", kv("fulfilmentCode", packCode));
+    throw new CTPException(Fault.BAD_REQUEST, "Fulfilment not compatible with survey");
   }
 
   private void validateContactName(Contact contact) throws CTPException {
@@ -293,5 +290,15 @@ public class CaseServiceImpl {
           "The fulfilment is for an individual so none of the following fields can be empty: "
               + "'forename' and 'surname'");
     }
+  }
+
+  private CaseUpdate findCaseDetails(UUID caseId) throws CTPException {
+    return dataRepo
+        .readCaseUpdate(caseId.toString())
+        .orElseThrow(
+            () -> {
+              log.info("Case not found", kv("caseId", caseId));
+              return new CTPException(Fault.RESOURCE_NOT_FOUND, "Case not found: " + caseId);
+            });
   }
 }

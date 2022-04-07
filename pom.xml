@@ -23,7 +23,7 @@
     <groupId>ons.sdc.int.common</groupId>
     <artifactId>common</artifactId>
     <!-- change this to the version of ALL common libs to be used by this build -->
-    <version>1.0.81</version>
+    <version>1.0.87-SNAPSHOT</version>
   </parent>
 
   <scm>
@@ -151,12 +151,6 @@
     <dependency>
       <groupId>ons.sdc.int.common</groupId>
       <artifactId>event-publisher</artifactId>
-      <version>${project.parent.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>ons.sdc.int.common</groupId>
-      <artifactId>product-reference</artifactId>
       <version>${project.parent.version}</version>
     </dependency>
 

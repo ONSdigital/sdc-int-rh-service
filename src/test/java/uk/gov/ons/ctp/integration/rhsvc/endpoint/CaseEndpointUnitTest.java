@@ -29,8 +29,7 @@ import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.error.RestExceptionHandler;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.NewCaseDTO;
-import uk.gov.ons.ctp.integration.rhsvc.representation.PostalFulfilmentRequestDTO;
-import uk.gov.ons.ctp.integration.rhsvc.representation.SMSFulfilmentRequestDTO;
+import uk.gov.ons.ctp.integration.rhsvc.representation.PrintFulfilmentRequestDTO;
 import uk.gov.ons.ctp.integration.rhsvc.service.impl.CaseServiceImpl;
 
 // ** Unit Tests on endpoint for Case resources */
@@ -99,7 +98,7 @@ public class CaseEndpointUnitTest {
     ObjectNode json = getPostFulfilmentFixture();
     String url = "/cases/" + json.get("caseId").asText() + "/fulfilments/post";
     mockMvc.perform(postJson(url, json.toString())).andExpect(status().isOk());
-    verify(caseService).fulfilmentRequestByPost(any(PostalFulfilmentRequestDTO.class));
+    verify(caseService).fulfilmentRequestByPost(any(PrintFulfilmentRequestDTO.class));
   }
 
   @Test
@@ -108,7 +107,7 @@ public class CaseEndpointUnitTest {
     json.putNull("clientIP");
     String url = "/cases/" + json.get("caseId").asText() + "/fulfilments/post";
     mockMvc.perform(postJson(url, json.toString())).andExpect(status().isOk());
-    verify(caseService).fulfilmentRequestByPost(any(PostalFulfilmentRequestDTO.class));
+    verify(caseService).fulfilmentRequestByPost(any(PrintFulfilmentRequestDTO.class));
   }
 
   @Test
@@ -117,34 +116,34 @@ public class CaseEndpointUnitTest {
     json.put("clientIP", "");
     String url = "/cases/" + json.get("caseId").asText() + "/fulfilments/post";
     mockMvc.perform(postJson(url, json.toString())).andExpect(status().isOk());
-    verify(caseService).fulfilmentRequestByPost(any(PostalFulfilmentRequestDTO.class));
+    verify(caseService).fulfilmentRequestByPost(any(PrintFulfilmentRequestDTO.class));
   }
 
-  @Test
-  public void shouldFulfilBySms() throws Exception {
-    ObjectNode json = getSmsFulfilmentFixture();
-    String url = "/cases/" + json.get("caseId").asText() + "/fulfilments/sms";
-    mockMvc.perform(postJson(url, json.toString())).andExpect(status().isOk());
-    verify(caseService).fulfilmentRequestBySMS(any(SMSFulfilmentRequestDTO.class));
-  }
-
-  @Test
-  public void shouldFulfilBySmsWithNullClientIP() throws Exception {
-    ObjectNode json = getSmsFulfilmentFixture();
-    json.putNull("clientIP");
-    String url = "/cases/" + json.get("caseId").asText() + "/fulfilments/sms";
-    mockMvc.perform(postJson(url, json.toString())).andExpect(status().isOk());
-    verify(caseService).fulfilmentRequestBySMS(any(SMSFulfilmentRequestDTO.class));
-  }
-
-  @Test
-  public void shouldFulfilBySmsWithEmptyClientIP() throws Exception {
-    ObjectNode json = getSmsFulfilmentFixture();
-    json.put("clientIP", "");
-    String url = "/cases/" + json.get("caseId").asText() + "/fulfilments/sms";
-    mockMvc.perform(postJson(url, json.toString())).andExpect(status().isOk());
-    verify(caseService).fulfilmentRequestBySMS(any(SMSFulfilmentRequestDTO.class));
-  }
+  //  @Test
+  //  public void shouldFulfilBySms() throws Exception {
+  //    ObjectNode json = getSmsFulfilmentFixture();
+  //    String url = "/cases/" + json.get("caseId").asText() + "/fulfilments/sms";
+  //    mockMvc.perform(postJson(url, json.toString())).andExpect(status().isOk());
+  //    verify(caseService).fulfilmentRequestBySMS(any(SMSFulfilmentRequestDTO.class));
+  //  }
+  //
+  //  @Test
+  //  public void shouldFulfilBySmsWithNullClientIP() throws Exception {
+  //    ObjectNode json = getSmsFulfilmentFixture();
+  //    json.putNull("clientIP");
+  //    String url = "/cases/" + json.get("caseId").asText() + "/fulfilments/sms";
+  //    mockMvc.perform(postJson(url, json.toString())).andExpect(status().isOk());
+  //    verify(caseService).fulfilmentRequestBySMS(any(SMSFulfilmentRequestDTO.class));
+  //  }
+  //
+  //  @Test
+  //  public void shouldFulfilBySmsWithEmptyClientIP() throws Exception {
+  //    ObjectNode json = getSmsFulfilmentFixture();
+  //    json.put("clientIP", "");
+  //    String url = "/cases/" + json.get("caseId").asText() + "/fulfilments/sms";
+  //    mockMvc.perform(postJson(url, json.toString())).andExpect(status().isOk());
+  //    verify(caseService).fulfilmentRequestBySMS(any(SMSFulfilmentRequestDTO.class));
+  //  }
 
   @Test
   public void shouldRejectFulfilByPostWithMismatchedCaseIds() throws Exception {
@@ -206,7 +205,7 @@ public class CaseEndpointUnitTest {
     String url = "/cases/" + json.get("caseId").asText() + "/fulfilments/post";
     json.putArray("fulfilmentCodes").add("A").add("B").add(StringUtils.repeat("C", 12));
     mockMvc.perform(postJson(url, json.toString())).andExpect(status().isOk());
-    verify(caseService).fulfilmentRequestByPost(any(PostalFulfilmentRequestDTO.class));
+    verify(caseService).fulfilmentRequestByPost(any(PrintFulfilmentRequestDTO.class));
   }
 
   @Test
@@ -218,83 +217,83 @@ public class CaseEndpointUnitTest {
 
   // ---
 
-  @Test
-  public void shouldRejectFulfilBySmsWhenPhoneNumberFailsRegex() throws Exception {
-    ObjectNode json = getSmsFulfilmentFixture();
-    String url = "/cases/" + json.get("caseId").asText() + "/fulfilments/sms";
-    json.put("telNo", "abc123");
-    verifyRejectedSmsFulfilmentRequest(json, url);
-  }
-
-  @Test
-  public void shouldRejectFulfilBySmsWithMismatchedCaseIds() throws Exception {
-    String url = "/cases/" + INCONSISTENT_CASEID + "/fulfilments/sms";
-    ObjectNode json = getSmsFulfilmentFixture();
-    verifyRejectedSmsFulfilmentRequest(json, url);
-  }
-
-  @Test
-  public void shouldRejectFulfilBySmsWithBadlyFormedCaseId() throws Exception {
-    String url = "/cases/abc/fulfilments/sms";
-    ObjectNode json = getSmsFulfilmentFixture();
-    verifyRejectedSmsFulfilmentRequest(json, url);
-  }
-
-  @Test
-  public void shouldRejectFulfilBySmsWithBadlyFormedDate() throws Exception {
-    ObjectNode json = getSmsFulfilmentFixture();
-    String url = "/cases/" + json.get("caseId").asText() + "/fulfilments/sms";
-    json.put("dateTime", "2019:12:25 12:34:56");
-    verifyRejectedSmsFulfilmentRequest(json, url);
-  }
-
-  @Test
-  public void shouldRejectFulfilBySmsWithMissingFulfilmentCodes() throws Exception {
-    ObjectNode json = getSmsFulfilmentFixture();
-    String url = "/cases/" + json.get("caseId").asText() + "/fulfilments/sms";
-    json.remove("fulfilmentCodes");
-    verifyRejectedSmsFulfilmentRequest(json, url);
-  }
-
-  @Test
-  public void shouldRejectFulfilBySmsWithEmptyFulfilmentCodes() throws Exception {
-    ObjectNode json = getSmsFulfilmentFixture();
-    String url = "/cases/" + json.get("caseId").asText() + "/fulfilments/sms";
-    json.putArray("fulfilmentCodes");
-    verifyRejectedSmsFulfilmentRequest(json, url);
-  }
-
-  @Test
-  public void shouldRejectFulfilBySmsWithAnEmptyFulfilmentCode() throws Exception {
-    ObjectNode json = getSmsFulfilmentFixture();
-    String url = "/cases/" + json.get("caseId").asText() + "/fulfilments/sms";
-    json.putArray("fulfilmentCodes").add("");
-    verifyRejectedSmsFulfilmentRequest(json, url);
-  }
-
-  @Test
-  public void shouldRejectFulfilBySmsWithNullFulfilmentCode() throws Exception {
-    ObjectNode json = getSmsFulfilmentFixture();
-    String url = "/cases/" + json.get("caseId").asText() + "/fulfilments/sms";
-    json.putArray("fulfilmentCodes").addNull();
-    verifyRejectedSmsFulfilmentRequest(json, url);
-  }
-
-  @Test
-  public void shouldAcceptFulfilBySmsWithMultipleValidFulfilmentCode() throws Exception {
-    ObjectNode json = getSmsFulfilmentFixture();
-    String url = "/cases/" + json.get("caseId").asText() + "/fulfilments/sms";
-    json.putArray("fulfilmentCodes").add("A").add("B").add(StringUtils.repeat("C", 12));
-    mockMvc.perform(postJson(url, json.toString())).andExpect(status().isOk());
-    verify(caseService).fulfilmentRequestBySMS(any(SMSFulfilmentRequestDTO.class));
-  }
-
-  @Test
-  public void shouldRejectFulfilBySmsWithIncorrectRequestBody() throws Exception {
-    String url = "/cases/3fa85f64-5717-4562-b3fc-2c963f66afa6/fulfilments/sms";
-    String json = "{ \"name\": \"Fred\" }";
-    verifyRejectedSmsFulfilmentRequest(json, url);
-  }
+  //  @Test
+  //  public void shouldRejectFulfilBySmsWhenPhoneNumberFailsRegex() throws Exception {
+  //    ObjectNode json = getSmsFulfilmentFixture();
+  //    String url = "/cases/" + json.get("caseId").asText() + "/fulfilments/sms";
+  //    json.put("telNo", "abc123");
+  //    verifyRejectedSmsFulfilmentRequest(json, url);
+  //  }
+  //
+  //  @Test
+  //  public void shouldRejectFulfilBySmsWithMismatchedCaseIds() throws Exception {
+  //    String url = "/cases/" + INCONSISTENT_CASEID + "/fulfilments/sms";
+  //    ObjectNode json = getSmsFulfilmentFixture();
+  //    verifyRejectedSmsFulfilmentRequest(json, url);
+  //  }
+  //
+  //  @Test
+  //  public void shouldRejectFulfilBySmsWithBadlyFormedCaseId() throws Exception {
+  //    String url = "/cases/abc/fulfilments/sms";
+  //    ObjectNode json = getSmsFulfilmentFixture();
+  //    verifyRejectedSmsFulfilmentRequest(json, url);
+  //  }
+  //
+  //  @Test
+  //  public void shouldRejectFulfilBySmsWithBadlyFormedDate() throws Exception {
+  //    ObjectNode json = getSmsFulfilmentFixture();
+  //    String url = "/cases/" + json.get("caseId").asText() + "/fulfilments/sms";
+  //    json.put("dateTime", "2019:12:25 12:34:56");
+  //    verifyRejectedSmsFulfilmentRequest(json, url);
+  //  }
+  //
+  //  @Test
+  //  public void shouldRejectFulfilBySmsWithMissingFulfilmentCodes() throws Exception {
+  //    ObjectNode json = getSmsFulfilmentFixture();
+  //    String url = "/cases/" + json.get("caseId").asText() + "/fulfilments/sms";
+  //    json.remove("fulfilmentCodes");
+  //    verifyRejectedSmsFulfilmentRequest(json, url);
+  //  }
+  //
+  //  @Test
+  //  public void shouldRejectFulfilBySmsWithEmptyFulfilmentCodes() throws Exception {
+  //    ObjectNode json = getSmsFulfilmentFixture();
+  //    String url = "/cases/" + json.get("caseId").asText() + "/fulfilments/sms";
+  //    json.putArray("fulfilmentCodes");
+  //    verifyRejectedSmsFulfilmentRequest(json, url);
+  //  }
+  //
+  //  @Test
+  //  public void shouldRejectFulfilBySmsWithAnEmptyFulfilmentCode() throws Exception {
+  //    ObjectNode json = getSmsFulfilmentFixture();
+  //    String url = "/cases/" + json.get("caseId").asText() + "/fulfilments/sms";
+  //    json.putArray("fulfilmentCodes").add("");
+  //    verifyRejectedSmsFulfilmentRequest(json, url);
+  //  }
+  //
+  //  @Test
+  //  public void shouldRejectFulfilBySmsWithNullFulfilmentCode() throws Exception {
+  //    ObjectNode json = getSmsFulfilmentFixture();
+  //    String url = "/cases/" + json.get("caseId").asText() + "/fulfilments/sms";
+  //    json.putArray("fulfilmentCodes").addNull();
+  //    verifyRejectedSmsFulfilmentRequest(json, url);
+  //  }
+  //
+  //  @Test
+  //  public void shouldAcceptFulfilBySmsWithMultipleValidFulfilmentCode() throws Exception {
+  //    ObjectNode json = getSmsFulfilmentFixture();
+  //    String url = "/cases/" + json.get("caseId").asText() + "/fulfilments/sms";
+  //    json.putArray("fulfilmentCodes").add("A").add("B").add(StringUtils.repeat("C", 12));
+  //    mockMvc.perform(postJson(url, json.toString())).andExpect(status().isOk());
+  //    verify(caseService).fulfilmentRequestBySMS(any(SMSFulfilmentRequestDTO.class));
+  //  }
+  //
+  //  @Test
+  //  public void shouldRejectFulfilBySmsWithIncorrectRequestBody() throws Exception {
+  //    String url = "/cases/3fa85f64-5717-4562-b3fc-2c963f66afa6/fulfilments/sms";
+  //    String json = "{ \"name\": \"Fred\" }";
+  //    verifyRejectedSmsFulfilmentRequest(json, url);
+  //  }
 
   /** Test should send out a new case event (register) */
   @Test
@@ -425,9 +424,9 @@ public class CaseEndpointUnitTest {
     verify(caseService, never()).sendNewCaseEvent(any(NewCaseDTO.class));
   }
 
-  private ObjectNode getSmsFulfilmentFixture() {
-    return FixtureHelper.loadClassObjectNode("SMSFulfilmentRequestDTO");
-  }
+  //  private ObjectNode getSmsFulfilmentFixture() {
+  //    return FixtureHelper.loadClassObjectNode("SMSFulfilmentRequestDTO");
+  //  }
 
   private ObjectNode getPostFulfilmentFixture() {
     return FixtureHelper.loadClassObjectNode("postal");
@@ -437,14 +436,15 @@ public class CaseEndpointUnitTest {
     return FixtureHelper.loadClassObjectNode("NewCaseEventDTO");
   }
 
-  private void verifyRejectedSmsFulfilmentRequest(ObjectNode json, String url) throws Exception {
-    verifyRejectedSmsFulfilmentRequest(json.toString(), url);
-  }
+  //  private void verifyRejectedSmsFulfilmentRequest(ObjectNode json, String url) throws Exception
+  // {
+  //    verifyRejectedSmsFulfilmentRequest(json.toString(), url);
+  //  }
 
-  private void verifyRejectedSmsFulfilmentRequest(String json, String url) throws Exception {
-    mockMvc.perform(postJson(url, json)).andExpect(status().isBadRequest());
-    verify(caseService, never()).fulfilmentRequestBySMS(any(SMSFulfilmentRequestDTO.class));
-  }
+  //  private void verifyRejectedSmsFulfilmentRequest(String json, String url) throws Exception {
+  //    mockMvc.perform(postJson(url, json)).andExpect(status().isBadRequest());
+  //    verify(caseService, never()).fulfilmentRequestBySMS(any(SMSFulfilmentRequestDTO.class));
+  //  }
 
   private void verifyRejectedPostFulfilmentRequest(ObjectNode json, String url) throws Exception {
     verifyRejectedPostFulfilmentRequest(json.toString(), url);
@@ -452,6 +452,6 @@ public class CaseEndpointUnitTest {
 
   private void verifyRejectedPostFulfilmentRequest(String json, String url) throws Exception {
     mockMvc.perform(postJson(url, json)).andExpect(status().isBadRequest());
-    verify(caseService, never()).fulfilmentRequestByPost(any(PostalFulfilmentRequestDTO.class));
+    verify(caseService, never()).fulfilmentRequestByPost(any(PrintFulfilmentRequestDTO.class));
   }
 }
