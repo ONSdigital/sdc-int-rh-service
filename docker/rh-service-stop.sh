@@ -8,6 +8,4 @@ set -e
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 echo "1/1 Stopping services"
-docker compose -f $SCRIPT_DIR/docker-compose-rh-service.yml stop
-docker compose -f $SCRIPT_DIR/docker-compose-mock-envoy.yml stop
-docker compose -f $SCRIPT_DIR/docker-compose-pubsub-emulator.yml stop
+docker compose -f $SCRIPT_DIR/docker-compose-rh-service.yml down
