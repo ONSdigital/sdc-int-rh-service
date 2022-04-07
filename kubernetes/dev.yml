@@ -68,6 +68,16 @@ spec:
             configMapKeyRef:
               name: rh-config
               key: cloud-storage-uac-schema-name
+        - name: CLOUD_STORAGE_SURVEY_SCHEMA_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: rh-config
+              key: cloud-storage-survey-schema-name
+        - name: CLOUD_STORAGE_COLLECTION_EXERCISE_SCHEMA_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: rh-config
+              key: cloud-storage-collection-exercise-schema-name
         - name: RATE_LIMITER_REST_CLIENT_CONFIG_SCHEME
           value: "http"
         - name: RATE_LIMITER_REST_CLIENT_CONFIG_PORT
