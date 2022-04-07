@@ -16,10 +16,21 @@ RH_SERVICE_VERSION="europe-west2-docker.pkg.dev/ons-ci-int/int-docker-release/rh
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
-
 echo "1/5 Checking environment variables"
-[ -z "$DOCKER_GCP_CREDENTIALS" ] && echo "Error: DOCKER_GCP_CREDENTIALS must be set" && exit 1;
-[ -z "$GOOGLE_CLOUD_PROJECT" ] && echo "Need to set GOOGLE_CLOUD_PROJECT" && exit 1;
+export GCP_METRICS_EXPORT=true
+if [ -z "$GOOGLE_CLOUD_PROJECT" ]
+then
+  echo "Using local firestore emulator and dummy local GCP project"
+  export GOOGLE_CLOUD_PROJECT=dummy-local
+  export FIRESTORE_EMULATOR_HOST=rh-firestore-emulator:8540
+  export GCP_METRICS_EXPORT=false
+fi
+
+if [ -z "$DOCKER_GCP_CREDENTIALS" ]
+then
+  echo "Using local fake service account credentials"
+  export DOCKER_GCP_CREDENTIALS=./fake-service-account.json
+fi
 
 echo "2/5 Pulling images ..."
 docker pull $PUBSUB_EMULATOR_VERSION

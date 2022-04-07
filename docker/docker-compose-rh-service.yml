@@ -23,7 +23,15 @@ services:
       read_only: true
     environment:
     - GOOGLE_APPLICATION_CREDENTIALS=/gcp/config/google-credentials.json
+    - FIRESTORE_EMULATOR_HOST=${FIRESTORE_EMULATOR_HOST}
     - GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT}
     - spring.profiles.active=local
     - spring.cloud.gcp.pubsub.emulator-host=host.docker.internal:9808
     - rate-limiter.rest-client-config.host=host.docker.internal
+    - MANAGEMENT_METRICS_EXPORT_STACKDRIVER_ENABLED=${GCP_METRICS_EXPORT}
+
+  firestore-emulator:
+    container_name: rh-firestore-emulator
+    image: europe-west2-docker.pkg.dev/ssdc-rm-ci/docker/gcloud-firestore-emulator:latest
+    ports:
+      - "8542:8540"
