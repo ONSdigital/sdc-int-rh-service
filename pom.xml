@@ -23,7 +23,7 @@
     <groupId>ons.sdc.int.common</groupId>
     <artifactId>common</artifactId>
     <!-- change this to the version of ALL common libs to be used by this build -->
-    <version>1.0.87-SNAPSHOT</version>
+    <version>1.0.87</version>
   </parent>
 
   <scm>
