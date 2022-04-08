@@ -80,26 +80,26 @@ public class SurveyServiceImplTest {
   private void verifyProducts(SurveyDTO dto) {
     var products = dto.getAllowedFulfilments();
     assertNotNull(products);
-    assertEquals(5, products.size());
-    assertEquals(0, countInChannel(DeliveryChannel.EMAIL, products));
-    assertEquals(2, countInChannel(DeliveryChannel.SMS, products));
-    assertEquals(3, countInChannel(DeliveryChannel.POST, products));
+    assertEquals(4, products.size());
+    assertEquals(1, countInChannel(DeliveryChannel.EMAIL, products));
+    assertEquals(1, countInChannel(DeliveryChannel.SMS, products));
+    assertEquals(2, countInChannel(DeliveryChannel.POST, products));
 
     // check one of the products ...
     var prod =
         products.stream()
             .filter(
                 p ->
-                    p.getDeliveryChannel() == DeliveryChannel.SMS
-                        && "replace-uac-en".equals(p.getPackCode()))
+                    p.getDeliveryChannel() == DeliveryChannel.POST
+                        && "REPLACEMENT_UAC".equals(p.getPackCode()))
             .findFirst()
             .orElse(null);
     assertNotNull(prod);
     assertEquals(ProductGroup.UAC, prod.getProductGroup());
     var meta = prod.getMetadata();
-    var regions = meta.get("suitableRegions");
+    var regions = meta.get("languages");
     assertNotNull(regions);
-    assertEquals(regions, Arrays.asList("E", "N"));
+    assertEquals(regions, Arrays.asList("en"));
   }
 
   private long countInChannel(DeliveryChannel channel, List<ProductDTO> products) {

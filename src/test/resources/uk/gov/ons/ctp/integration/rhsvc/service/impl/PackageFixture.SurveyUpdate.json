@@ -82,57 +82,49 @@
   ],
   "allowedPrintFulfilments": [
     {
-      "packCode": "replace-uac-en",
-      "description": "Replacement UAC - English",
+      "packCode": "REPLACEMENT_UAC",
+      "description": "Replacement UAC Letter",
       "metadata": {
-        "suitableRegions": [
-          "E",
-          "N"
-        ]
+        "languages": [
+          "en"
+        ],
+        "foo": "bar"
       }
     },
     {
-      "packCode": "replace-uac-en2",
-      "description": "Replacement UAC - English2",
+      "packCode": "DUMMY_FULFILMENT",
+      "description": "Dummy Fulfilment",
       "metadata": {
-        "suitableRegions": [
-          "E",
-          "N"
-        ]
-      }
-    },
-    {
-      "packCode": "replace-uac-cy",
-      "description": "Replacement UAC - English & Welsh",
-      "metadata": {
-        "suitableRegions": [
-          "W"
-        ]
+        "languages": [
+          "en", "cy"
+        ],
+        "foo": "bar"
       }
     }
   ],
   "allowedSmsFulfilments": [
     {
-      "packCode": "replace-uac-en",
-      "description": "Replacement UAC - English",
+      "packCode": "REPLACEMENT_UAC",
+      "description": "Replacement UAC SMS",
       "metadata": {
-        "suitableRegions": [
-          "E",
-          "N"
-        ]
-      }
-    },
-    {
-      "packCode": "replace-uac-cy",
-      "description": "Replacement UAC - English & Welsh",
-      "metadata": {
-        "suitableRegions": [
-          "W"
-        ]
+        "languages": [
+          "en"
+        ],
+        "foo": "bar"
       }
     }
   ],
   "allowedEmailFulfilments": [
+    {
+      "packCode": "REPLACEMENT_UAC",
+      "description": "Replacement UAC Email",
+      "metadata": {
+        "languages": [
+          "en"
+        ],
+        "foo": "bar"
+      }
+    }
   ],
   "metadata": {
     "ex_e4": true

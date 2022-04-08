@@ -1,6 +1,6 @@
 {
   "header": {
-    "version": "0.4.0",
+    "version": "0.6.0",
     "topic": "event_survey-update",
     "source" : "SAMPLE_LOADER",
     "channel" : "RH",
@@ -11,7 +11,7 @@
   },
   "payload": {
     "surveyUpdate": {
-      "surveyId": "3883af91-0052-4497-9805-3238544fcf8a",
+      "surveyId": "4a6c6e0a-6384-4da8-8c3c-7c56a801f792",
       "name": "LMS",
       "sampleDefinition": [
         {
@@ -90,6 +90,52 @@
               "expression": "^07[0-9]{9}$"
             }
           ]
+        }
+      ],
+      "allowedPrintFulfilments": [
+        {
+          "packCode": "REPLACEMENT_UAC",
+          "description": "Replacement UAC Letter",
+          "metadata": {
+            "languages": [
+              "en"
+            ],
+            "foo": "bar"
+          }
+        },
+        {
+          "packCode": "DUMMY_FULFILMENT",
+          "description": "Dummy Fulfilment",
+          "metadata": {
+            "languages": [
+              "en", "cy"
+            ],
+            "foo": "bar"
+          }
+        }
+      ],
+      "allowedSmsFulfilments": [
+        {
+          "packCode": "REPLACEMENT_UAC",
+          "description": "Replacement UAC SMS",
+          "metadata": {
+            "languages": [
+              "en"
+            ],
+            "foo": "bar"
+          }
+        }
+      ],
+      "allowedEmailFulfilments": [
+        {
+          "packCode": "REPLACEMENT_UAC",
+          "description": "Replacement UAC Email",
+          "metadata": {
+            "languages": [
+              "en"
+            ],
+            "foo": "bar"
+          }
         }
       ],
       "metadata": {

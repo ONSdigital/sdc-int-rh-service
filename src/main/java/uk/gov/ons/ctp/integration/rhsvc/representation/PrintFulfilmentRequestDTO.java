@@ -14,11 +14,7 @@ import uk.gov.ons.ctp.common.log.Scope;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PostalFulfilmentRequestDTO extends FulfilmentRequestDTO {
-
-  @Size(max = 12)
-  @LoggingScope(scope = Scope.MASK)
-  private String title;
+public class PrintFulfilmentRequestDTO extends FulfilmentRequestDTO {
 
   @Size(max = 60)
   @LoggingScope(scope = Scope.MASK)

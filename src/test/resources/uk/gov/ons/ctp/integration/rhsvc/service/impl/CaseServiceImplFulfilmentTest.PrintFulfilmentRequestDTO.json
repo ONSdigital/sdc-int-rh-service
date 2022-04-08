@@ -1,0 +1,30 @@
+[
+    {
+        "caseId": "dc4477d1-dd3f-4c69-b181-7ff725dc9fa4",
+        "forename": "Ethel",
+        "surname": "Brown",
+        "fulfilmentCodes": [ "REPLACEMENT_UAC" ],
+        "clientIP": "216.58.206.142"
+    },
+    {
+        "caseId": "dc4477d1-dd3f-4c69-b181-7ff725dc9fa4",
+        "forename": "Ethel",
+        "surname": "Brown",
+        "fulfilmentCodes": [ "BAD_FULFILMENT" ],
+        "clientIP": "216.58.206.142"
+    },
+    {
+        "caseId": "dc4477d1-dd3f-4c69-b181-7ff725dc9fa4",
+        "forename": "Ethel",
+        "surname": "Brown",
+        "fulfilmentCodes": [ "REPLACEMENT_UAC", "DUMMY_FULFILMENT" ],
+        "clientIP": "216.58.206.142"
+    },
+    {
+        "caseId": "dc4477d1-dd3f-4c69-b181-7ff725dc9fa4",
+        "forename": "Ethel",
+        "surname": "Brown",
+        "fulfilmentCodes": [ "REPLACEMENT_UAC", "DUMMY_FULFILMENT", "DUMMY_FULFILMENT", "DUMMY_FULFILMENT"],
+        "clientIP": "216.58.206.142"
+    }
+]

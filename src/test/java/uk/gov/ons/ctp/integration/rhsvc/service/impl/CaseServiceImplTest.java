@@ -31,7 +31,6 @@ import uk.gov.ons.ctp.common.event.EventPublisher;
 import uk.gov.ons.ctp.common.event.TopicType;
 import uk.gov.ons.ctp.common.event.model.CaseUpdate;
 import uk.gov.ons.ctp.common.event.model.NewCasePayloadContent;
-import uk.gov.ons.ctp.integration.common.product.ProductReference;
 import uk.gov.ons.ctp.integration.rhsvc.RHSvcBeanMapper;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.config.Sis;
@@ -54,8 +53,6 @@ public class CaseServiceImplTest {
   @Mock private EventPublisher eventPublisher;
 
   @Spy private MapperFacade mapperFacade = new RHSvcBeanMapper();
-
-  @Mock private ProductReference productReference;
 
   @Spy private AppConfig appConfig = new AppConfig();
 
