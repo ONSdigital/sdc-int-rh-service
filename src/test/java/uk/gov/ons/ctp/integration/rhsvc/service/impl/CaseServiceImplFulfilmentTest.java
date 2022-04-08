@@ -1,8 +1,6 @@
 package uk.gov.ons.ctp.integration.rhsvc.service.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -15,7 +13,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -37,7 +34,9 @@ import org.springframework.web.server.ResponseStatusException;
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.domain.Channel;
 import uk.gov.ons.ctp.common.domain.DeliveryChannel;
+import uk.gov.ons.ctp.common.domain.Language;
 import uk.gov.ons.ctp.common.domain.Product;
+import uk.gov.ons.ctp.common.domain.ProductGroup;
 import uk.gov.ons.ctp.common.domain.Source;
 import uk.gov.ons.ctp.common.domain.UniquePropertyReferenceNumber;
 import uk.gov.ons.ctp.common.error.CTPException;
@@ -47,14 +46,15 @@ import uk.gov.ons.ctp.common.event.model.CaseUpdate;
 import uk.gov.ons.ctp.common.event.model.Contact;
 import uk.gov.ons.ctp.common.event.model.EventPayload;
 import uk.gov.ons.ctp.common.event.model.FulfilmentRequest;
+import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient;
 import uk.gov.ons.ctp.integration.ratelimiter.client.RateLimiterClient.Domain;
 import uk.gov.ons.ctp.integration.rhsvc.RHSvcBeanMapper;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.config.RateLimiterConfig;
 import uk.gov.ons.ctp.integration.rhsvc.repository.CaseRepository;
+import uk.gov.ons.ctp.integration.rhsvc.repository.SurveyRepository;
 import uk.gov.ons.ctp.integration.rhsvc.representation.PrintFulfilmentRequestDTO;
-import uk.gov.ons.ctp.integration.rhsvc.representation.SMSFulfilmentRequestDTO;
 
 @ExtendWith(MockitoExtension.class)
 @ContextConfiguration(
@@ -67,6 +67,8 @@ public class CaseServiceImplFulfilmentTest {
 
   @Mock private CaseRepository dataRepo;
 
+  @Mock private SurveyRepository surveyRepository;
+
   @Mock private EventPublisher eventPublisher;
 
   @Mock private RateLimiterClient rateLimiterClient;
@@ -75,15 +77,37 @@ public class CaseServiceImplFulfilmentTest {
 
   @Captor private ArgumentCaptor<Product> productCaptor;
 
-  private List<CaseUpdate> caseUpdate;
-  private SMSFulfilmentRequestDTO smsRequest;
-  private PrintFulfilmentRequestDTO postalRequest;
+  private CaseUpdate caseDetails;
+  private SurveyUpdate surveyUpdate;
+  // private SMSFulfilmentRequestDTO smsRequest;
+  private PrintFulfilmentRequestDTO printRequest;
+  private PrintFulfilmentRequestDTO badPrintRequest;
+  private List<PrintFulfilmentRequestDTO> printFulfilmentRequestDTOS;
+  private final Product p1 =
+      new Product(
+          "REPLACEMENT_UAC",
+          "Replacement UAC Letter",
+          ProductGroup.UAC,
+          DeliveryChannel.POST,
+          List.of(Language.ENGLISH));
+  private final Product p2 =
+      new Product(
+          "DUMMY_FULFILMENT",
+          "Dummy Fulfilment",
+          ProductGroup.UAC,
+          DeliveryChannel.POST,
+          List.of(Language.ENGLISH, Language.WELSH));
 
   @BeforeEach
   public void setUp() throws Exception {
-    this.caseUpdate = FixtureHelper.loadPackageFixtures(CaseUpdate[].class);
-    this.smsRequest = FixtureHelper.loadClassFixtures(SMSFulfilmentRequestDTO[].class).get(0);
-    this.postalRequest = FixtureHelper.loadClassFixtures(PrintFulfilmentRequestDTO[].class).get(0);
+    this.caseDetails = FixtureHelper.loadPackageFixtures(CaseUpdate[].class).get(0);
+    this.surveyUpdate = FixtureHelper.loadPackageFixtures(SurveyUpdate[].class).get(0);
+    // this.smsRequest = FixtureHelper.loadClassFixtures(SMSFulfilmentRequestDTO[].class).get(0);
+
+    this.printFulfilmentRequestDTOS =
+        FixtureHelper.loadClassFixtures(PrintFulfilmentRequestDTO[].class);
+    this.printRequest = printFulfilmentRequestDTOS.get(0);
+    this.badPrintRequest = printFulfilmentRequestDTOS.get(1);
     lenient().when(appConfig.getRateLimiter()).thenReturn(rateLimiterConfig(true));
   }
 
@@ -179,75 +203,25 @@ public class CaseServiceImplFulfilmentTest {
   // --- fulfilment by post
 
   @Test
-  public void shouldFulfilRequestByPostForHousehold() throws Exception {
-    FulfilmentRequest eventPayload = doFulfilmentRequestByPost(Product.CaseType.HH, false, "Mrs");
+  public void shouldFulfilRequestByPost() throws Exception {
+    when(dataRepo.readCaseUpdate(any())).thenReturn(Optional.of(caseDetails));
+    when(surveyRepository.readSurvey(any())).thenReturn(Optional.of(surveyUpdate));
+    caseSvc.fulfilmentRequestByPost(printRequest);
 
-    // Individual case id field should not be set for non-individual
-    assertNull(eventPayload.getIndividualCaseId());
-  }
-
-  @Test
-  public void shouldFulfilRequestByPostForHouseholdWhenProductReturnsNullIndividual()
-      throws Exception {
-    FulfilmentRequest eventPayload = doFulfilmentRequestByPost(Product.CaseType.HH, null, "Mrs");
-    assertNull(eventPayload.getIndividualCaseId());
-  }
-
-  @Test
-  public void shouldFulfilRequestByPostForHouseholdWithNullTitle() throws Exception {
-    FulfilmentRequest eventPayload = doFulfilmentRequestByPost(Product.CaseType.HH, null, null);
-    assertNull(eventPayload.getIndividualCaseId());
-  }
-
-  @Test
-  public void shouldFulfilRequestByPostForIndividual() throws Exception {
-    FulfilmentRequest eventPayload = doFulfilmentRequestByPost(Product.CaseType.HH, true, "Mrs");
-
-    // Individual case id field should be populated as case+product is for an individual
-    String individualUuid = eventPayload.getIndividualCaseId();
-    assertNotNull(individualUuid);
-    assertNotNull(UUID.fromString(individualUuid)); // must be valid UUID
-  }
-
-  @Test
-  public void shouldFulfilRequestByPostForIndividualWhereProductHasMultipleCaseTypes()
-      throws Exception {
-    CaseUpdate caseDetails = caseUpdate.get(0);
-    FulfilmentRequest eventPayload =
-        doFulfilmentRequestByPost(
-            true, caseDetails, "Mr", Product.CaseType.CE, Product.CaseType.HH);
-
-    // Individual case id field should be populated as case+product is for an individual
-    String individualUuid = eventPayload.getIndividualCaseId();
-    assertNotNull(individualUuid);
-    assertNotNull(UUID.fromString(individualUuid)); // must be valid UUID
-  }
-
-  private FulfilmentRequest doFulfilmentRequestByPost(Boolean individual, CaseUpdate caseDetails)
-      throws Exception {
-    String caseId = caseDetails.getCaseId();
-    postalRequest.setCaseId(UUID.fromString(caseId));
-    when(dataRepo.readCaseUpdate(eq(caseId))).thenReturn(Optional.of(caseDetails));
-    mockProductSearch("F1", individual, DeliveryChannel.POST);
-    caseSvc.fulfilmentRequestByPost(postalRequest);
-
-    verifyRateLimiterCall(1, null, postalRequest.getClientIP(), caseDetails);
+    verifyRateLimiterCall(1, null, printRequest.getClientIP(), caseDetails);
     Contact contact = new Contact();
     contact.setForename("Ethel");
     contact.setSurname("Brown");
-    FulfilmentRequest eventPayload =
-        getAndValidatePublishedEvent(caseDetails, contact, "F1").get(0);
-    return eventPayload;
+    getAndValidatePublishedEvent(caseDetails, contact, "REPLACEMENT_UAC").get(0);
   }
 
   private void assertRejectPostalFulfilmentForIndividualWithoutContactName() throws Exception {
-    CaseUpdate caseDetails = selectCaseUpdateForTest(Product.CaseType.HH, true);
     String caseId = caseDetails.getCaseId();
-    postalRequest.setCaseId(UUID.fromString(caseId));
+    printRequest.setCaseId(UUID.fromString(caseId));
     when(dataRepo.readCaseUpdate(eq(caseId))).thenReturn(Optional.of(caseDetails));
-    mockProductSearch("F1", true, DeliveryChannel.POST, Product.CaseType.HH);
+    when(surveyRepository.readSurvey(any())).thenReturn(Optional.of(surveyUpdate));
     CTPException e =
-        assertThrows(CTPException.class, () -> caseSvc.fulfilmentRequestByPost(postalRequest));
+        assertThrows(CTPException.class, () -> caseSvc.fulfilmentRequestByPost(printRequest));
     assertTrue(
         e.getMessage()
             .contains(
@@ -256,26 +230,26 @@ public class CaseServiceImplFulfilmentTest {
   }
 
   @Test
-  public void shouldRejectPostalFulfilmentForIndividualWithoutForename() throws Exception {
-    postalRequest.setForename(null);
+  public void shouldRejectPostalFulfilmentWithoutForename() throws Exception {
+    printRequest.setForename(null);
     assertRejectPostalFulfilmentForIndividualWithoutContactName();
   }
 
   @Test
-  public void shouldRejectPostalFulfilmentForIndividualWithoutSurname() throws Exception {
-    postalRequest.setSurname(null);
+  public void shouldRejectPostalFulfilmentWithoutSurname() throws Exception {
+    printRequest.setSurname(null);
     assertRejectPostalFulfilmentForIndividualWithoutContactName();
   }
 
   @Test
-  public void shouldRejectPostalFulfilmentForIndividualWithEmptyForename() throws Exception {
-    postalRequest.setForename("");
+  public void shouldRejectPostalFulfilmentWithEmptyForename() throws Exception {
+    printRequest.setForename("");
     assertRejectPostalFulfilmentForIndividualWithoutContactName();
   }
 
   @Test
-  public void shouldRejectPostalFulfilmentForIndividualWithEmptySurname() throws Exception {
-    postalRequest.setSurname("");
+  public void shouldRejectPostalFulfilmentWithEmptySurname() throws Exception {
+    printRequest.setSurname("");
     assertRejectPostalFulfilmentForIndividualWithoutContactName();
   }
 
@@ -283,18 +257,18 @@ public class CaseServiceImplFulfilmentTest {
   public void shouldRejectPostalFulfilmentForUnknownCase() throws Exception {
     when(dataRepo.readCaseUpdate(any())).thenReturn(Optional.empty());
     CTPException e =
-        assertThrows(CTPException.class, () -> caseSvc.fulfilmentRequestByPost(postalRequest));
+        assertThrows(CTPException.class, () -> caseSvc.fulfilmentRequestByPost(printRequest));
     assertTrue(e.getMessage().contains("Case not found"));
     verifyRateLimiterNotCalled();
   }
 
   @Test
-  public void shouldRejectPostalFulfilmentForUnknownProduct() throws Exception {
-    when(dataRepo.readCaseUpdate(any())).thenReturn(Optional.of(caseUpdate.get(0)));
-    when(productReference.searchProducts(any())).thenReturn(new ArrayList<>());
+  public void shouldRejectPostalFulfilmentForUnknownSurveyFulfilment() throws Exception {
+    when(dataRepo.readCaseUpdate(any())).thenReturn(Optional.of(caseDetails));
+    when(surveyRepository.readSurvey(any())).thenReturn(Optional.of(surveyUpdate));
     CTPException e =
-        assertThrows(CTPException.class, () -> caseSvc.fulfilmentRequestByPost(postalRequest));
-    assertTrue(e.getMessage().contains("Compatible product cannot be found"));
+        assertThrows(CTPException.class, () -> caseSvc.fulfilmentRequestByPost(badPrintRequest));
+    assertEquals("Fulfilment not compatible with survey", e.getMessage());
     verifyRateLimiterNotCalled();
   }
 
@@ -302,56 +276,42 @@ public class CaseServiceImplFulfilmentTest {
 
   @Test
   public void shouldFulfilRequestByPostForMultipleFulfilmentCodes() throws Exception {
-    CaseUpdate caseDetails = selectCaseUpdateForTest(Product.CaseType.HH, false);
-    String caseId = caseDetails.getCaseId();
-    when(dataRepo.readCaseUpdate(eq(caseId.toString()))).thenReturn(Optional.of(caseDetails));
+    when(dataRepo.readCaseUpdate(any())).thenReturn(Optional.of(caseDetails));
+    when(surveyRepository.readSurvey(any())).thenReturn(Optional.of(surveyUpdate));
 
-    postalRequest.setCaseId(UUID.fromString(caseId));
-    postalRequest.setTitle("Mrs");
-    postalRequest.setFulfilmentCodes(Arrays.asList("F1", "F2", "F3"));
-
-    Product p1 = mockProductSearch("F1", false, DeliveryChannel.POST, Product.CaseType.HH);
-    Product p2 = mockProductSearch("F2", false, DeliveryChannel.POST, Product.CaseType.HH);
-    Product p3 = mockProductSearch("F3", false, DeliveryChannel.POST, Product.CaseType.HH);
-
-    caseSvc.fulfilmentRequestByPost(postalRequest);
+    caseSvc.fulfilmentRequestByPost(printFulfilmentRequestDTOS.get(2));
 
     Contact contact = new Contact();
-    contact.setTitle("Mrs");
     contact.setForename("Ethel");
     contact.setSurname("Brown");
-    getAndValidatePublishedEvent(caseDetails, contact, "F1", "F2", "F3");
+    getAndValidatePublishedEvent(caseDetails, contact, "REPLACEMENT_UAC", "DUMMY_FULFILMENT");
 
-    verifyRateLimiterCall(3, null, postalRequest.getClientIP(), caseDetails);
+    verifyRateLimiterCall(2, null, printRequest.getClientIP(), caseDetails);
 
     assertEquals(p1, productCaptor.getAllValues().get(0));
     assertEquals(p2, productCaptor.getAllValues().get(1));
-    assertEquals(p3, productCaptor.getAllValues().get(2));
   }
 
   // simulate RHUI continuation pages using same fulfilment code.
   @Test
   public void shouldFulfilRequestByPostForMultipleRepeatedFulfilmentCodes() throws Exception {
-    CaseUpdate caseDetails = selectCaseUpdateForTest(Product.CaseType.HH, false);
-    String caseId = caseDetails.getCaseId();
-    when(dataRepo.readCaseUpdate(eq(caseId.toString()))).thenReturn(Optional.of(caseDetails));
+    when(dataRepo.readCaseUpdate(any())).thenReturn(Optional.of(caseDetails));
+    when(surveyRepository.readSurvey(any())).thenReturn(Optional.of(surveyUpdate));
 
-    postalRequest.setCaseId(UUID.fromString(caseId));
-    postalRequest.setTitle("Mrs");
-    postalRequest.setFulfilmentCodes(Arrays.asList("F1", "CLONE", "CLONE", "CLONE"));
-
-    Product p1 = mockProductSearch("F1", false, DeliveryChannel.POST, Product.CaseType.HH);
-    Product p2 = mockProductSearch("CLONE", false, DeliveryChannel.POST, Product.CaseType.HH);
-
-    caseSvc.fulfilmentRequestByPost(postalRequest);
+    caseSvc.fulfilmentRequestByPost(printFulfilmentRequestDTOS.get(3));
 
     Contact contact = new Contact();
-    contact.setTitle("Mrs");
     contact.setForename("Ethel");
     contact.setSurname("Brown");
-    getAndValidatePublishedEvent(caseDetails, contact, "F1", "CLONE", "CLONE", "CLONE");
+    getAndValidatePublishedEvent(
+        caseDetails,
+        contact,
+        "REPLACEMENT_UAC",
+        "DUMMY_FULFILMENT",
+        "DUMMY_FULFILMENT",
+        "DUMMY_FULFILMENT");
 
-    verifyRateLimiterCall(4, null, postalRequest.getClientIP(), caseDetails);
+    verifyRateLimiterCall(4, null, printRequest.getClientIP(), caseDetails);
 
     assertEquals(p1, productCaptor.getAllValues().get(0));
     assertEquals(p2, productCaptor.getAllValues().get(1));
@@ -361,24 +321,20 @@ public class CaseServiceImplFulfilmentTest {
 
   @Test
   public void shouldRejectPostalFulfilmentWhenRateLimiterRejects() throws Exception {
-    CaseUpdate caseDetails = selectCaseUpdateForTest(Product.CaseType.HH, false);
-    String caseId = caseDetails.getCaseId();
-    when(dataRepo.readCaseUpdate(eq(caseId))).thenReturn(Optional.of(caseDetails));
+    when(dataRepo.readCaseUpdate(any())).thenReturn(Optional.of(caseDetails));
+    when(surveyRepository.readSurvey(any())).thenReturn(Optional.of(surveyUpdate));
 
     doThrow(new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS))
         .when(rateLimiterClient)
         .checkFulfilmentRateLimit(any(), any(), any(), any(), any());
 
-    postalRequest.setCaseId(UUID.fromString(caseId));
-    mockProductSearch("F1", false, DeliveryChannel.POST, Product.CaseType.HH);
-
     ResponseStatusException ex =
         assertThrows(
-            ResponseStatusException.class, () -> caseSvc.fulfilmentRequestByPost(postalRequest));
+            ResponseStatusException.class, () -> caseSvc.fulfilmentRequestByPost(printRequest));
 
     assertEquals(HttpStatus.TOO_MANY_REQUESTS, ex.getStatus());
     verify(eventPublisher, never()).sendEvent(any(), any(), any(), any(EventPayload.class));
-    verifyRateLimiterCall(1, null, postalRequest.getClientIP(), caseDetails);
+    verifyRateLimiterCall(1, null, printRequest.getClientIP(), caseDetails);
   }
 
   // multi sms fulfilment tests
@@ -440,39 +396,33 @@ public class CaseServiceImplFulfilmentTest {
 
   @Test
   public void shouldFulfilRequestByPostWhenRateLimiterNotEnabled() throws Exception {
-    CaseUpdate caseDetails = selectCaseUpdateForTest(Product.CaseType.HH, false);
-    String caseId = caseDetails.getCaseId();
-    when(dataRepo.readCaseUpdate(eq(caseId))).thenReturn(Optional.of(caseDetails));
+    when(dataRepo.readCaseUpdate(any())).thenReturn(Optional.of(caseDetails));
+    when(surveyRepository.readSurvey(any())).thenReturn(Optional.of(surveyUpdate));
 
-    postalRequest.setCaseId(UUID.fromString(caseId));
-    postalRequest.setTitle("Mrs");
-    postalRequest.setFulfilmentCodes(Arrays.asList("F1"));
-
-    mockProductSearch("F1", false, DeliveryChannel.POST, Product.CaseType.HH);
     when(appConfig.getRateLimiter()).thenReturn(rateLimiterConfig(false));
 
-    caseSvc.fulfilmentRequestByPost(postalRequest);
+    caseSvc.fulfilmentRequestByPost(printRequest);
     verifyRateLimiterNotCalled();
   }
 
-  @Test
-  public void shouldFulfilRequestBySmsWhenRateLimiterNotEnabled() throws Exception {
-    CaseUpdate caseDetails = selectCaseUpdateForTest(Product.CaseType.HH, false);
-    String caseId = caseDetails.getCaseId();
-    when(dataRepo.readCaseUpdate(eq(caseId))).thenReturn(Optional.of(caseDetails));
-
-    String phoneNo = "07714111222";
-
-    smsRequest.setTelNo(phoneNo);
-    smsRequest.setCaseId(UUID.fromString(caseId));
-    smsRequest.setFulfilmentCodes(Arrays.asList("F1"));
-
-    mockProductSearch("F1", false, DeliveryChannel.SMS, Product.CaseType.HH);
-    when(appConfig.getRateLimiter()).thenReturn(rateLimiterConfig(false));
-
-    caseSvc.fulfilmentRequestBySMS(smsRequest);
-    verifyRateLimiterNotCalled();
-  }
+  //  @Test
+  //  public void shouldFulfilRequestBySmsWhenRateLimiterNotEnabled() throws Exception {
+  //    CaseUpdate caseDetails = selectCaseUpdateForTest(Product.CaseType.HH, false);
+  //    String caseId = caseDetails.getCaseId();
+  //    when(dataRepo.readCaseUpdate(eq(caseId))).thenReturn(Optional.of(caseDetails));
+  //
+  //    String phoneNo = "07714111222";
+  //
+  //    smsRequest.setTelNo(phoneNo);
+  //    smsRequest.setCaseId(UUID.fromString(caseId));
+  //    smsRequest.setFulfilmentCodes(Arrays.asList("F1"));
+  //
+  //    mockProductSearch("F1", false, DeliveryChannel.SMS, Product.CaseType.HH);
+  //    when(appConfig.getRateLimiter()).thenReturn(rateLimiterConfig(false));
+  //
+  //    caseSvc.fulfilmentRequestBySMS(smsRequest);
+  //    verifyRateLimiterNotCalled();
+  //  }
 
   // --- helpers
 
@@ -487,25 +437,6 @@ public class CaseServiceImplFulfilmentTest {
 
   private void verifyRateLimiterNotCalled() throws Exception {
     verify(rateLimiterClient, never()).checkFulfilmentRateLimit(any(), any(), any(), any(), any());
-  }
-
-  private Product createProductForSearch(String fulfilmentCode, DeliveryChannel channel) {
-    Product product = new Product();
-    product.setRequestChannels(Arrays.asList(Product.RequestChannel.RH));
-    product.setRegions(Arrays.asList(Product.Region.E));
-    product.setDeliveryChannel(channel);
-    product.setFulfilmentCode(fulfilmentCode);
-    return product;
-  }
-
-  private Product mockProductSearch(
-      String fulfilmentCode, Boolean individual, DeliveryChannel channel) throws Exception {
-    Product expectedSearchProduct = createProductForSearch(fulfilmentCode, channel);
-    Product productToReturn = new Product();
-    productToReturn.setFulfilmentCode(fulfilmentCode);
-    when(productReference.searchProducts(eq(expectedSearchProduct)))
-        .thenReturn(Arrays.asList(productToReturn));
-    return productToReturn;
   }
 
   private List<FulfilmentRequest> getAndValidatePublishedEvent(

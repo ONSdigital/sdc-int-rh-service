@@ -175,10 +175,18 @@ public class CaseServiceImpl {
       product.setFulfilmentCode(fulfilmentCode);
       product.setDescription(fulfilment.getDescription());
 
-      String[] languageStrings = fulfilment.getMetadata().get("languages").toString().replace("\"","").split(",");
+      String[] languageStrings =
+          fulfilment
+              .getMetadata()
+              .get("languages")
+              .toString()
+              .replace("[", "")
+              .replace("]", "")
+              .split(",");
       List<Language> languages = new ArrayList<>();
-      for(String languageString : languageStrings){
-        languages.add(Language.valueOf(languageString));
+      for (String languageString : languageStrings) {
+        languageString = languageString.replace("\"", "").trim();
+        languages.add(Language.lookup(languageString));
       }
       product.setLanguages(languages);
 
@@ -263,12 +271,13 @@ public class CaseServiceImpl {
         kv("deliveryChannel", deliveryChannel),
         kv("packCode", packCode));
 
-    List<SurveyFulfilment> fulfilments = new ArrayList<>();
+    List<SurveyFulfilment> fulfilments;
 
     switch (deliveryChannel) {
       case POST -> fulfilments = surveyUpdate.getAllowedPrintFulfilments();
       case SMS -> fulfilments = surveyUpdate.getAllowedSmsFulfilments();
       case EMAIL -> fulfilments = surveyUpdate.getAllowedEmailFulfilments();
+      default -> throw new CTPException(Fault.SYSTEM_ERROR, "Unknown delivery channel");
     }
 
     for (SurveyFulfilment surveyFulfilment : fulfilments) {
