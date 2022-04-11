@@ -1,7 +1,0 @@
-version: '3.8'
-services:
-  mock-envoy:
-    container_name: mock-envoy
-    image: mock-envoy
-    ports:
-    - "8181:8181"
