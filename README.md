@@ -5,7 +5,7 @@ This repository contains the Respondent Data service. This microservice is a RES
 
 ## Set Up
 Do the following steps to set up the code to run locally:
-* Install Java 11 locally
+* Install Java 17 locally
 * Install Docker: Sign in to docker hub and then install docker by downloading it from https://hub.docker.com/editions/community/docker-ce-desktop-mac
 * Install maven
 * Clone the following git repositories:
@@ -51,6 +51,31 @@ export GOOGLE_CLOUD_PROJECT="<name of your project>" e.g. export GOOGLE_CLOUD_PR
 
 ## Running
 
+### Docker Compose
+
+A [docker compose file](/docker/docker-compose-rh-service.yml) and [helper script](/docker/rh-service-up.sh) are provided for running dependencies and the RH service locally. 
+
+Start them with
+
+```shell
+make up
+```
+
+This will default to running entirely locally against emulators.
+
+You can bring the containers down with
+
+```shell
+make down
+```
+
+If you have made local code changes, you can test and rebuild locally with
+```shell
+make build
+```
+Which will build to the same image tag that the docker compose file uses, so that you are running your image with changes in the docker compose. You can reset this image to the remote, release version with `make docker-refresh`.
+
+### Locally
 To run locally, either through terminal or through an IDE, you must set your profile to local so that the `application-local.yml` is picked up.
 
 Make sure you run RH with the VM argument:
@@ -125,6 +150,7 @@ More details about RH Firestore can be found in [FIRESTORE.md](docs/FIRESTORE.md
 Instructions for testing the sending and receiving of events can be found in [MANUAL_TESTING.md](docs/MANUAL_TESTING.md)
 
 ## Docker image build
+*NOTE: The dockerfile plugin implementation is currently broken, use `make build` to test and build the docker image, or `make docker` to do a quick compile and build for now.* 
 
 Is switched off by default for clean deploy. Switch on with;
 

@@ -18,19 +18,18 @@ echo "1/3 Checking environment variables ..."
 if [ -z "$GOOGLE_CLOUD_PROJECT" ]
 then
   echo "Using local firestore emulator and dummy local GCP project"
-  export GOOGLE_CLOUD_PROJECT=dummy-local
-  export VAR_FIRESTORE_EMULATOR_HOST=FIRESTORE_EMULATOR_HOST
+else
+  export VAR_FIRESTORE_EMULATOR_HOST=DUMMY_DISABLE_EMULATOR  # Switch off firestore emulator
+  echo "Running against GCP project: $GOOGLE_CLOUD_PROJECT"
 fi
-echo "Running against GCP project: $GOOGLE_CLOUD_PROJECT"
 
 if [ -z "$DOCKER_GCP_CREDENTIALS" ]
 then
   echo "Using local fake service account credentials"
-  export DOCKER_GCP_CREDENTIALS=./fake-service-account.json
 fi
 
 echo "2/3 Starting dependencies and RH Service ..."
-docker compose -f $SCRIPT_DIR/docker-compose-rh-service.yml up -d
+COMPOSE_IGNORE_ORPHANS=True docker compose -f $SCRIPT_DIR/docker-compose-rh-service.yml up -d
 
 echo "3/3 Setting up PubSub ..."
 $SCRIPT_DIR/../scripts/pubsub-setup.sh

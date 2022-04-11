@@ -34,17 +34,21 @@ services:
     container_name: rh-service
     image: europe-west2-docker.pkg.dev/ons-ci-int/int-docker-release/rh-service:latest
     ports:
-    - "8071:8071"
+      - "8071:8071"
     volumes:
-    - type: bind
-      source: $DOCKER_GCP_CREDENTIALS
-      target: /gcp/config/google-credentials.json
-      read_only: true
+      - type: bind
+        source: ${DOCKER_GCP_CREDENTIALS:-./fake-service-account.json}
+        target: /gcp/config/google-credentials.json
+        read_only: true
     environment:
-    - GOOGLE_APPLICATION_CREDENTIALS=/gcp/config/google-credentials.json
-    - ${VAR_FIRESTORE_EMULATOR_HOST:-VAR_DUMMY_REPLACEMENT}=rh-firestore-emulator:8540
-    - GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT}
-    - spring.profiles.active=local
-    - spring.cloud.gcp.pubsub.emulator-host=host.docker.internal:9808
-    - rate-limiter.rest-client-config.host=host.docker.internal
-    - MANAGEMENT_METRICS_EXPORT_STACKDRIVER_ENABLED=false
+      - GOOGLE_APPLICATION_CREDENTIALS=/gcp/config/google-credentials.json
+      - GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT:-dummy-local}
+      - spring.profiles.active=local
+      - spring.cloud.gcp.pubsub.emulator-host=host.docker.internal:9808
+      - rate-limiter.rest-client-config.host=host.docker.internal
+      - MANAGEMENT_METRICS_EXPORT_STACKDRIVER_ENABLED=false
+
+      # If FIRESTORE_EMULATOR_HOST is set at all, spring will try to use it. To get around this we make the var name
+      # configurable from the environment so that a different, dummy var name can be set instead in order to run
+      # against a real, remote firestore if desired
+      - ${VAR_FIRESTORE_EMULATOR_HOST:-FIRESTORE_EMULATOR_HOST}=rh-firestore-emulator:8540
