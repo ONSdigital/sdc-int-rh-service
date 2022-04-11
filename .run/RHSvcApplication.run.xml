@@ -1,0 +1,17 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Local RHSvcApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <module name="rhsvc" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="uk.gov.ons.ctp.integration.rhsvc.RHSvcApplication" />
+    <option name="ACTIVE_PROFILES" value="local" />
+    <option name="VM_PARAMETERS" value="--add-opens java.base/java.lang=ALL-UNNAMED" />
+    <option name="ALTERNATIVE_JRE_PATH" />
+    <envs>
+      <env name="FIRESTORE_EMULATOR_HOST" value="localhost:8542" />
+      <env name="GOOGLE_CLOUD_PROJECT" value="dummy-local" />
+      <env name="GOOGLE_APPLICATION_CREDENTIALS" value="./docker/fake-service-account.json" />
+    </envs>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
