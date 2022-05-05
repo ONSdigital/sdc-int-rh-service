@@ -37,7 +37,7 @@ management:
       pod: ${HOSTNAME}
     export:
       stackdriver:
-        project-id: ${GOOGLE_CLOUD_PROJECT}
+        project-id: dummy-local
         enabled: true
         step: PT2M
 

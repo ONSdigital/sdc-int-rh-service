@@ -36,10 +36,13 @@ public class SurveyEventReceiverImpl implements SurveyEventReceiver {
     SurveyUpdate surveyUpdate = surveyUpdateEvent.getPayload().getSurveyUpdate();
     String surveyMessageId = surveyUpdateEvent.getHeader().getMessageId().toString();
 
+
+
     log.info(
         "Entering acceptSurveyUpdateEvent",
         kv("messageId", surveyMessageId),
-        kv("surveyId", surveyUpdate.getSurveyId()));
+        kv("surveyId", surveyUpdate.getSurveyId()),
+        kv("sampleDefinitionUrl", surveyUpdate.getSampleDefinitionUrl()));
 
     try {
       respondentSurveyRepo.writeSurvey(surveyUpdate);
