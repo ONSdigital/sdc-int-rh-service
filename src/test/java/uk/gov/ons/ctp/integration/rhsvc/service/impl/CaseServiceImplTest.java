@@ -26,10 +26,8 @@ import uk.gov.ons.ctp.common.event.model.CaseUpdate;
 import uk.gov.ons.ctp.common.event.model.NewCasePayloadContent;
 import uk.gov.ons.ctp.integration.rhsvc.RHSvcBeanMapper;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
-import uk.gov.ons.ctp.integration.rhsvc.config.Sis;
 import uk.gov.ons.ctp.integration.rhsvc.repository.CaseRepository;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
-import uk.gov.ons.ctp.integration.rhsvc.representation.NewCaseDTO;
 
 @ExtendWith(MockitoExtension.class)
 public class CaseServiceImplTest {
@@ -52,17 +50,10 @@ public class CaseServiceImplTest {
   private List<CaseUpdate> caseUpdates;
   @Captor ArgumentCaptor<NewCasePayloadContent> sendEventCaptor;
 
-  private List<NewCaseDTO> newCaseDTO;
-
   /** Setup tests */
   @BeforeEach
   public void setUp() {
     this.caseUpdates = FixtureHelper.loadClassFixtures(CaseUpdate[].class);
-    this.newCaseDTO = FixtureHelper.loadClassFixtures(NewCaseDTO[].class);
-
-    Sis sis = new Sis();
-    sis.setCollectionExerciseId(COLLECTION_EXERCISE_ID);
-    appConfig.setSis(sis);
     ReflectionTestUtils.setField(caseSvc, "appConfig", appConfig);
   }
 
