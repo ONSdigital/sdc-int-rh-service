@@ -1,4 +1,4 @@
-package uk.gov.ons.ctp.integration.rhsvc.event.impl;
+package uk.gov.ons.ctp.integration.rhsvc.event;
 
 import static uk.gov.ons.ctp.common.log.ScopedStructuredArguments.kv;
 
