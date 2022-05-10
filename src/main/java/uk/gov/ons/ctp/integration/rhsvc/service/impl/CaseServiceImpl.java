@@ -20,6 +20,7 @@ import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
 /** Implementation to deal with Case data */
 @Slf4j
 @Service
+// I really want to rename this, but stuff blows up real bad, probably why it wasn't renamed before
 public class CaseServiceImpl {
   @Autowired private AppConfig appConfig;
   @Autowired private CaseRepository dataRepo;
