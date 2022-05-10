@@ -41,9 +41,9 @@ import uk.gov.ons.ctp.integration.rhsvc.repository.UacRepository;
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("mocked-connection-factory")
 @ResourceLock(value = ParallelTestLocks.SPRING_TEST, mode = READ_WRITE)
-public class CollectionExerciseEventReceiverImplSpringTest {
+public class CollectionExerciseEventReceiverSpringTest {
 
-  @Autowired private CollectionExerciseEventReceiverImpl receiver;
+  @Autowired private CollectionExerciseEventReceiver receiver;
   @Autowired private PubSubInboundChannelAdapter collectionExerciseEventInbound;
   @MockBean private SurveyRepository respondentSurveyRepo;
   @MockBean private CollectionExerciseRepository respondentCollExRepo;

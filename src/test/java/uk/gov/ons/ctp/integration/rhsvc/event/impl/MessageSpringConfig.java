@@ -24,20 +24,20 @@ public class MessageSpringConfig {
 
   /** Spy on Service Activator Message End point */
   @Bean
-  public CollectionExerciseEventReceiverImpl collectionExerciseEventReceiver() {
-    return Mockito.spy(new CollectionExerciseEventReceiverImpl());
+  public CollectionExerciseEventReceiver collectionExerciseEventReceiver() {
+    return Mockito.spy(new CollectionExerciseEventReceiver());
   }
 
   /** Spy on Service Activator Message End point */
   @Bean
-  public SurveyEventReceiverImpl surveyEventReceiver() {
-    return Mockito.spy(new SurveyEventReceiverImpl());
+  public SurveyEventReceiver surveyEventReceiver() {
+    return Mockito.spy(new SurveyEventReceiver());
   }
 
   /** Spy on Service Activator Message End point */
   @Bean
-  public UACEventReceiverImpl uacEventReceiver(AppConfig appConfig) {
-    UACEventReceiverImpl receiver = new UACEventReceiverImpl();
+  public UACEventReceiver uacEventReceiver(AppConfig appConfig) {
+    UACEventReceiver receiver = new UACEventReceiver();
     ReflectionTestUtils.setField(receiver, "appConfig", appConfig);
     return Mockito.spy(receiver);
   }

@@ -20,7 +20,7 @@ import uk.gov.ons.ctp.integration.rhsvc.repository.CollectionExerciseRepository;
 @NoArgsConstructor
 @AllArgsConstructor
 @MessageEndpoint
-public class CollectionExerciseEventReceiverImpl {
+public class CollectionExerciseEventReceiver {
   @Autowired private CollectionExerciseRepository respondentCollExRepo;
 
   /**

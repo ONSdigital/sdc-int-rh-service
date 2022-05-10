@@ -19,7 +19,7 @@ public class SurveyUpdateEventReceiverImplUnit_test {
 
   @Mock private SurveyRepository mockRespondentSurveyRepo;
 
-  @InjectMocks private SurveyEventReceiverImpl target;
+  @InjectMocks private SurveyEventReceiver target;
 
   @Test
   public void test_acceptSurveyEvent_success() throws Exception {

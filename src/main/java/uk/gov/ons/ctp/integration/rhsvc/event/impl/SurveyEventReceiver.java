@@ -12,7 +12,6 @@ import org.springframework.integration.annotation.ServiceActivator;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdateEvent;
-import uk.gov.ons.ctp.integration.rhsvc.event.SurveyEventReceiver;
 import uk.gov.ons.ctp.integration.rhsvc.repository.SurveyRepository;
 
 /** Service implementation responsible for receipt of Survey Events. */
@@ -21,7 +20,7 @@ import uk.gov.ons.ctp.integration.rhsvc.repository.SurveyRepository;
 @NoArgsConstructor
 @AllArgsConstructor
 @MessageEndpoint
-public class SurveyEventReceiverImpl implements SurveyEventReceiver {
+public class SurveyEventReceiver {
   @Autowired private SurveyRepository respondentSurveyRepo;
 
   /**

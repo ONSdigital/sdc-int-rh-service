@@ -53,7 +53,7 @@ public class UacEventReceiverImplSpringTest {
 
   @Autowired private PubSubInboundChannelAdapter uacEventInbound;
   @Autowired private AppConfig appConfig;
-  @Autowired private UACEventReceiverImpl receiver;
+  @Autowired private UACEventReceiver receiver;
   @MockBean private PubSubTemplate pubSubTemplate;
   @MockBean private SurveyRepository respondentSurveyRepo;
   @MockBean private CollectionExerciseRepository respondentCollExRepo;

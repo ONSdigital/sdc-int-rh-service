@@ -43,7 +43,7 @@ import uk.gov.ons.ctp.integration.rhsvc.repository.UacRepository;
 @ResourceLock(value = ParallelTestLocks.SPRING_TEST, mode = READ_WRITE)
 public class SurveyUpdateEventReceiverImplSpringTest {
 
-  @Autowired private SurveyEventReceiverImpl receiver;
+  @Autowired private SurveyEventReceiver receiver;
   @Autowired private PubSubInboundChannelAdapter surveyEventInbound;
   @MockBean private SurveyRepository respondentSurveyRepo;
   @MockBean private CollectionExerciseRepository respondentCollExRepo;

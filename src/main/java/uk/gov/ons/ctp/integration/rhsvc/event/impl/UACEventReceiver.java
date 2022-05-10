@@ -24,7 +24,7 @@ import uk.gov.ons.ctp.integration.rhsvc.repository.UacRepository;
 @NoArgsConstructor
 @AllArgsConstructor
 @MessageEndpoint
-public class UACEventReceiverImpl {
+public class UACEventReceiver {
   @Autowired private UacRepository respondentUacRepo;
   @Autowired private AppConfig appConfig;
   @Autowired private EventFilter eventFilter;
