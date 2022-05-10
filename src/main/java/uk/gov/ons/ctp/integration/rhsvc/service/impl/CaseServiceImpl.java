@@ -21,6 +21,7 @@ import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
 @Slf4j
 @Service
 // I really want to rename this, but stuff blows up real bad, probably why it wasn't renamed before
+// Try again when dependency on 'common' is gone
 public class CaseServiceImpl {
   @Autowired private AppConfig appConfig;
   @Autowired private CaseRepository dataRepo;
