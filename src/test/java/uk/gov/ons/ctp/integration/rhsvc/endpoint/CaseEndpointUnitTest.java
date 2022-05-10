@@ -16,7 +16,6 @@ import static uk.gov.ons.ctp.integration.rhsvc.RespondentHomeFixture.EXPECTED_JS
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,7 +27,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import uk.gov.ons.ctp.common.FixtureHelper;
 import uk.gov.ons.ctp.common.error.RestExceptionHandler;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CaseDTO;
-import uk.gov.ons.ctp.integration.rhsvc.representation.NewCaseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.PrintFulfilmentRequestDTO;
 import uk.gov.ons.ctp.integration.rhsvc.service.impl.CaseServiceImpl;
 
@@ -93,32 +91,6 @@ public class CaseEndpointUnitTest {
         .andExpect(jsonPath("$.length()", is(0)));
   }
 
-  @Test
-  public void shouldFulfilByPost() throws Exception {
-    ObjectNode json = getPostFulfilmentFixture();
-    String url = "/cases/" + json.get("caseId").asText() + "/fulfilment/post";
-    mockMvc.perform(postJson(url, json.toString())).andExpect(status().isOk());
-    verify(caseService).fulfilmentRequestByPost(any(PrintFulfilmentRequestDTO.class));
-  }
-
-  @Test
-  public void shouldFulfilByPostWithNullClientIP() throws Exception {
-    ObjectNode json = getPostFulfilmentFixture();
-    json.putNull("clientIP");
-    String url = "/cases/" + json.get("caseId").asText() + "/fulfilment/post";
-    mockMvc.perform(postJson(url, json.toString())).andExpect(status().isOk());
-    verify(caseService).fulfilmentRequestByPost(any(PrintFulfilmentRequestDTO.class));
-  }
-
-  @Test
-  public void shouldFulfilByPostWithEmptyClientIP() throws Exception {
-    ObjectNode json = getPostFulfilmentFixture();
-    json.put("clientIP", "");
-    String url = "/cases/" + json.get("caseId").asText() + "/fulfilment/post";
-    mockMvc.perform(postJson(url, json.toString())).andExpect(status().isOk());
-    verify(caseService).fulfilmentRequestByPost(any(PrintFulfilmentRequestDTO.class));
-  }
-
   //  @Test
   //  public void shouldFulfilBySms() throws Exception {
   //    ObjectNode json = getSmsFulfilmentFixture();
@@ -145,62 +117,6 @@ public class CaseEndpointUnitTest {
   //    verify(caseService).fulfilmentRequestBySMS(any(SMSFulfilmentRequestDTO.class));
   //  }
 
-  @Test
-  public void shouldRejectFulfilByPostWithMismatchedCaseIds() throws Exception {
-    String url = "/cases/" + INCONSISTENT_CASEID + "/fulfilment/post";
-    ObjectNode json = getPostFulfilmentFixture();
-    verifyRejectedPostFulfilmentRequest(json, url);
-  }
-
-  @Test
-  public void shouldRejectFulfilByPostWithBadlyFormedCaseId() throws Exception {
-    String url = "/cases/abc/fulfilment/post";
-    ObjectNode json = getPostFulfilmentFixture();
-    verifyRejectedPostFulfilmentRequest(json, url);
-  }
-
-  @Test
-  public void shouldRejectFulfilByPostWithMissingFulfilmentCodes() throws Exception {
-    ObjectNode json = getPostFulfilmentFixture();
-    String url = "/cases/" + json.get("caseId").asText() + "/fulfilment/post";
-    json.remove("fulfilmentCodes");
-    verifyRejectedPostFulfilmentRequest(json, url);
-  }
-
-  @Test
-  public void shouldRejectFulfilByPostWithEmptyFulfilmentCodes() throws Exception {
-    ObjectNode json = getPostFulfilmentFixture();
-    String url = "/cases/" + json.get("caseId").asText() + "/fulfilment/post";
-    json.putArray("fulfilmentCodes");
-    verifyRejectedPostFulfilmentRequest(json, url);
-  }
-
-  @Test
-  public void shouldRejectFulfilByPostWithAnEmptyFulfilmentCode() throws Exception {
-    ObjectNode json = getPostFulfilmentFixture();
-    String url = "/cases/" + json.get("caseId").asText() + "/fulfilment/post";
-    json.putArray("fulfilmentCodes").add("");
-    verifyRejectedPostFulfilmentRequest(json, url);
-  }
-
-  @Test
-  public void shouldRejectFulfilByPostWithNullFulfilmentCode() throws Exception {
-    ObjectNode json = getPostFulfilmentFixture();
-    String url = "/cases/" + json.get("caseId").asText() + "/fulfilment/post";
-    json.putArray("fulfilmentCodes").addNull();
-    verifyRejectedPostFulfilmentRequest(json, url);
-  }
-
-  @Test
-  public void shouldAcceptFulfilByPostWithMultipleValidFulfilmentCode() throws Exception {
-    ObjectNode json = getPostFulfilmentFixture();
-    String url = "/cases/" + json.get("caseId").asText() + "/fulfilment/post";
-    json.putArray("fulfilmentCodes").add("A").add("B").add(StringUtils.repeat("C", 12));
-    mockMvc.perform(postJson(url, json.toString())).andExpect(status().isOk());
-    verify(caseService).fulfilmentRequestByPost(any(PrintFulfilmentRequestDTO.class));
-  }
-
-  @Test
   public void shouldRejectFulfilByPostWithIncorrectRequestBody() throws Exception {
     String url = "/cases/3fa85f64-5717-4562-b3fc-2c963f66afa6/fulfilment/post";
     String json = "{ \"name\": \"Fred\" }";
@@ -286,135 +202,6 @@ public class CaseEndpointUnitTest {
   //    String json = "{ \"name\": \"Fred\" }";
   //    verifyRejectedSmsFulfilmentRequest(json, url);
   //  }
-
-  /** Test should send out a new case event (register) */
-  @Test
-  public void shouldCreateNewCase() throws Exception {
-    ObjectNode json = getNewCaseEventFixture();
-    String url = "/cases/new";
-    mockMvc.perform(postJson(url, json.toString())).andExpect(status().isOk());
-    verify(caseService).sendNewCaseEvent(any(NewCaseDTO.class));
-  }
-
-  @Test
-  public void shouldRejectNewCaseIfConsentNotGiven() throws Exception {
-    ObjectNode json = getNewCaseEventFixture();
-    json.remove("consentGivenTest");
-    json.put("consentGivenTest", "false");
-    String url = "/cases/new";
-    mockMvc.perform(postJson(url, json.toString())).andExpect(status().is4xxClientError());
-    verify(caseService, never()).sendNewCaseEvent(any(NewCaseDTO.class));
-  }
-
-  @Test
-  public void shouldRejectNewCaseIfConsentNotGivenSurvey() throws Exception {
-    ObjectNode json = getNewCaseEventFixture();
-    json.remove("consentGivenSurvey");
-    json.put("consentGivenSurvey", "false");
-    String url = "/cases/new";
-    mockMvc.perform(postJson(url, json.toString())).andExpect(status().is4xxClientError());
-    verify(caseService, never()).sendNewCaseEvent(any(NewCaseDTO.class));
-  }
-
-  @Test
-  public void shouldRejectNewCaseIfSchoolIdNotPresent() throws Exception {
-    ObjectNode json = getNewCaseEventFixture();
-    json.remove("schoolId");
-    json.put("schoolId", "");
-    String url = "/cases/new";
-    mockMvc.perform(postJson(url, json.toString())).andExpect(status().is4xxClientError());
-    verify(caseService, never()).sendNewCaseEvent(any(NewCaseDTO.class));
-  }
-
-  @Test
-  public void shouldRejectNewCaseIfSchoolNameNotPresent() throws Exception {
-    ObjectNode json = getNewCaseEventFixture();
-    json.remove("schoolName");
-    json.put("schoolName", "");
-    String url = "/cases/new";
-    mockMvc.perform(postJson(url, json.toString())).andExpect(status().is4xxClientError());
-    verify(caseService, never()).sendNewCaseEvent(any(NewCaseDTO.class));
-  }
-
-  @Test
-  public void shouldRejectNewCaseIfParentFirstNameNotPresent() throws Exception {
-    ObjectNode json = getNewCaseEventFixture();
-    json.remove("firstName");
-    json.put("firstName", "");
-    String url = "/cases/new";
-    mockMvc.perform(postJson(url, json.toString())).andExpect(status().is4xxClientError());
-    verify(caseService, never()).sendNewCaseEvent(any(NewCaseDTO.class));
-  }
-
-  @Test
-  public void shouldRejectNewCaseIfParentLastNameNotPresent() throws Exception {
-    ObjectNode json = getNewCaseEventFixture();
-    json.remove("lastName");
-    json.put("lastName", "");
-    String url = "/cases/new";
-    mockMvc.perform(postJson(url, json.toString())).andExpect(status().is4xxClientError());
-    verify(caseService, never()).sendNewCaseEvent(any(NewCaseDTO.class));
-  }
-
-  @Test
-  public void shouldRejectNewCaseIfChildFirstNameNotPresent() throws Exception {
-    ObjectNode json = getNewCaseEventFixture();
-    json.remove("childFirstName");
-    json.put("childFirstName", "");
-    String url = "/cases/new";
-    mockMvc.perform(postJson(url, json.toString())).andExpect(status().is4xxClientError());
-    verify(caseService, never()).sendNewCaseEvent(any(NewCaseDTO.class));
-  }
-
-  @Test
-  public void shouldAcceptNewCaseWithNoChildMiddleNames() throws Exception {
-    ObjectNode json = getNewCaseEventFixture();
-    json.remove("childMiddleNames");
-    json.put("childMiddleNames", "");
-    String url = "/cases/new";
-    mockMvc.perform(postJson(url, json.toString())).andExpect(status().isOk());
-    verify(caseService).sendNewCaseEvent(any(NewCaseDTO.class));
-  }
-
-  @Test
-  public void shouldRejectNewCaseIfChildLastNameNotPresent() throws Exception {
-    ObjectNode json = getNewCaseEventFixture();
-    json.remove("childLastName");
-    json.put("childLastName", "");
-    String url = "/cases/new";
-    mockMvc.perform(postJson(url, json.toString())).andExpect(status().is4xxClientError());
-    verify(caseService, never()).sendNewCaseEvent(any(NewCaseDTO.class));
-  }
-
-  @Test
-  public void shouldRejectNewCaseIfChildDobNotPresent() throws Exception {
-    ObjectNode json = getNewCaseEventFixture();
-    json.remove("childDob");
-    json.put("childDob", "");
-    String url = "/cases/new";
-    mockMvc.perform(postJson(url, json.toString())).andExpect(status().is4xxClientError());
-    verify(caseService, never()).sendNewCaseEvent(any(NewCaseDTO.class));
-  }
-
-  @Test
-  public void shouldRejectNewCaseIfMobileNumberNotPresent() throws Exception {
-    ObjectNode json = getNewCaseEventFixture();
-    json.remove("mobileNumber");
-    json.put("mobileNumber", "");
-    String url = "/cases/new";
-    mockMvc.perform(postJson(url, json.toString())).andExpect(status().is4xxClientError());
-    verify(caseService, never()).sendNewCaseEvent(any(NewCaseDTO.class));
-  }
-
-  @Test
-  public void shouldRejectNewCaseIfEmailNotPresent() throws Exception {
-    ObjectNode json = getNewCaseEventFixture();
-    json.remove("emailAddress");
-    json.put("emailAddress", "");
-    String url = "/cases/new";
-    mockMvc.perform(postJson(url, json.toString())).andExpect(status().is4xxClientError());
-    verify(caseService, never()).sendNewCaseEvent(any(NewCaseDTO.class));
-  }
 
   //  private ObjectNode getSmsFulfilmentFixture() {
   //    return FixtureHelper.loadClassObjectNode("SMSFulfilmentRequestDTO");
