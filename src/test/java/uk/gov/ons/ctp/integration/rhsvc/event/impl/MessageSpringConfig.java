@@ -16,8 +16,8 @@ public class MessageSpringConfig {
 
   /** Spy on Service Activator Message End point */
   @Bean
-  public CaseEventReceiverImpl caseEventReceiver(EventFilter eventFilter) {
-    CaseEventReceiverImpl receiver = new CaseEventReceiverImpl();
+  public CaseEventReceiver caseEventReceiver(EventFilter eventFilter) {
+    CaseEventReceiver receiver = new CaseEventReceiver();
     ReflectionTestUtils.setField(receiver, "eventFilter", eventFilter);
     return Mockito.spy(receiver);
   }

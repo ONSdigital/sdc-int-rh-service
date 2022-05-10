@@ -19,13 +19,13 @@ import uk.gov.ons.ctp.common.event.model.CaseEvent;
 import uk.gov.ons.ctp.integration.rhsvc.repository.CaseRepository;
 
 @ExtendWith(MockitoExtension.class)
-public class CaseEventReceiverImplUnit_Test {
+public class CaseEventReceiverUnit_Test {
 
   @Mock private CaseRepository mockRespondentCaseRepo;
 
   @Mock private EventFilter eventFilter;
 
-  @InjectMocks private CaseEventReceiverImpl target;
+  @InjectMocks private CaseEventReceiver target;
 
   @Test
   public void test_successfulFilter_caseSaved() throws Exception {

@@ -12,7 +12,6 @@ import org.springframework.integration.annotation.ServiceActivator;
 import uk.gov.ons.ctp.common.error.CTPException;
 import uk.gov.ons.ctp.common.event.model.CaseEvent;
 import uk.gov.ons.ctp.common.event.model.CaseUpdate;
-import uk.gov.ons.ctp.integration.rhsvc.event.CaseEventReceiver;
 import uk.gov.ons.ctp.integration.rhsvc.repository.CaseRepository;
 
 /**
@@ -24,7 +23,7 @@ import uk.gov.ons.ctp.integration.rhsvc.repository.CaseRepository;
 @NoArgsConstructor
 @AllArgsConstructor
 @MessageEndpoint
-public class CaseEventReceiverImpl implements CaseEventReceiver {
+public class CaseEventReceiver {
   @Autowired private CaseRepository respondentCaseRepo;
 
   @Autowired private EventFilter eventFilter;
