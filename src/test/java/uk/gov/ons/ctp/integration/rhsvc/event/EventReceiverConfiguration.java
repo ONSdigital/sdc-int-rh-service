@@ -1,4 +1,4 @@
-package uk.gov.ons.ctp.integration.rhsvc.event.impl;
+package uk.gov.ons.ctp.integration.rhsvc.event;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

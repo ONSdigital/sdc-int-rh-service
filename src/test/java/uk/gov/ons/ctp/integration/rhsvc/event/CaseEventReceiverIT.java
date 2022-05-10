@@ -1,4 +1,4 @@
-package uk.gov.ons.ctp.integration.rhsvc.event.impl;
+package uk.gov.ons.ctp.integration.rhsvc.event;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -14,7 +14,6 @@ import uk.gov.ons.ctp.common.event.model.CaseUpdate;
 import uk.gov.ons.ctp.common.event.model.CollectionExerciseUpdate;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 import uk.gov.ons.ctp.integration.rhsvc.FirestoreTestBase;
-import uk.gov.ons.ctp.integration.rhsvc.event.CaseEventReceiver;
 import uk.gov.ons.ctp.integration.rhsvc.repository.CaseRepository;
 import uk.gov.ons.ctp.integration.rhsvc.repository.CollectionExerciseRepository;
 import uk.gov.ons.ctp.integration.rhsvc.repository.SurveyRepository;

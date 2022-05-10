@@ -1,4 +1,4 @@
-package uk.gov.ons.ctp.integration.rhsvc.event.impl;
+package uk.gov.ons.ctp.integration.rhsvc.event;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.parallel.ResourceAccessMode.READ_WRITE;
@@ -26,7 +26,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.ons.ctp.common.FixtureHelper;
-import uk.gov.ons.ctp.common.event.model.SurveyUpdateEvent;
+import uk.gov.ons.ctp.common.event.model.CollectionExerciseUpdateEvent;
 import uk.gov.ons.ctp.common.utility.ParallelTestLocks;
 import uk.gov.ons.ctp.integration.rhsvc.config.AppConfig;
 import uk.gov.ons.ctp.integration.rhsvc.repository.CaseRepository;
@@ -41,10 +41,10 @@ import uk.gov.ons.ctp.integration.rhsvc.repository.UacRepository;
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("mocked-connection-factory")
 @ResourceLock(value = ParallelTestLocks.SPRING_TEST, mode = READ_WRITE)
-public class SurveyUpdateEventReceiverImplSpringTest {
+public class CollectionExerciseEventReceiverSpringTest {
 
-  @Autowired private SurveyEventReceiverImpl receiver;
-  @Autowired private PubSubInboundChannelAdapter surveyEventInbound;
+  @Autowired private CollectionExerciseEventReceiver receiver;
+  @Autowired private PubSubInboundChannelAdapter collectionExerciseEventInbound;
   @MockBean private SurveyRepository respondentSurveyRepo;
   @MockBean private CollectionExerciseRepository respondentCollExRepo;
   @MockBean private CaseRepository respondentCaseRepo;
@@ -59,43 +59,47 @@ public class SurveyUpdateEventReceiverImplSpringTest {
 
   /** Test the receiver flow */
   @Test
-  public void surveyEventFlowTest() throws Exception {
-    SurveyUpdateEvent surveyUpdateEvent =
-        FixtureHelper.loadPackageFixtures(SurveyUpdateEvent[].class).get(0);
+  public void collectionExerciseEventFlowTest() throws Exception {
+    CollectionExerciseUpdateEvent collectionExerciseUpdateEvent =
+        FixtureHelper.loadPackageFixtures(CollectionExerciseUpdateEvent[].class).get(0);
 
     // Construct message
-    Message<SurveyUpdateEvent> message = new GenericMessage<>(surveyUpdateEvent, new HashMap<>());
+    Message<CollectionExerciseUpdateEvent> message =
+        new GenericMessage<>(collectionExerciseUpdateEvent, new HashMap<>());
     // Send message to container
-    surveyEventInbound.getOutputChannel().send(message);
+    collectionExerciseEventInbound.getOutputChannel().send(message);
 
     // Capture and check Service Activator argument
-    ArgumentCaptor<SurveyUpdateEvent> captur = ArgumentCaptor.forClass(SurveyUpdateEvent.class);
-    verify(receiver).acceptSurveyUpdateEvent(captur.capture());
-    assertEquals(captur.getValue().getPayload(), surveyUpdateEvent.getPayload());
+    ArgumentCaptor<CollectionExerciseUpdateEvent> captur =
+        ArgumentCaptor.forClass(CollectionExerciseUpdateEvent.class);
+    verify(receiver).acceptCollectionExerciseUpdateEvent(captur.capture());
+    assertEquals(captur.getValue().getPayload(), collectionExerciseUpdateEvent.getPayload());
   }
 
   @Test
-  public void surveyEventReceivedWithoutMillisTest() throws Exception {
+  public void collectionExerciseEventReceivedWithoutMillisTest() throws Exception {
 
-    // Create a Survey with a timestamp. Note that the milliseconds are not specified
-    SurveyUpdateEvent surveyUpdateEvent =
-        FixtureHelper.loadPackageFixtures(SurveyUpdateEvent[].class).get(0);
+    // Create a collection exercise with a timestamp. Note that the milliseconds are not specified
+    CollectionExerciseUpdateEvent collectionExerciseUpdateEvent =
+        FixtureHelper.loadPackageFixtures(CollectionExerciseUpdateEvent[].class).get(0);
 
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.ENGLISH);
     sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
-    surveyUpdateEvent.getHeader().setDateTime(sdf.parse("2011-08-12T20:17:46Z"));
+    collectionExerciseUpdateEvent.getHeader().setDateTime(sdf.parse("2011-08-12T20:17:46Z"));
 
     // Construct message
-    Message<SurveyUpdateEvent> message = new GenericMessage<>(surveyUpdateEvent, new HashMap<>());
+    Message<CollectionExerciseUpdateEvent> message =
+        new GenericMessage<>(collectionExerciseUpdateEvent, new HashMap<>());
 
     // Send message to container
-    surveyEventInbound.getOutputChannel().send(message);
+    collectionExerciseEventInbound.getOutputChannel().send(message);
 
     // Capture and check Service Activator argument
-    ArgumentCaptor<SurveyUpdateEvent> captur = ArgumentCaptor.forClass(SurveyUpdateEvent.class);
-    verify(receiver).acceptSurveyUpdateEvent(captur.capture());
+    ArgumentCaptor<CollectionExerciseUpdateEvent> captur =
+        ArgumentCaptor.forClass(CollectionExerciseUpdateEvent.class);
+    verify(receiver).acceptCollectionExerciseUpdateEvent(captur.capture());
     assertEquals(sdf.parse("2011-08-12T20:17:46Z"), captur.getValue().getHeader().getDateTime());
-    assertEquals(surveyUpdateEvent.getHeader(), captur.getValue().getHeader());
-    assertEquals(surveyUpdateEvent.getPayload(), captur.getValue().getPayload());
+    assertEquals(collectionExerciseUpdateEvent.getHeader(), captur.getValue().getHeader());
+    assertEquals(collectionExerciseUpdateEvent.getPayload(), captur.getValue().getPayload());
   }
 }

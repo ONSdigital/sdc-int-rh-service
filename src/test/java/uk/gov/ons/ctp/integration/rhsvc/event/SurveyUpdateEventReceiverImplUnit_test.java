@@ -1,4 +1,4 @@
-package uk.gov.ons.ctp.integration.rhsvc.event.impl;
+package uk.gov.ons.ctp.integration.rhsvc.event;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
@@ -19,7 +19,7 @@ public class SurveyUpdateEventReceiverImplUnit_test {
 
   @Mock private SurveyRepository mockRespondentSurveyRepo;
 
-  @InjectMocks private SurveyEventReceiverImpl target;
+  @InjectMocks private SurveyEventReceiver target;
 
   @Test
   public void test_acceptSurveyEvent_success() throws Exception {

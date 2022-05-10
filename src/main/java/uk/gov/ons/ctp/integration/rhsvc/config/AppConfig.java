@@ -16,7 +16,6 @@ import uk.gov.ons.ctp.integration.eqlaunch.crypto.KeyStore;
 @ConfigurationProperties
 @Data
 public class AppConfig {
-  private Sis sis;
   private Logging logging;
   private QueueConfig queueConfig;
   private MessagingConfig messaging;

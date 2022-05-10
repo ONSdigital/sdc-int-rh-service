@@ -1,4 +1,4 @@
-package uk.gov.ons.ctp.integration.rhsvc.event.impl;
+package uk.gov.ons.ctp.integration.rhsvc.event;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
@@ -15,11 +15,11 @@ import uk.gov.ons.ctp.common.event.model.CollectionExerciseUpdateEvent;
 import uk.gov.ons.ctp.integration.rhsvc.repository.CollectionExerciseRepository;
 
 @ExtendWith(MockitoExtension.class)
-public class CollectionExerciseEventReceiverImplUnit_test {
+public class CollectionExerciseEventReceiverUnit_test {
 
   @Mock private CollectionExerciseRepository mockRespondentCollExRepo;
 
-  @InjectMocks private CollectionExerciseEventReceiverImpl target;
+  @InjectMocks private CollectionExerciseEventReceiver target;
 
   @Test
   public void test_acceptCollectionExerciseEvent_success() throws Exception {

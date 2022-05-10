@@ -15,14 +15,11 @@ import ma.glasnost.orika.metadata.Type;
 import org.eclipse.jdt.internal.compiler.SourceElementNotifier;
 import org.springframework.stereotype.Component;
 import uk.gov.ons.ctp.common.domain.EstabType;
-import uk.gov.ons.ctp.common.event.model.Address;
-import uk.gov.ons.ctp.common.event.model.AddressCompact;
 import uk.gov.ons.ctp.common.event.model.CollectionExerciseUpdate;
 import uk.gov.ons.ctp.common.event.model.SurveyUpdate;
 import uk.gov.ons.ctp.common.event.model.UacUpdate;
 import uk.gov.ons.ctp.common.util.StringToUPRNConverter;
 import uk.gov.ons.ctp.common.util.StringToUUIDConverter;
-import uk.gov.ons.ctp.integration.rhsvc.representation.AddressDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.CollectionExerciseDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.SurveyLiteDTO;
 import uk.gov.ons.ctp.integration.rhsvc.representation.UACContextDTO;
@@ -60,8 +57,8 @@ public class RHSvcBeanMapper extends ConfigurableMapper {
         .byDefault()
         .register();
 
-    factory.classMap(AddressDTO.class, AddressCompact.class).byDefault().register();
-    factory.classMap(Address.class, AddressCompact.class).byDefault().register();
+    //    factory.classMap(AddressDTO.class, AddressCompact.class).byDefault().register();
+    //    factory.classMap(Address.class, AddressCompact.class).byDefault().register();
     factory.classMap(SurveyUpdate.class, SurveyLiteDTO.class).byDefault().register();
   }
 

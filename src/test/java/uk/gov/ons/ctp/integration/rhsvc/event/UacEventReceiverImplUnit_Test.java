@@ -1,4 +1,4 @@
-package uk.gov.ons.ctp.integration.rhsvc.event.impl;
+package uk.gov.ons.ctp.integration.rhsvc.event;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -35,14 +35,14 @@ public class UacEventReceiverImplUnit_Test {
 
   private UacRepository mockRespondentUacRepo;
   private EventFilter eventFilter;
-  private UACEventReceiverImpl target;
+  private UACEventReceiver target;
   private UacEvent UacEventFixture;
   private UacUpdate uacFixture;
   private AppConfig appConfig = new AppConfig();
 
   @BeforeEach
   public void setUp() {
-    target = new UACEventReceiverImpl();
+    target = new UACEventReceiver();
     QueueConfig queueConfig = new QueueConfig();
     queueConfig.setQidFilterPrefixes(Stream.of("11", "12", "13", "14").collect(Collectors.toSet()));
     appConfig.setQueueConfig(queueConfig);

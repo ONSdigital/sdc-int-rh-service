@@ -1,4 +1,4 @@
-package uk.gov.ons.ctp.integration.rhsvc.event.impl;
+package uk.gov.ons.ctp.integration.rhsvc.event;
 
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
@@ -16,28 +16,28 @@ public class MessageSpringConfig {
 
   /** Spy on Service Activator Message End point */
   @Bean
-  public CaseEventReceiverImpl caseEventReceiver(EventFilter eventFilter) {
-    CaseEventReceiverImpl receiver = new CaseEventReceiverImpl();
+  public CaseEventReceiver caseEventReceiver(EventFilter eventFilter) {
+    CaseEventReceiver receiver = new CaseEventReceiver();
     ReflectionTestUtils.setField(receiver, "eventFilter", eventFilter);
     return Mockito.spy(receiver);
   }
 
   /** Spy on Service Activator Message End point */
   @Bean
-  public CollectionExerciseEventReceiverImpl collectionExerciseEventReceiver() {
-    return Mockito.spy(new CollectionExerciseEventReceiverImpl());
+  public CollectionExerciseEventReceiver collectionExerciseEventReceiver() {
+    return Mockito.spy(new CollectionExerciseEventReceiver());
   }
 
   /** Spy on Service Activator Message End point */
   @Bean
-  public SurveyEventReceiverImpl surveyEventReceiver() {
-    return Mockito.spy(new SurveyEventReceiverImpl());
+  public SurveyEventReceiver surveyEventReceiver() {
+    return Mockito.spy(new SurveyEventReceiver());
   }
 
   /** Spy on Service Activator Message End point */
   @Bean
-  public UACEventReceiverImpl uacEventReceiver(AppConfig appConfig) {
-    UACEventReceiverImpl receiver = new UACEventReceiverImpl();
+  public UACEventReceiver uacEventReceiver(AppConfig appConfig) {
+    UACEventReceiver receiver = new UACEventReceiver();
     ReflectionTestUtils.setField(receiver, "appConfig", appConfig);
     return Mockito.spy(receiver);
   }
