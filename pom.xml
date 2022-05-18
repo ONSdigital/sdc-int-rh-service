@@ -437,6 +437,23 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.owasp</groupId>
+        <artifactId>dependency-check-maven</artifactId>
+        <configuration>
+          <failBuildOnCVSS>8</failBuildOnCVSS>
+          <format>json</format>
+          <format>html</format>
+          <prettyPrint>true</prettyPrint>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
 
     <resources>
