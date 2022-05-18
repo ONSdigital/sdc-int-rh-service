@@ -14,6 +14,7 @@ steps:
     env:
       - TZ=Europe/London
     args: ['-Dmaven.repo.local=/workspace/.m2/repository', 'verify']
+    timeout: '900s'
     entrypoint: mvn
 
   - name: 'gcr.io/cloud-builders/docker'
